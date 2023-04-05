@@ -4,11 +4,11 @@ xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
 http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
 version="4.0">
 <servlet>
-<servlet-name>TestServlet</servlet-name>
-<servlet-class>it.polimi.tiw.project.TestServlet</servlet-class>
+<servlet-name>TiwProjectServlet</servlet-name>
+<servlet-class>it.polimi.tiw.project.TiwProjectServlet</servlet-class>
 </servlet>
 <servlet-mapping>
-<servlet-name>ConnectionTester</servlet-name>
+<servlet-name>TiwProjectServlet</servlet-name>
 <url-pattern>/</url-pattern>
 </servlet-mapping>
 </web-app>
