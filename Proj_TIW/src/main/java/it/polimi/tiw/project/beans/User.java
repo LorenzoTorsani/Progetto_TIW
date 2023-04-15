@@ -1,4 +1,4 @@
-package beans;
+package it.polimi.tiw.project.beans;
 
 // this class refers to the table utente
 public class User {

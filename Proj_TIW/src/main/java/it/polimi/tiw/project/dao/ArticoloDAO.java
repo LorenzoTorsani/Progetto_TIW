@@ -1,4 +1,4 @@
-package dao;
+package it.polimi.tiw.project.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,12 +9,12 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import it.polimi.tiw.project.beans.Articolo;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Blob;
-
-import beans.Articolo;
 
 
 public class ArticoloDAO {

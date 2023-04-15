@@ -1,4 +1,4 @@
-package beans;
+package it.polimi.tiw.project.beans;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

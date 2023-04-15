@@ -19,7 +19,7 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
-import beans.User;
+import it.polimi.tiw.project.beans.User;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
 

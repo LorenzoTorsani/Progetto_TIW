@@ -1,11 +1,11 @@
-package dao;
+package it.polimi.tiw.project.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import beans.User;
+import it.polimi.tiw.project.beans.User;
 
 public class UserDAO {
 	private Connection con;
