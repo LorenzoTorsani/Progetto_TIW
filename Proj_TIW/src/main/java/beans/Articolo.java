@@ -1,6 +1,12 @@
 package beans;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Blob;
+import java.sql.SQLException;
+
+import javax.imageio.ImageIO;
 
 public class Articolo {
 	private int code;
@@ -54,7 +60,8 @@ public class Articolo {
 		return image;
 	}
 
-	public void setImage(BufferedImage image) {
-		this.image = image;
+	public void setImage(Blob blob) throws IOException, SQLException {
+		InputStream in = blob.getBinaryStream();  
+		this.image = ImageIO.read(in);
 	}
 }

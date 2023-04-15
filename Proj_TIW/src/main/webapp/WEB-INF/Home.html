@@ -11,6 +11,10 @@
 	<h1>Gestore di aste</h1>
 	<h3 th:text="${'Benvenuto ' + session.user.username}"></h3>
 	<p> Che cosa vuoi fare oggi? </p>
-	<button onclick="" >Vendere</button>
+	
+	<form>
+    <button type="submit" th:formaction="@{/Vendo}">Vendere</button>
+    <button type="submit" th:formaction="@{/Acquisto}">Acquistare</button>
+	</form>
 </body>
 </html>
