@@ -6,7 +6,7 @@ version="4.0">
 <display-name>Aste online</display-name>
 <context-param>
     <param-name>dbUrl</param-name>
-    <param-value>jdbc:mysql://localhost:3306/progetto_tiw?serverTimezone=UTC</param-value>
+    <param-value>jdbc:mysql://127.0.0.1:3306/progetto_tiw?serverTimezone=UTC</param-value>
   </context-param>
   <context-param>
     <param-name>dbUser</param-name>
