@@ -12,7 +12,7 @@ public class Articolo {
 	private int code;
 	private String name;
 	private String description;
-	private float price;
+	private Double price;
 	private boolean sold;
 	private BufferedImage image;
 	
@@ -40,11 +40,11 @@ public class Articolo {
 		this.description = description;
 	}
 
-	public float getPrice() {
+	public Double getPrice() {
 		return price;
 	}
 
-	public void setPrice(float price) {
+	public void setPrice(Double price) {
 		this.price = price;
 	}
 
