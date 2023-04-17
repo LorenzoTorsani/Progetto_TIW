@@ -51,7 +51,7 @@ public class ArticoloDAO {
 		return articoli;
 	}
 	
-	public void createArticolo(String description, BufferedImage image, String name, float price, Boolean sold) throws SQLException, IOException {
+	public void createArticolo(String description, BufferedImage image, String name, Float price, boolean sold) throws SQLException, IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ImageIO.write(image, "png", baos);
 		byte[] imageBytes = baos.toByteArray();

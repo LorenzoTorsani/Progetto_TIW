@@ -22,7 +22,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import it.polimi.tiw.project.beans.User;
 import it.polimi.tiw.project.dao.ArticoloDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
-import it.polimi.tiw.projects.dao.MissionsDAO;
 
 public class CreateArticolo extends HttpServlet{
 	private static final long serialVersionUID = 1L;
@@ -47,16 +46,17 @@ public class CreateArticolo extends HttpServlet{
 		boolean isBadRequest = false;
 		String name = null;
 		String description = null;
-		Double price = 0.0;
+		Float price = 0.0f;
 		boolean sold = false;
 		Part bits = null;
 		BufferedImage image = null;
 		try {
 			name = StringEscapeUtils.escapeJava(request.getParameter("name"));
 			description = StringEscapeUtils.escapeJava(request.getParameter("description"));
-			price = Double.parseDouble(request.getParameter("price"));
+			price = Float.parseFloat(request.getParameter("price"));
 			bits = request.getPart("image");
 			image = ImageIO.read(bits.getInputStream());
+			sold = Boolean.parseBoolean(request.getParameter("sold"));
 			isBadRequest = name.isEmpty() || description.isEmpty();
 		} catch(NumberFormatException | NullPointerException e) {
 			isBadRequest = true;
@@ -69,9 +69,9 @@ public class CreateArticolo extends HttpServlet{
 		
 		
 		User user = (User) session.getAttribute("user");
-		ArticoloDAO missionsDAO = new ArticoloDAO(connection);
+		ArticoloDAO articoloDAO = new ArticoloDAO(connection);
 		try {
-			ArticoloDAO.createArticolo(..);
+			articoloDAO.createArticolo(description, image, name, price, sold);
 		}catch(SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile creare articolo");
 			return;
