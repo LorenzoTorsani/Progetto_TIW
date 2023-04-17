@@ -60,8 +60,20 @@ public class Articolo {
 		return image;
 	}
 
-	public void setImage(Blob blob) throws IOException, SQLException {
-		InputStream in = blob.getBinaryStream();  
-		this.image = ImageIO.read(in);
+	public void setImage(Blob blob) {
+	    try {
+	        InputStream in = blob.getBinaryStream();  
+	        this.image = ImageIO.read(in);
+	    } catch (SQLException e) {
+	        System.err.println("Errore SQL durante la lettura del BLOB: " + e.getMessage());
+	        e.printStackTrace();
+	    } catch (IOException e) {
+	        System.err.println("Errore di IO durante la lettura dell'immagine: " + e.getMessage());
+	        e.printStackTrace();
+	    } catch (NullPointerException e) {
+	        System.err.println("Il BLOB è NULL: " + e.getMessage());
+	        e.printStackTrace();
+	    }
 	}
+
 }

@@ -9,6 +9,7 @@ public class Offerta {
 		this.username = username;
 	}
 	
+	
 	public void setIdAsta(int idAsta) {
 		this.idAsta = idAsta;
 	}
