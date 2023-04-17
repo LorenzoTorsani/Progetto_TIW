@@ -1,6 +1,5 @@
 package it.polimi.tiw.project.dao;
 
-<<<<<<< HEAD
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
@@ -19,6 +18,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Blob;
 
+import it.polimi.tiw.project.beans.Asta;
+
 public class AstaDAO {
 	private Connection connection;
 
@@ -35,24 +36,6 @@ public class AstaDAO {
 			pstatement.setBoolean(4, stato);
 		}
 		
-	}
-=======
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
->>>>>>> branch 'main' of https://github.com/LorenzoTorsani/Progetto_TIW.git
-
-import it.polimi.tiw.project.beans.Asta;
-
-public class AstaDAO {
-	private Connection connection;
-
-	public AstaDAO(Connection connection) {
-		this.connection = connection;
 	}
 
 	// stato == true
