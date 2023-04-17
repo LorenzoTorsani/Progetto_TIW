@@ -27,7 +27,7 @@ public class ArticoloDAO {
 	public List<Articolo> getArticoliByUser(String user) throws SQLException, IOException {
 		List<Articolo> articoli = new ArrayList<Articolo>();
 		
-		String query = "SELECT codice, descrizione, immagine, nome, prezzo, venduto "
+		String query = "SELECT * "
 				+ "FROM articolo JOIN possiede ON articolo.codice = possiede.codice"
 				+ "JOIN utente ON utente.username = possiede.username"
 				+ "WHERE utente.username = ?";
@@ -45,6 +45,8 @@ public class ArticoloDAO {
 					articolo.setSold(result.getBoolean("venduto"));
 					articoli.add(articolo);
 				}
+			} catch (SQLException e) {
+				
 			}
 		}
 		
