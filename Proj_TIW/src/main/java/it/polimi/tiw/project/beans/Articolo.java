@@ -1,6 +1,7 @@
 package it.polimi.tiw.project.beans;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
@@ -8,13 +9,15 @@ import java.sql.SQLException;
 
 import javax.imageio.ImageIO;
 
+import org.apache.tomcat.util.codec.binary.Base64;
+
 public class Articolo {
 	private int code;
 	private String name;
 	private String description;
 	private Float price;
 	private boolean sold;
-	private BufferedImage image;
+	//private BufferedImage image;
 	
 	public int getCode() {
 		return this.code;
@@ -56,11 +59,11 @@ public class Articolo {
 		this.sold = sold;
 	}
 
-	public BufferedImage getImage() {
-		return image;
-	}
+	//public BufferedImage getImage() {
+	//	return image;
+	//}
 
-	public void setImage(Blob blob) {
+	/*public void setImage(Blob blob) {
 	    try {
 	        InputStream in = blob.getBinaryStream();  
 	        this.image = ImageIO.read(in);
@@ -75,5 +78,17 @@ public class Articolo {
 	        e.printStackTrace();
 	    }
 	}
+	*/
+	
+	/*public String getBase64Image() {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+			ImageIO.write(image, "png", baos);
+		}catch(IOException e) {
+		}
+		byte[] imageBytes = baos.toByteArray();
+		return Base64.encodeBase64String(imageBytes);
+	}
+	*/
 
 }

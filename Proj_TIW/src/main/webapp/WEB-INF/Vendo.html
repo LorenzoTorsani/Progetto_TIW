@@ -7,7 +7,21 @@
 <body>
 	<h1>Area vendita</h1>
 	<p>Crea un'asta</p>
-	<p>Crea un articolo</p>
+	<p>Crea un articolo:</p>
+	<form action="#" th:action="@{/CreateArticolo}" method = "POST"> <!--enctype="multipart/form-data"  -->
+		<fieldset>
+				<p>
+					Nome: <input type="text" name="name" required />
+				</p>
+				<p>
+					Descrizione: <input type="text" name="description" required />
+				</p>
+				<p>
+					Prezzo: <input type="text" name="price" required />
+				</p>
+				<input type="submit" name="Crea Articolo">
+			</fieldset>
+	</form>
 	<p>I tuoi articoli:</p>
 	<div th:if="${articoli.size() > 0}">
 		
@@ -21,13 +35,13 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr th:each="a : ${articoli}">
-					<!-- per ogni m in mission creo una riga -->
+					<tr th:each="a : ${articoli}">
 					<td th:text="${a.name}"></td>
 					<td th:text="${a.description}"></td>
 					<td th:text="${a.price}"></td>
 					<td th:if="${a.sold == true}">Venduto</td>
 					<td th:if="${a.sold == false}">Non venduto</td>
+					<!--<img th:src="@{'data:image/jpeg;base64,'+${a.getBase64Image()}}" />  -->
 				</tr>
 			</tbody>
 		</table>

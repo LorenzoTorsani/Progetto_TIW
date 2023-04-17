@@ -39,7 +39,7 @@ public class ArticoloDAO {
 					Articolo articolo = new Articolo();
 					articolo.setCode(result.getInt("codice"));
 					articolo.setDescription(result.getString("descrizione"));
-					articolo.setImage(result.getBlob("immagine"));	// throws IOException
+					//articolo.setImage(result.getBlob("immagine"));	// throws IOException
 					articolo.setName(result.getString("nome"));
 					articolo.setPrice(result.getFloat("prezzo"));
 					articolo.setSold(result.getBoolean("venduto"));
@@ -53,20 +53,21 @@ public class ArticoloDAO {
 		return articoli;
 	}
 	
-	public void createArticolo(String description, BufferedImage image, String name, Float price, boolean sold) throws SQLException, IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ImageIO.write(image, "png", baos);
-		byte[] imageBytes = baos.toByteArray();
-		Blob imageBlob = connection.createBlob();
-		imageBlob.setBytes(1, imageBytes);
+	public void createArticolo(String description, String name, Float price, boolean sold) throws SQLException, IOException {
+		//ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		//ImageIO.write(image, "png", baos);
+		//byte[] imageBytes = baos.toByteArray();
+		//Blob imageBlob = connection.createBlob();
+		//imageBlob.setBytes(1, imageBytes);
 		
-		String query = "INSERT into articolo (descrizione, immagine, nome, prezzo, venduto) VALUES(?, ?, ?, ?, ?)";
+		String query = "INSERT into articolo (descrizione, nome, prezzo, venduto) VALUES(?, ?, ?, ?)";
 		try (PreparedStatement pstatement = connection.prepareStatement(query)){
 			pstatement.setString(1, description);
-			pstatement.setBlob(2, imageBlob);
-			pstatement.setString(3, name);
-			pstatement.setFloat(4, price);
-			pstatement.setBoolean(5, sold);
+			//pstatement.setBlob(2, imageBlob);
+			pstatement.setString(2, name);
+			pstatement.setFloat(3, price);
+			pstatement.setBoolean(4, sold);
+			pstatement.executeUpdate();
 		}
 	}
 }
