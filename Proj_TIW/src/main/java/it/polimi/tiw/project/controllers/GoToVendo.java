@@ -20,8 +20,10 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import it.polimi.tiw.project.beans.Articolo;
+import it.polimi.tiw.project.beans.Asta;
 import it.polimi.tiw.project.beans.User;
 import it.polimi.tiw.project.dao.ArticoloDAO;
+import it.polimi.tiw.project.dao.AstaDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
 
@@ -60,9 +62,19 @@ public class GoToVendo extends HttpServlet{
 		User user = (User) session.getAttribute("user");
 		ArticoloDAO articoloDAO = new ArticoloDAO(connection);
 		List<Articolo> articoli = new ArrayList<Articolo>();
-		
 		try {
 			articoli = articoloDAO.getArticoliByUser(user.getUsername());
+		} catch (SQLException e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere articoli");
+			return;
+		}
+		
+		AstaDAO astaDAO = new AstaDAO(connection);
+		List<Asta> asteAperte = new ArrayList<Asta>();
+		List<Asta> asteChiuse = new ArrayList<Asta>();
+		try {
+			asteAperte = astaDAO.getAsteAperteByUser(user.getUsername());
+			asteChiuse = astaDAO.getAsteChiuseByUser(user.getUsername());
 		} catch (SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere articoli");
 			return;
@@ -73,6 +85,8 @@ public class GoToVendo extends HttpServlet{
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("articoli", articoli);
+		ctx.setVariable("asteAperte", asteAperte);
+		ctx.setVariable("asteChiuse", asteChiuse);
 		templateEngine.process(path, ctx, response.getWriter());
 		
 	}

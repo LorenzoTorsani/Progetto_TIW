@@ -6,14 +6,65 @@
 </head>
 <body>
 	<h1>Area vendita</h1>
-	<p>Crea un'asta</p>
-	<p>Crea un articolo</p>
+	<p th:href="@{/CreateAsta(user)}">Crea un'asta</p>
+	
+	<p th:href="@{/CreaArticolo}">Crea un articolo</p>
+	
+	<p>Le tue aste:</p>
+	<div th:if="${asteAperte.size() > 0}">
+		<p>Le tue aste aperte:</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Scadenza</th>  <!-- TODO tempo mancante --> 
+					<th>Prezzo iniziale</th>
+					<th>Rialzo minimo</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="a : ${asteAperte}">
+					<td th:text="${a.idAsta}"></td>
+					<td th:text="${a.scadenza}"></td>
+					<td th:text="${a.prezzoIniziale}"></td>
+					<td th:text="${a.rialzoMinimo}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div th:if="${asteAperte.size() == 0}">Non hai aste aperte.</div>
+	
+	<div th:if="${asteChiuse.size() > 0}">
+	<p>Le tue aste chiuse:</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Scadenza</th>
+					<th>Prezzo iniziale</th>
+					<th>Rialzo minimo</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="a : ${asteChiuse}">
+					<td th:text="${a.idAsta}"></td>
+					<td th:text="${a.scadenza}"></td>
+					<td th:text="${a.prezzoIniziale}"></td>
+					<td th:text="${a.rialzoMinimo}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div th:if="${asteChiuse.size() == 0}">Non hai aste chiuse.</div>
+	
+	
 	<p>I tuoi articoli:</p>
 	<div th:if="${articoli.size() > 0}">
 		
 		<table>
 			<thead>
 				<tr>
+					<th>Codice</th>
 					<th>Nome</th>
 					<th>Descrizione</th>
 					<th>Prezzo</th>
@@ -22,7 +73,7 @@
 			</thead>
 			<tbody>
 				<tr th:each="a : ${articoli}">
-					<!-- per ogni m in mission creo una riga -->
+					<td th:text="${a.code}"></td>
 					<td th:text="${a.name}"></td>
 					<td th:text="${a.description}"></td>
 					<td th:text="${a.price}"></td>

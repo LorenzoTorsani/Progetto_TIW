@@ -4,9 +4,9 @@ import java.sql.Date;
 
 public class Asta {
 	private int idAsta;
-	private Date scadenza;
-	private int rialzoMinimo;
-	private int prezzoIniziale;
+	private Date scadenza; //TODO da cambiare in datetime
+	private float rialzoMinimo;
+	private float prezzoIniziale;
 	private boolean stato;
 	
 	public void setId(int idAsta) {
@@ -17,11 +17,11 @@ public class Asta {
 		this.scadenza = scadenza;
 	}
 	
-	public void setRialzoMinimo(int rialzoMinimo) {
+	public void setRialzoMinimo(float rialzoMinimo) {
 		this.rialzoMinimo = rialzoMinimo;
 	}
 	
-	public void setPrezzoIniziale(int prezzoIniziale) {
+	public void setPrezzoIniziale(float prezzoIniziale) {
 		this.prezzoIniziale = prezzoIniziale;
 	}
 	
@@ -37,11 +37,11 @@ public class Asta {
 		return this.scadenza;
 	}
 	
-	public int getRialzoMinimo() {
+	public float getRialzoMinimo() {
 		return this.rialzoMinimo;
 	}
 	
-	public int getPrezzoIniziale() {
+	public float getPrezzoIniziale() {
 		return this.prezzoIniziale;
 	}
 	
