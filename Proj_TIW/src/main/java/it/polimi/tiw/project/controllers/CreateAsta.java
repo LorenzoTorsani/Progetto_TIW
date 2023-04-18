@@ -42,8 +42,8 @@ public class CreateAsta extends HttpServlet {
 		}
 		boolean isBadRequest = false;
 		Date scadenza = null;
-		Float rialzoMinimo = 0.0f;
-		Float prezzoIniziale = 0.0f;
+		Integer rialzoMinimo = 0;
+		Double prezzoIniziale = 0.0;
 		boolean stato = false;
 		java.util.Date tempdate = null;
 		try {
@@ -53,8 +53,8 @@ public class CreateAsta extends HttpServlet {
 				e.printStackTrace();
 			}
 			scadenza = new java.sql.Date(tempdate.getTime());
-			rialzoMinimo = Float.parseFloat(request.getParameter("rialzominimo"));
-			prezzoIniziale = Float.parseFloat(request.getParameter("prezzoiniziale"));
+			rialzoMinimo = Integer.parseInt(request.getParameter("rialzominimo"));
+			prezzoIniziale = Double.parseDouble(request.getParameter("prezzoiniziale"));
 			stato = Boolean.parseBoolean(request.getParameter("stato"));
 			isBadRequest = scadenza == null;
 		} catch(NumberFormatException | NullPointerException e) {
@@ -70,13 +70,13 @@ public class CreateAsta extends HttpServlet {
 		User user = (User) session.getAttribute("user");
 		AstaDAO astaDAO = new AstaDAO(connection);
 		try {
-			astaDAO.createAsta(scadenza, rialzoMinimo, prezzoIniziale, stato);
+			astaDAO.createAsta(scadenza, rialzoMinimo, prezzoIniziale, user);
 		}catch(SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile creare asta");
 			return;
 		}
 		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/Home";
+		String path = ctxpath + "/Vendo";
 		response.sendRedirect(path);
 	}
 	

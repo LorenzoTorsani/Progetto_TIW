@@ -3,19 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <title>Area vendita</title>
+<link rel="stylesheet" type="text/css" media="all"
+	href="../CSS/mystyle.css" th:href="@{/css/mystyle.css}" />
 </head>
 <body>
 	<h1>Area vendita</h1>
+
+	<div>
+		<p>Crea un'asta</p>
+		<form action="#" th:action="@{/CreateAsta(user)}" method="POST">
+			<fieldset>
+				<p>
+					Scadenza: <input type="text" name="scadenza" required />
+				</p>
+				<p>
+					Rialzo minimo: <input type="number" step="1" min=1
+						name="rialzoMinimo" required />
+				</p>
+
+				<input type="submit" name="Crea Asta">
+			</fieldset>
+		</form>
+	</div>
+
 	<p>Le tue aste:</p>
 	<div th:if="${asteAperte.size() > 0}">
-		<p>Le tue aste aperte:</p>
 		<table>
+			<caption>Le tue aste aperte:</caption>
 			<thead>
 				<tr>
 					<th>Id</th>
-					<th>Scadenza</th>  <!-- TODO tempo mancante --> 
+					<th>Scadenza</th>
+					<!-- TODO tempo mancante -->
 					<th>Prezzo iniziale</th>
 					<th>Rialzo minimo</th>
+					<th>Link</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -24,39 +46,50 @@
 					<td th:text="${a.scadenza}"></td>
 					<td th:text="${a.prezzoIniziale}"></td>
 					<td th:text="${a.rialzoMinimo}"></td>
+					<td><a th:href="@{/GoToDettaglioAsta(idasta=${a.idasta})}">Dettagli</a></td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
 	<div th:if="${asteAperte.size() == 0}">Non hai aste aperte.</div>
-	
+
+	<br>
+
 	<div th:if="${asteChiuse.size() > 0}">
-	<p>Le tue aste chiuse:</p>
 		<table>
+			<caption>Le tue aste chiuse:</caption>
 			<thead>
 				<tr>
 					<th>Id</th>
 					<th>Scadenza</th>
 					<th>Prezzo iniziale</th>
 					<th>Rialzo minimo</th>
+					<th>Aggiudicatario</th>
+					<th>Indirizzo</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr th:each="a : ${asteChiuse}">
-					<td th:text="${a.idAsta}"></td>
-					<td th:text="${a.scadenza}"></td>
-					<td th:text="${a.prezzoIniziale}"></td>
-					<td th:text="${a.rialzoMinimo}"></td>
+				<tr th:each="entry : ${asteChiuse}">
+					<td th:text="${entry.key.idAsta}"></td>
+					<td th:text="${entry.key.scadenza}"></td>
+					<td th:text="${entry.key.prezzoIniziale}"></td>
+					<td th:text="${entry.key.rialzoMinimo}"></td>
+					<td th:text="${entry.value.username}"></td>
+					<td th:text="${entry.value.address}"></td>
+					<!-- i nomi delle variabili dopo value sono gli stessi usati nel bean -->
 				</tr>
 			</tbody>
 		</table>
 	</div>
 	<div th:if="${asteChiuse.size() == 0}">Non hai aste chiuse.</div>
-	
-	<p th:href="@{/CreateAsta(user)}">Crea un'asta</p>
-	<p>Crea un articolo:</p>
-	<form action="#" th:action="@{/CreateArticolo}" method = "POST"> <!--enctype="multipart/form-data"  -->
-		<fieldset>
+	<br>
+	<hr>
+	<br>
+	<div>
+		<p>Crea un articolo:</p>
+		<form action="#" th:action="@{/CreateArticolo}" method="POST">
+			<!--enctype="multipart/form-data"  -->
+			<fieldset>
 				<p>
 					Nome: <input type="text" name="name" required />
 				</p>
@@ -64,14 +97,15 @@
 					Descrizione: <input type="text" name="description" required />
 				</p>
 				<p>
-					Prezzo: <input type="text" name="price" required />
+					Prezzo: <input type="text" name="price" min=0 required />
 				</p>
 				<input type="submit" name="Crea Articolo">
 			</fieldset>
-	</form>
+		</form>
+	</div>
 	<p>I tuoi articoli:</p>
 	<div th:if="${articoli.size() > 0}">
-		
+
 		<table>
 			<thead>
 				<tr>
@@ -82,7 +116,7 @@
 				</tr>
 			</thead>
 			<tbody>
-					<tr th:each="a : ${articoli}">
+				<tr th:each="a : ${articoli}">
 					<td th:text="${a.code}"></td>
 					<td th:text="${a.name}"></td>
 					<td th:text="${a.description}"></td>

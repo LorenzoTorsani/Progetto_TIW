@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -21,21 +19,18 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
-import it.polimi.tiw.project.beans.Articolo;
 import it.polimi.tiw.project.beans.Asta;
 import it.polimi.tiw.project.beans.User;
-import it.polimi.tiw.project.dao.ArticoloDAO;
 import it.polimi.tiw.project.dao.AstaDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
-
-@WebServlet("/Vendo")
-public class GoToVendo extends HttpServlet{
+@WebServlet("/GoToDettaglioAsta")
+public class GoToDettaglioAsta extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 
-	public GoToVendo() {
+	public GoToDettaglioAsta() {
 		super();
 	}
 
@@ -60,37 +55,44 @@ public class GoToVendo extends HttpServlet{
 			response.sendRedirect(loginpath);
 			return;
 		}
+
+		// get and check params
+		Integer idAsta = null;
+		try {
+			idAsta = Integer.parseInt(request.getParameter("idasta"));
+		} catch (NumberFormatException | NullPointerException e) {
+			// only for debugging e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+			return;
+		}
 		
+		//return the asta with the selected id
 		User user = (User) session.getAttribute("user");
-		ArticoloDAO articoloDAO = new ArticoloDAO(connection);
-		List<Articolo> articoli = new ArrayList<Articolo>();
-		try {
-			articoli = articoloDAO.getArticoliByUser(user.getUsername());
-		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere articoli");
-			return;
-		}
-		
 		AstaDAO astaDAO = new AstaDAO(connection);
-		List<Asta> asteAperte = new ArrayList<Asta>();
-		Map<Asta, User> asteChiuse = new HashMap<Asta, User>();
+		Asta asta = new Asta();
 		try {
-			asteAperte = astaDAO.getAsteAperteByUser(user.getUsername());
-			asteChiuse = astaDAO.getAsteChiuseByUser(user.getUsername());
+			asta = astaDAO.findAstaById(idAsta);
+			if (asta == null) {
+				response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
+				return;
+			}
+			// TODO creare un metodo getCreatorUser che ritorna lo username del creatore dell'asta
+			if (!astaDAO.getCreatorUser(idAsta).equals(user.getUsername()) ) {
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not allowed");
+				return;
+			}
+			// TODO usare offertaDAO per prendere le offerte dell'asta
 		} catch (SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere articoli");
 			return;
 		}
 		
-		// Redirect to the Home page and add missions to the parameters
-		String path = "/WEB-INF/Vendo.html";
+		String path = "/WEB-INF/DettaglioAsta.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("articoli", articoli);
-		ctx.setVariable("asteAperte", asteAperte);
-		ctx.setVariable("asteChiuse", asteChiuse);
+		ctx.setVariable("asta", asta);
+		// TODO con le offerte ctx.setVariable("offerte", offerte);
 		templateEngine.process(path, ctx, response.getWriter());
-		
 	}
 	
 	public void destroy() {
@@ -100,5 +102,4 @@ public class GoToVendo extends HttpServlet{
 			e.printStackTrace();
 		}
 	}
-	
 }
