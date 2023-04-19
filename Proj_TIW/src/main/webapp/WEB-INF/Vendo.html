@@ -87,7 +87,7 @@
 	<br>
 	<div>
 		<p>Crea un articolo:</p>
-		<form action="#" th:action="@{/CreateArticolo}" method="POST">
+		<form action="#" th:action="@{/CreateArticolo}" method="POST" enctype="multipart/form-data">
 			<!--enctype="multipart/form-data"  -->
 			<fieldset>
 				<p>
@@ -99,7 +99,9 @@
 				<p>
 					Prezzo: <input type="text" name="price" min=0 required />
 				</p>
-				<input type="submit" name="Crea Articolo">
+				<input type="file" name="file"/>
+				<br/>
+				<input type="submit" name="Crea Articolo"/>
 			</fieldset>
 		</form>
 	</div>
@@ -109,10 +111,12 @@
 		<table>
 			<thead>
 				<tr>
+					<th>Codice</th>
 					<th>Nome</th>
 					<th>Descrizione</th>
 					<th>Prezzo</th>
 					<th>Stato</th>
+					<th>Immagine</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -123,7 +127,8 @@
 					<td th:text="${a.price}"></td>
 					<td th:if="${a.sold == true}">Venduto</td>
 					<td th:if="${a.sold == false}">Non venduto</td>
-					<!--<img th:src="@{'data:image/jpeg;base64,'+${a.getBase64Image()}}" />  -->
+					<td><a th:href="@{/GetImage(name=${a.name})}">view</a></td>
+					<!-- TODO: fix the link -->
 				</tr>
 			</tbody>
 		</table>

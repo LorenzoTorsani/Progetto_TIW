@@ -1,7 +1,11 @@
 package it.polimi.tiw.project.controllers;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -10,6 +14,7 @@ import java.sql.Date;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,10 +29,12 @@ import it.polimi.tiw.project.dao.ArticoloDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
 @WebServlet("/CreateArticolo")
+@MultipartConfig
 public class CreateArticolo extends HttpServlet{
 	private static final long serialVersionUID = 1L;
 
 	private Connection connection = null;
+	String folderPath = "";
 
 	public CreateArticolo() {
 		super();
@@ -35,6 +42,7 @@ public class CreateArticolo extends HttpServlet{
 
 	public void init() throws ServletException {
 		connection = ConnectionHandler.getConnection(getServletContext());
+		folderPath = getServletContext().getInitParameter("outputpath");
 	}
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
@@ -43,6 +51,24 @@ public class CreateArticolo extends HttpServlet{
 			String loginpath = getServletContext().getContextPath() + "/index.html";
 			response.sendRedirect(loginpath);
 			return;
+		}
+		Part filePart = request.getPart("file");
+		if(filePart == null || filePart.getSize() <= 0) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing file in request!");
+		}
+		String contentType = filePart.getContentType();
+		if (!contentType.startsWith("image")) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "File format not permitted");
+			return;
+		}
+		String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+		String outputPath = folderPath + fileName;
+		File file = new File(outputPath);
+		try (InputStream fileContent = filePart.getInputStream()) {
+			Files.copy(fileContent, file.toPath());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while saving file");
 		}
 		boolean isBadRequest = false;
 		String name = null;
@@ -72,7 +98,7 @@ public class CreateArticolo extends HttpServlet{
 		User user = (User) session.getAttribute("user");
 		ArticoloDAO articoloDAO = new ArticoloDAO(connection);
 		try {
-			articoloDAO.createArticolo(description, name, price, sold);
+			articoloDAO.createArticolo(description, name, price, fileName, sold, user.getUsername());
 		}catch(SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile creare articolo");
 			return;

@@ -28,9 +28,8 @@ public class ArticoloDAO {
 		List<Articolo> articoli = new ArrayList<Articolo>();
 		
 		String query = "SELECT * "
-				+ "FROM articolo JOIN possiede ON articolo.codice = possiede.codice"
-				+ "JOIN utente ON utente.username = possiede.username"
-				+ "WHERE utente.username = ?";
+				+ "FROM progetto_tiw.articolo "
+				+ "WHERE articolo.proprietario = ?";
 		
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setString(1, user);
@@ -43,6 +42,8 @@ public class ArticoloDAO {
 					articolo.setName(result.getString("nome"));
 					articolo.setPrice(result.getFloat("prezzo"));
 					articolo.setSold(result.getBoolean("venduto"));
+					articolo.setProprietario(result.getString("proprietario"));
+					articolo.setUrlEncodedName();
 					articoli.add(articolo);
 				}
 			} catch (SQLException e) {
@@ -53,20 +54,22 @@ public class ArticoloDAO {
 		return articoli;
 	}
 	
-	public void createArticolo(String description, String name, Float price, boolean sold) throws SQLException, IOException {
+	public void createArticolo(String description, String name, Float price, String image, boolean sold, String user) throws SQLException, IOException {
 		//ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		//ImageIO.write(image, "png", baos);
 		//byte[] imageBytes = baos.toByteArray();
 		//Blob imageBlob = connection.createBlob();
 		//imageBlob.setBytes(1, imageBytes);
 		
-		String query = "INSERT into articolo (descrizione, nome, prezzo, venduto) VALUES(?, ?, ?, ?)";
+		String query = "INSERT into articolo (descrizione, nome, prezzo, immagine, venduto, proprietario) VALUES(?, ?, ?, ?, ?, ?)";
 		try (PreparedStatement pstatement = connection.prepareStatement(query)){
 			pstatement.setString(1, description);
 			//pstatement.setBlob(2, imageBlob);
 			pstatement.setString(2, name);
 			pstatement.setFloat(3, price);
-			pstatement.setBoolean(4, sold);
+			pstatement.setString(4, image);
+			pstatement.setBoolean(5, sold);
+			pstatement.setString(6, user);
 			pstatement.executeUpdate();
 		}
 	}

@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.Blob;
 import java.sql.SQLException;
 
@@ -17,7 +19,9 @@ public class Articolo {
 	private String description;
 	private Float price;
 	private boolean sold;
-	//private BufferedImage image;
+	private String proprietario;
+	private String image;
+	private String urlEncodedName;
 	
 	public int getCode() {
 		return this.code;
@@ -59,36 +63,20 @@ public class Articolo {
 		this.sold = sold;
 	}
 
-	//public BufferedImage getImage() {
-	//	return image;
-	//}
-
-	/*public void setImage(Blob blob) {
-	    try {
-	        InputStream in = blob.getBinaryStream();  
-	        this.image = ImageIO.read(in);
-	    } catch (SQLException e) {
-	        System.err.println("Errore SQL durante la lettura del BLOB: " + e.getMessage());
-	        e.printStackTrace();
-	    } catch (IOException e) {
-	        System.err.println("Errore di IO durante la lettura dell'immagine: " + e.getMessage());
-	        e.printStackTrace();
-	    } catch (NullPointerException e) {
-	        System.err.println("Il BLOB è NULL: " + e.getMessage());
-	        e.printStackTrace();
-	    }
+	public String getProprietario() {
+		return proprietario;
 	}
-	*/
+
+	public void setProprietario(String proprietario) {
+		this.proprietario = proprietario;
+	}
 	
-	/*public String getBase64Image() {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	public void setUrlEncodedName() {
 		try {
-			ImageIO.write(image, "png", baos);
-		}catch(IOException e) {
+			urlEncodedName = URLEncoder.encode(this.name, "utf-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
 		}
-		byte[] imageBytes = baos.toByteArray();
-		return Base64.encodeBase64String(imageBytes);
 	}
-	*/
-
+	
 }
