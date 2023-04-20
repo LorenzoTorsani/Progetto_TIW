@@ -104,7 +104,7 @@ public class CreateArticolo extends HttpServlet{
 			return;
 		}
 		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/Home";
+		String path = ctxpath + "/Vendo";
 		response.sendRedirect(path);
 	}
 	
