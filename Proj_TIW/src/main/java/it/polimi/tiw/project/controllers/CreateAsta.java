@@ -48,14 +48,25 @@ public class CreateAsta extends HttpServlet {
 		java.util.Date tempdate = null;
 		try {
 			try {
-				tempdate = new SimpleDateFormat("dd MMM yyyy").parse(request.getParameter("scadenza"));
+				tempdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(request.getParameter("scadenza"));
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
 			scadenza = new java.sql.Date(tempdate.getTime());
-			rialzoMinimo = Integer.parseInt(request.getParameter("rialzominimo"));
-			prezzoIniziale = Double.parseDouble(request.getParameter("prezzoiniziale"));
-			stato = Boolean.parseBoolean(request.getParameter("stato"));
+			rialzoMinimo = Integer.parseInt(request.getParameter("rialzoMinimo"));
+			String[] codes = request.getParameterValues("articoli");
+			int[] codici = new int[codes.length];
+			for(int i = 0; i < codes.length; i++) {
+				codici[i] = Integer.parseInt(codes[i]);
+			}
+			ArticoloDAO articoloDAO = new ArticoloDAO(connection);
+			try {
+				prezzoIniziale = articoloDAO.getPrezzoIniziale(codici);
+			}catch(SQLException e) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ottenere prezzo iniziale");
+				return;
+			}
+			stato = true;
 			isBadRequest = scadenza == null;
 		} catch(NumberFormatException | NullPointerException e) {
 			isBadRequest = true;

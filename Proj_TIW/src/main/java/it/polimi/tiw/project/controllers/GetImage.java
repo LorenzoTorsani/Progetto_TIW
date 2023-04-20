@@ -25,11 +25,12 @@ public class GetImage extends HttpServlet{
 	}
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		/*String pathInfo = request.getPathInfo();
+		String pathInfo = request.getPathInfo();
 		if (pathInfo == null || pathInfo.equals("/")) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing file name!");
 			return;
 		}
+		/*
 		String filename = URLDecoder.decode(pathInfo.substring(1), "UTF-8");
 		*/
 		String filename = StringEscapeUtils.escapeJava(request.getParameter("name"));
