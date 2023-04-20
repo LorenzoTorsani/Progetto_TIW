@@ -23,12 +23,37 @@ public class ArticoloDAO {
 	public ArticoloDAO(Connection connection) {
 		this.connection = connection;
 	}
+	
+	public Double getPrezzoIniziale(int[] codici) throws SQLException{
+		Double prezzoIniziale = 0.0;
+		String query = "SELECT sum(articolo.prezzo) "
+				+ "FROM articolo " 
+				+ "WHERE ";
+		for(int i = 0; i < codici.length; i++) {
+			if(i != codici.length - 1) {
+			query = query + "articolo.codice = ? OR ";
+			}else {
+				query = query + "articolo.codice = ?";
+			}
+		}
+		try(PreparedStatement pstatement = connection.prepareStatement(query);) {
+			for(int i = 1; i <= codici.length; i++) {
+				pstatement.setInt(i, codici[i - 1]);
+			}
+			try(ResultSet result = pstatement.executeQuery();){
+				if(result.next()) {
+					prezzoIniziale = result.getDouble("sum(articolo.prezzo)");
+				}
+			}
+		}
+		return prezzoIniziale;
+	}
 
 	public List<Articolo> getArticoliByUser(String user) throws SQLException, IOException {
 		List<Articolo> articoli = new ArrayList<Articolo>();
 		
 		String query = "SELECT * "
-				+ "FROM progetto_tiw.articolo "
+				+ "FROM articolo "
 				+ "WHERE articolo.proprietario = ?";
 		
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {

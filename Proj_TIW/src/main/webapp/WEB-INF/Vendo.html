@@ -20,7 +20,10 @@
 					Rialzo minimo: <input type="number" step="1" min=1
 						name="rialzoMinimo" required />
 				</p>
-
+				<p th:each="a : ${articoli}">
+				<input type="checkbox" th:id="${a.code}" name="articoli" th:value="${a.code}">
+				<label th:for="${a.code}" th:text="${a.name}"></label>
+				</p>
 				<input type="submit" name="Crea Asta">
 			</fieldset>
 		</form>
