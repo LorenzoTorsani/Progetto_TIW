@@ -1,6 +1,7 @@
 package it.polimi.tiw.project.beans;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 public class Asta {
 	private int idAsta;
@@ -10,13 +11,14 @@ public class Asta {
 	private boolean stato;
 	private String creatore;
 	private String aggiudicatario;
+	private Date tempoRestante;
 	
 	public void setId(int idAsta) {
 		this.idAsta = idAsta;
 	}
 	
-	public void setScadenza(Date scadenza) {
-		this.scadenza = scadenza;
+	public void setScadenza(Date date) {
+		this.scadenza = date;
 	}
 	
 	public void setRialzoMinimo(int rialzoMinimo) {
@@ -65,6 +67,14 @@ public class Asta {
 
 	public void setAggiudicatario(String aggiudicatario) {
 		this.aggiudicatario = aggiudicatario;
+	}
+
+	public Date getTempoRestante() {
+		return tempoRestante;
+	}
+
+	public void setTempoRestante(Date tempoRestante) {
+		this.tempoRestante = tempoRestante;
 	}
 
 }

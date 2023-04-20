@@ -3,6 +3,7 @@ package it.polimi.tiw.project.controllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,9 +29,8 @@ import it.polimi.tiw.project.dao.ArticoloDAO;
 import it.polimi.tiw.project.dao.AstaDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
-
 @WebServlet("/Vendo")
-public class GoToVendo extends HttpServlet{
+public class GoToVendo extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
@@ -60,7 +60,7 @@ public class GoToVendo extends HttpServlet{
 			response.sendRedirect(loginpath);
 			return;
 		}
-		
+
 		User user = (User) session.getAttribute("user");
 		ArticoloDAO articoloDAO = new ArticoloDAO(connection);
 		List<Articolo> articoli = new ArrayList<Articolo>();
@@ -70,10 +70,14 @@ public class GoToVendo extends HttpServlet{
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere articoli");
 			return;
 		}
-		
+
 		AstaDAO astaDAO = new AstaDAO(connection);
-		List<Asta> asteAperte = new ArrayList<Asta>();
+		Map<Asta, String> asteAperte = new HashMap<Asta, String>();
 		Map<Asta, User> asteChiuse = new HashMap<Asta, User>();
+		List<Long> giorni = new ArrayList<Long>();
+		List<Long> ore = new ArrayList<Long>();
+		List<Long> minuti = new ArrayList<Long>();
+		List<Long> secondi = new ArrayList<Long>();
 		try {
 			asteAperte = astaDAO.getAsteAperteByUser(user.getUsername());
 			asteChiuse = astaDAO.getAsteChiuseByUser(user.getUsername());
@@ -81,7 +85,7 @@ public class GoToVendo extends HttpServlet{
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere articoli");
 			return;
 		}
-		
+
 		// Redirect to the Home page and add missions to the parameters
 		String path = "/WEB-INF/Vendo.html";
 		ServletContext servletContext = getServletContext();
@@ -90,9 +94,9 @@ public class GoToVendo extends HttpServlet{
 		ctx.setVariable("asteAperte", asteAperte);
 		ctx.setVariable("asteChiuse", asteChiuse);
 		templateEngine.process(path, ctx, response.getWriter());
-		
+
 	}
-	
+
 	public void destroy() {
 		try {
 			ConnectionHandler.closeConnection(connection);
@@ -100,5 +104,5 @@ public class GoToVendo extends HttpServlet{
 			e.printStackTrace();
 		}
 	}
-	
+
 }

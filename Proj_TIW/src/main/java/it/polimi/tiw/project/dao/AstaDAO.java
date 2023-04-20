@@ -3,6 +3,12 @@ package it.polimi.tiw.project.dao;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -53,7 +59,7 @@ public class AstaDAO {
 				if (result.next()) {
 					asta = new Asta();
 					asta.setId(result.getInt("idasta"));
-					asta.setScadenza(result.getDate("scadenza"));
+					asta.setScadenza(new Date(result.getTimestamp("scadenza").getTime()));					
 					asta.setRialzoMinimo(result.getInt("rialzominimo"));
 					asta.setPrezzoIniziale(result.getDouble("prezzoiniziale"));
 					asta.setStato(result.getBoolean("stato"));
@@ -67,8 +73,8 @@ public class AstaDAO {
 	}
 
 	// stato == true
-	public List<Asta> getAsteAperteByUser(String user) throws SQLException, IOException {
-		List<Asta> asteAperte = new ArrayList<Asta>();
+	public Map<Asta, String> getAsteAperteByUser(String user) throws SQLException, IOException {
+		Map<Asta, String> asteAperte = new HashMap<Asta, String>();
 
 		String query = "SELECT * " + "FROM progetto_tiw.asta " + "WHERE stato = true AND creatore = ? "
 				+ "ORDER BY scadenza ASC";
@@ -79,12 +85,23 @@ public class AstaDAO {
 				while (result.next()) {
 					Asta asta = new Asta();
 					asta.setId(result.getInt("idasta"));
-					asta.setScadenza(result.getDate("scadenza"));
+					// TODO fare differenza di tempo
+					Date scadenza = new Date(result.getTimestamp("scadenza").getTime());
+					LocalDate date = scadenza.toLocalDate();
+					asta.setScadenza(scadenza);
+					Instant i = date.atStartOfDay(ZoneOffset.UTC).toInstant();
+					Instant oggi = Instant.now();
+					Duration tempoRimanente = Duration.between(oggi, i);
+					long giorni = tempoRimanente.toDays();
+					long ore = tempoRimanente.toHours() % 24;
+					long minuti = tempoRimanente.toMinutes() % 60;
+					long secondi = tempoRimanente.getSeconds() % 60;
+					String tempo = giorni + " giorni, " + ore + " ore, " + minuti + " minuti, " + secondi + " secondi";
 					asta.setRialzoMinimo(result.getInt("rialzominimo")); // throws IOException
 					asta.setPrezzoIniziale(result.getFloat("prezzoiniziale"));
 					asta.setStato(result.getBoolean("stato"));
 					asta.setCreatore(result.getString("creatore"));
-					asteAperte.add(asta);
+					asteAperte.put(asta, tempo);
 				}
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
@@ -117,7 +134,7 @@ public class AstaDAO {
 					Asta asta = new Asta();
 					User utente = new User();
 					asta.setId(result.getInt("idasta"));
-					asta.setScadenza(new Date(result.getTimestamp("scadenza").getTime()));
+					asta.setScadenza(new Date(result.getTimestamp("scadenza").getTime()));					
 					asta.setRialzoMinimo(result.getInt("rialzominimo")); // throws IOException
 					asta.setPrezzoIniziale(result.getFloat("prezzoiniziale"));
 					asta.setStato(result.getBoolean("stato"));

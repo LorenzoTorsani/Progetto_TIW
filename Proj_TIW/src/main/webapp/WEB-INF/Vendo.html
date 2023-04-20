@@ -34,21 +34,26 @@
 				<tr>
 					<th>Id</th>
 					<th>Scadenza</th>
-					<!-- TODO tempo mancante -->
+					<th>Tempo rimanente</th>
 					<th>Prezzo iniziale</th>
 					<th>Rialzo minimo</th>
 					<th>Link</th>
 				</tr>
 			</thead>
+
 			<tbody>
-				<tr th:each="a : ${asteAperte}">
-					<td th:text="${a.idAsta}"></td>
-					<td th:text="${a.scadenza}"></td>
-					<td th:text="${a.prezzoIniziale}"></td>
-					<td th:text="${a.rialzoMinimo}"></td>
-					<td><a th:href="@{/GoToDettaglioAsta(idasta=${a.idasta})}">Dettagli</a></td>
+				<tr th:each="entry : ${asteAperte}">
+					<td th:text="${entry.key.idAsta}"></td>
+					<td th:text="${entry.key.scadenza}"></td>
+					<td th:text="${entry.value}"></td>
+					<td th:text="${entry.key.prezzoIniziale}"></td>
+					<td th:text="${entry.key.rialzoMinimo}"></td>
+					<td><a th:href="@{/GoToDettaglioAsta(idasta=${entry.key.idasta})}">Dettagli</a></td>
 				</tr>
+
+
 			</tbody>
+
 		</table>
 	</div>
 	<div th:if="${asteAperte.size() == 0}">Non hai aste aperte.</div>
@@ -87,7 +92,8 @@
 	<br>
 	<div>
 		<p>Crea un articolo:</p>
-		<form action="#" th:action="@{/CreateArticolo}" method="POST" enctype="multipart/form-data">
+		<form action="#" th:action="@{/CreateArticolo}" method="POST"
+			enctype="multipart/form-data">
 			<!--enctype="multipart/form-data"  -->
 			<fieldset>
 				<p>
@@ -99,9 +105,8 @@
 				<p>
 					Prezzo: <input type="text" name="price" min=0 required />
 				</p>
-				<input type="file" name="file"/>
-				<br/>
-				<input type="submit" name="Crea Articolo"/>
+				<input type="file" name="file" /> <br /> <input type="submit"
+					name="Crea Articolo" />
 			</fieldset>
 		</form>
 	</div>
