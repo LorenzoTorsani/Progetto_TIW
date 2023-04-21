@@ -73,14 +73,14 @@ public class CreateArticolo extends HttpServlet{
 		boolean isBadRequest = false;
 		String name = null;
 		String description = null;
-		Float price = 0.0f;
+		Double price = 0.0;
 		boolean sold = false;
 		//Part bits = null;
 		//BufferedImage image = null;
 		try {
 			name = StringEscapeUtils.escapeJava(request.getParameter("name"));
 			description = StringEscapeUtils.escapeJava(request.getParameter("description"));
-			price = Float.parseFloat(request.getParameter("price"));
+			price = Double.parseDouble(request.getParameter("price"));
 			//bits = request.getPart("image");
 			//image = ImageIO.read(bits.getInputStream());
 			sold = false;

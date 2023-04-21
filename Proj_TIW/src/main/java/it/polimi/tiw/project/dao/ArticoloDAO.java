@@ -79,7 +79,7 @@ public class ArticoloDAO {
 		return articoli;
 	}
 	
-	public void createArticolo(String description, String name, Float price, String image, boolean sold, String user) throws SQLException, IOException {
+	public void createArticolo(String description, String name, Double price, String image, boolean sold, String user) throws SQLException, IOException {
 		//ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		//ImageIO.write(image, "png", baos);
 		//byte[] imageBytes = baos.toByteArray();
@@ -91,7 +91,7 @@ public class ArticoloDAO {
 			pstatement.setString(1, description);
 			//pstatement.setBlob(2, imageBlob);
 			pstatement.setString(2, name);
-			pstatement.setFloat(3, price);
+			pstatement.setDouble(3, price);
 			pstatement.setString(4, image);
 			pstatement.setBoolean(5, sold);
 			pstatement.setString(6, user);
