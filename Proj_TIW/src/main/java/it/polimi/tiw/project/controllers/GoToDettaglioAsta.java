@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -20,8 +22,10 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import it.polimi.tiw.project.beans.Asta;
+import it.polimi.tiw.project.beans.Offerta;
 import it.polimi.tiw.project.beans.User;
 import it.polimi.tiw.project.dao.AstaDAO;
+import it.polimi.tiw.project.dao.OffertaDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
 @WebServlet("/GoToDettaglioAsta")
@@ -69,21 +73,22 @@ public class GoToDettaglioAsta extends HttpServlet {
 		//return the asta with the selected id
 		User user = (User) session.getAttribute("user");
 		AstaDAO astaDAO = new AstaDAO(connection);
-		Asta asta = new Asta();
+		OffertaDAO offertaDAO = new OffertaDAO(connection);
+		Map<Asta, String> asta = new HashMap<Asta, String>();
+		List<Offerta> offerte = new ArrayList<Offerta>();
 		try {
 			asta = astaDAO.findAstaById(idAsta);
 			if (asta == null) {
 				response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
 				return;
 			}
-			// TODO creare un metodo getCreatorUser che ritorna lo username del creatore dell'asta
 			if (!astaDAO.getCreatorUser(idAsta).equals(user.getUsername()) ) {
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not allowed");
 				return;
 			}
-			// TODO usare offertaDAO per prendere le offerte dell'asta
+			offerte = offertaDAO.findOfferte(idAsta);
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere articoli");
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile vedere dettagli");
 			return;
 		}
 		
@@ -91,7 +96,7 @@ public class GoToDettaglioAsta extends HttpServlet {
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("asta", asta);
-		// TODO con le offerte ctx.setVariable("offerte", offerte);
+		ctx.setVariable("offerte", offerte);
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 	

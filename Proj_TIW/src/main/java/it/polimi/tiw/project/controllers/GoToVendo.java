@@ -3,7 +3,6 @@ package it.polimi.tiw.project.controllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,10 +73,6 @@ public class GoToVendo extends HttpServlet {
 		AstaDAO astaDAO = new AstaDAO(connection);
 		Map<Asta, String> asteAperte = new HashMap<Asta, String>();
 		Map<Asta, User> asteChiuse = new HashMap<Asta, User>();
-		List<Long> giorni = new ArrayList<Long>();
-		List<Long> ore = new ArrayList<Long>();
-		List<Long> minuti = new ArrayList<Long>();
-		List<Long> secondi = new ArrayList<Long>();
 		try {
 			asteAperte = astaDAO.getAsteAperteByUser(user.getUsername());
 			asteChiuse = astaDAO.getAsteChiuseByUser(user.getUsername());
