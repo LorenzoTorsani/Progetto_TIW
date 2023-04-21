@@ -9,7 +9,9 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import java.io.IOException;
@@ -176,5 +178,39 @@ public class AstaDAO {
 			}
 		}
 		return user;
+	}
+	
+	public Map<Asta, String> findAstaByWord(String parola) throws SQLException, IOException {
+		Map<Asta, String> aste = new HashMap<Asta, String>();
+		String query = "SELECT * FROM asta JOIN articolo ON asta.idasta = articolo.idasta "
+				+ "WHERE descrizione LIKE '%?%' ";
+		try (PreparedStatement pstatement = connection.prepareStatement(query);){
+			pstatement.setString(1, parola);
+			try (ResultSet result = pstatement.executeQuery();) {
+				while (result.next()) {
+					Asta asta = new Asta();
+					asta.setId(result.getInt("idasta"));
+					Date scadenza = new Date(result.getTimestamp("scadenza").getTime());
+					LocalDate date = scadenza.toLocalDate();
+					asta.setScadenza(scadenza);
+					Instant i = date.atStartOfDay(ZoneOffset.UTC).toInstant();
+					Instant oggi = Instant.now();
+					Duration tempoRimanente = Duration.between(oggi, i);
+					long giorni = tempoRimanente.toDays();
+					long ore = tempoRimanente.toHours() % 24;
+					long minuti = tempoRimanente.toMinutes() % 60;
+					long secondi = tempoRimanente.getSeconds() % 60;
+					String tempo = giorni + " giorni, " + ore + " ore, " + minuti + " minuti, " + secondi + " secondi";
+					asta.setRialzoMinimo(result.getInt("rialzominimo")); // throws IOException
+					asta.setPrezzoIniziale(result.getFloat("prezzoiniziale"));
+					asta.setStato(result.getBoolean("stato"));
+					asta.setCreatore(result.getString("creatore"));
+					aste.put(asta, tempo);				}
+			} catch (SQLException e) {
+
+			}
+			
+			return aste;
+		}
 	}
 }
