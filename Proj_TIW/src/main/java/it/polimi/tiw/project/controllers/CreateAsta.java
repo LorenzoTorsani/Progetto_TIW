@@ -81,7 +81,13 @@ public class CreateAsta extends HttpServlet {
 		User user = (User) session.getAttribute("user");
 		AstaDAO astaDAO = new AstaDAO(connection);
 		try {
-			astaDAO.createAsta(scadenza, rialzoMinimo, prezzoIniziale, user);
+			Date oggi = new Date(System.currentTimeMillis());
+			if(rialzoMinimo > 0 && scadenza.after(oggi)) {
+				astaDAO.createAsta(scadenza, rialzoMinimo, prezzoIniziale, user);
+			} else {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+				return;
+			}
 		}catch(SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile creare asta");
 			return;
