@@ -97,7 +97,6 @@ public class FindAstaByWord extends HttpServlet {
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("aste", aste);
 		templateEngine.process(path, ctx, response.getWriter());
-
 	}
 
 	public void destroy() {
