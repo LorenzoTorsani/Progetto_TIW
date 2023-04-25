@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -60,5 +63,54 @@ public class GoToAcquisto extends HttpServlet {
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		templateEngine.process(path, ctx, response.getWriter());
+	}
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		if (session.isNew() || session.getAttribute("user") == null) {
+			String loginpath = getServletContext().getContextPath() + "/index.html";
+			response.sendRedirect(loginpath);
+			return;
+		}
+
+		boolean isBadRequest = false;
+		String parola = null;
+		try {
+			parola = StringEscapeUtils.escapeJava(request.getParameter("parola"));
+			isBadRequest = parola.isEmpty();
+		} catch (NullPointerException e) {
+			isBadRequest = true;
+			e.printStackTrace();
+		}
+
+		if (isBadRequest) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect or missing param values");
+			return;
+		}
+
+		AstaDAO astaDAO = new AstaDAO(connection);
+		Map<Asta, String> aste = new HashMap<Asta, String>();
+		try {
+			aste = astaDAO.findAstaByWord(parola);
+		} catch (SQLException e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile trovare parola");
+			return;
+		}
+		
+		//TODO da finire
+
+		request.setAttribute("aste", aste);
+		String ctxpath = getServletContext().getContextPath();
+		String path = ctxpath + "/Acquisto";
+		request.getRequestDispatcher(path).forward(request, response);
+	}
+	
+	public void destroy() {
+		try {
+			ConnectionHandler.closeConnection(connection);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -3,9 +3,7 @@ package it.polimi.tiw.project.controllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -17,27 +15,24 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
-import it.polimi.tiw.project.beans.Articolo;
 import it.polimi.tiw.project.beans.Asta;
 import it.polimi.tiw.project.beans.User;
-import it.polimi.tiw.project.dao.ArticoloDAO;
 import it.polimi.tiw.project.dao.AstaDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
-@WebServlet("/Vendo")
-public class GoToVendo extends HttpServlet {
+@WebServlet("/chiudiAsta")
+public class ChiudiAsta extends HttpServlet{
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 
-	public GoToVendo() {
+	public ChiudiAsta() {
 		super();
 	}
-
+	
 	public void init() throws ServletException {
 		ServletContext servletContext = getServletContext();
 		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
@@ -48,50 +43,52 @@ public class GoToVendo extends HttpServlet {
 
 		connection = ConnectionHandler.getConnection(getServletContext());
 	}
-
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-
-		// If the user is not logged in (not present in session) redirect to the login
-		String loginpath = getServletContext().getContextPath() + "/index.html";
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
-		if (session.isNew() || session.getAttribute("user") == null) {
+		if(session.isNew() || session.getAttribute("user") == null) {
+			String loginpath = getServletContext().getContextPath() + "/index.html";
 			response.sendRedirect(loginpath);
 			return;
 		}
-
+		
+		Integer idAsta = null;
+		try {
+			idAsta = Integer.parseInt(request.getParameter("idasta"));
+		} catch (NumberFormatException | NullPointerException e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+			return;
+		}
+		
 		User user = (User) session.getAttribute("user");
-		ArticoloDAO articoloDAO = new ArticoloDAO(connection);
-		List<Articolo> articoli = new ArrayList<Articolo>();
-		try {
-			articoli = articoloDAO.getArticoliByUser(user.getUsername());
-		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere articoli");
-			return;
-		}
-
 		AstaDAO astaDAO = new AstaDAO(connection);
-		Map<Asta, String> asteAperte = new HashMap<Asta, String>();
-		Map<Asta, User> asteChiuse = new HashMap<Asta, User>();
 		try {
-			asteAperte = astaDAO.getAsteAperteByUser(user.getUsername());
-			asteChiuse = astaDAO.getAsteChiuseByUser(user.getUsername());
+			Map<Asta, String> asta = astaDAO.findAstaById(idAsta);
+			if (asta == null) {
+				response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Asta non trovata");
+				return;
+			}
+			Asta a = (Asta) asta.keySet();
+			if (!a.getCreatore().equals(user.getUsername())) {
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Non hai il permesso");
+				return;
+			}
+			if (!a.getStato()) {
+				response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Asta già chiusa");
+				return;
+			}
+			
+			astaDAO.chiudiAsta(idAsta);
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere aste");
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile chiudere asta");
 			return;
 		}
-
-		// Redirect to the Home page and add missions to the parameters
-		String path = "/WEB-INF/Vendo.html";
-		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("articoli", articoli);
-		ctx.setVariable("asteAperte", asteAperte);
-		ctx.setVariable("asteChiuse", asteChiuse);
-		templateEngine.process(path, ctx, response.getWriter());
-
+		
+		String ctxpath = getServletContext().getContextPath();
+		String path = ctxpath + "/Vendo";
+		response.sendRedirect(path);
 	}
-
+	
 	public void destroy() {
 		try {
 			ConnectionHandler.closeConnection(connection);
@@ -99,5 +96,4 @@ public class GoToVendo extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-
 }

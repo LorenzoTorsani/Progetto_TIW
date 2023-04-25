@@ -7,9 +7,9 @@
 <body>
 	<h1>Area acquisti</h1>
 	<p>Ricerca per parola chiave</p>
-	<form>
+	<form method="POST">
 		<input name="parola" type="text" placeholder="Inserisci qui la parola chiave" size="40" maxlength="200" />
-		<button type="submit" th:formaction="@{/cercaAstaPerParola}">Cerca</button>	
+		<button type="submit" th:formaction="@{/Acquisto}">Cerca</button>	
 	</form>
 	
 	<div th:if="${aste.size() > 0}">
@@ -17,6 +17,10 @@
 		
 	</div>
 	
+	<div th:if="${aste.size() == 0}">
+	<p>niente</p>
+		
+	</div>
 	
 </body>
 </html>
