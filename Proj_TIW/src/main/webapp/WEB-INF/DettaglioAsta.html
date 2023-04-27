@@ -22,11 +22,11 @@
 			</thead>
 			<tbody>
 				<tr th:each="entry : ${asta}">
-					<td th:text="${entry.key.idAsta}"></td>
-					<td th:text="${entry.key.scadenza}"></td>
-					<td th:text="${entry.value}"></td>
-					<td th:text="${entry.key.prezzoIniziale}"></td>
-					<td th:text="${entry.key.rialzoMinimo}"></td>
+					<td th:text="${entry.idAsta}"></td>
+					<td th:text="${entry.scadenza}"></td>
+					<td th:text="${entry.tempoMancante}"></td>
+					<td th:text="${entry.prezzoIniziale}"></td>
+					<td th:text="${entry.rialzoMinimo}"></td>
 				</tr>
 			</tbody>
 		</table>
@@ -55,8 +55,9 @@
 		offerte.</div>
 
 	<div>
+		<!-- prova con passaggio parametri a chiudi asta -->
 		<form th:action="@{/chiudiAsta}" method="POST">
-			<input type="hidden" name="idasta" th:value="${asta.idasta}">
+			<input type="hidden" name="idAsta" th:value="${asta.idAsta}">
 			<button type="submit">Chiudi asta</button>
 		</form>
 	</div>

@@ -74,7 +74,7 @@ public class GoToDettaglioAsta extends HttpServlet {
 		User user = (User) session.getAttribute("user");
 		AstaDAO astaDAO = new AstaDAO(connection);
 		OffertaDAO offertaDAO = new OffertaDAO(connection);
-		Map<Asta, String> asta = new HashMap<Asta, String>();
+		Asta asta = new Asta();
 		List<Offerta> offerte = new ArrayList<Offerta>();
 		try {
 			asta = astaDAO.findAstaById(idAsta);

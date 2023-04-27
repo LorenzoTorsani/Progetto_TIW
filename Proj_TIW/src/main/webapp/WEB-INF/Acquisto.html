@@ -12,15 +12,41 @@
 		<button type="submit" th:formaction="@{/Acquisto}">Cerca</button>	
 	</form>
 	
-	<div th:if="${aste.size() > 0}">
-	<p>ciao</p>
-		
+	<div th:if="${aste == null}">
+	<p>pisello</p>
 	</div>
 	
-	<div th:if="${aste.size() == 0}">
-	<p>niente</p>
-		
+	<div th:if="${aste.size() > 0}">
+	<table>
+			<caption>Aste aperte:</caption>
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Scadenza</th>
+					<th>Tempo rimanente</th>
+					<th>Prezzo iniziale</th>
+					<th>Rialzo minimo</th>
+					<th>Offerta massima</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				<tr th:each="entry : ${aste}">
+					<td th:text="${entry.idAsta}"></td>
+					<td th:text="${entry.scadenza}"></td>
+					<td th:text="${entry.tempoMancante}"></td>
+					<td th:text="${entry.prezzoIniziale}"></td>
+					<td th:text="${entry.rialzoMinimo}"></td>
+					<td th:if="${entry.offertaMax > 0}" th:text="${entry.offertaMax}"></td>
+					<td th:if="${entry.offertaMax < 0}">Ancora nessuna offerta</td>
+				</tr>
+
+
+			</tbody>
+
+		</table>	
 	</div>
+
 	
 </body>
 </html>
