@@ -3,6 +3,7 @@ package it.polimi.tiw.project.controllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import it.polimi.tiw.project.beans.Asta;
 import it.polimi.tiw.project.beans.User;
+import it.polimi.tiw.project.dao.ArticoloDAO;
 import it.polimi.tiw.project.dao.AstaDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
@@ -69,7 +71,7 @@ public class ChiudiAsta extends HttpServlet{
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter id with format number is required");
 			return;
 		}
-		
+		List<Integer> codici = new ArrayList<Integer>();
 		User user = (User) session.getAttribute("user");
 		AstaDAO astaDAO = new AstaDAO(connection);
 		try {
@@ -87,8 +89,17 @@ public class ChiudiAsta extends HttpServlet{
 				response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Asta già chiusa");
 				return;
 			}
-			
-			astaDAO.chiudiAsta(idAsta);
+			codici = astaDAO.chiudiAsta(idAsta);
+			ArticoloDAO articoloDAO = new ArticoloDAO(connection);
+			try {
+				for(int i = 0; i < codici.size(); i++) {
+					articoloDAO.setVendutiByCodice(codici.get(i));
+				}
+			}
+			catch(SQLException e) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile vendere articolo");
+				return;
+			}
 		} catch (SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile chiudere asta");
 			return;

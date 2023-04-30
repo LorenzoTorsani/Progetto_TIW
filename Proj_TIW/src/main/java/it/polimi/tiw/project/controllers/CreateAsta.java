@@ -83,14 +83,28 @@ public class CreateAsta extends HttpServlet {
 		AstaDAO astaDAO = new AstaDAO(connection);
 		ArticoloDAO articoloDAO = new ArticoloDAO(connection);
 		try {
+			Boolean error = false;
 			Date oggi = new Date(System.currentTimeMillis());
 			if(rialzoMinimo > 0 && scadenza.after(oggi)) {
-				int id = astaDAO.createAsta(scadenza, rialzoMinimo, prezzoIniziale, user.getUsername());
 				for(int i = 0; i < codici.length; i++) {
-					articoloDAO.updateArticolo(codici[i], id);
+					Integer check = articoloDAO.getIdByCodice(codici[i]);
+					System.out.println(check);
+					if(check != null) {
+						error = true;
+					}
+				}
+				if(!error) {
+					int id = astaDAO.createAsta(scadenza, rialzoMinimo, prezzoIniziale, user.getUsername());
+					for(int i = 0; i < codici.length; i++) {
+							articoloDAO.updateArticolo(codici[i], id);
+					}
 				}
 			} else {
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+				return;
+			}
+			if(error) {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Almeno un articolo già in un'asta");
 				return;
 			}
 		}catch(SQLException e) {

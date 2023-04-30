@@ -33,22 +33,24 @@ public class AstaDAO {
 			pstatement.setDate(1, scadenza);
 			pstatement.setInt(2, rialzoMinimo);
 			pstatement.setDouble(3, prezzoIniziale);
-			pstatement.setString(5, creatore);
+			pstatement.setString(4, creatore);
 			pstatement.executeUpdate();
 		}
+		System.out.println("eseguita query 1");
 		String query2 = "SELECT MAX(progetto_tiw.asta.idasta) FROM progetto_tiw.asta";
-		
 		try (PreparedStatement pstatement = connection.prepareStatement(query2);) {
 			try (ResultSet result = pstatement.executeQuery();) {
 				if (result.next()) {
-					return result.getInt("idasta");
+					int id = result.getInt("MAX(progetto_tiw.asta.idasta)");
+					return id;
 				}
 			}
 		}
 		return 0;
 	}
 
-	public void chiudiAsta(int idAsta) throws SQLException {
+	public List<Integer> chiudiAsta(int idAsta) throws SQLException {
+		List<Integer> codici = new ArrayList<Integer>();
 		String query = "UPDATE progetto_tiw.asta " + "SET `stato` = '0', `aggiudicatario` = "
 				+ "(SELECT offerente FROM progetto_tiw.offerta "
 				+ "WHERE progetto_tiw.offerta.idasta = progetto_tiw.asta.idasta "
@@ -58,6 +60,16 @@ public class AstaDAO {
 			pstatement.setInt(1, idAsta);
 			pstatement.executeUpdate();
 		}
+		String query2 = "SELECT progetto_tiw.articolo.codice FROM progetto_tiw.asta JOIN progetto_tiw.articolo ON progetto_tiw.asta.idasta = progetto_tiw.articolo.idasta WHERE progetto_tiw.asta.idasta = ?";
+		try (PreparedStatement pstatement = connection.prepareStatement(query2);) {
+			pstatement.setInt(1, idAsta);
+			try (ResultSet result = pstatement.executeQuery();) {
+				if (result.next()) {
+					codici.add(result.getInt("codice"));
+				}
+			}
+		}
+		return codici;
 	}
 
 	public Asta findAstaById(int idAsta) throws SQLException {
@@ -135,7 +147,7 @@ public class AstaDAO {
 
 		return asteAperte;
 	}
-
+	
 	public Map<Asta, User> getAsteChiuseByUser(String user) throws SQLException, IOException {
 		Map<Asta, User> asteChiuse= new HashMap<Asta, User>();
 

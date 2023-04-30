@@ -21,8 +21,8 @@
 						name="rialzoMinimo" required />
 				</p>
 				<p th:each="a : ${articoli}">
-				<input type="checkbox" th:id="${a.code}" name="articoli" th:value="${a.code}">
-				<label th:for="${a.code}" th:text="${a.name}"></label>
+					<input type="checkbox" th:id="${a.code}" name="articoli" th:value="${a.code}" th:if="${a.sold} == false">
+					<label th:for="${a.code}" th:text="${a.name}" th:if="${a.sold} == false"></label>
 				</p>
 				<input type="submit" name="Crea Asta">
 			</fieldset>
@@ -42,6 +42,8 @@
 					<th>Rialzo minimo</th>
 					<th>Offerta massima</th>
 					<th>Link</th>
+					<th>Codici Articoli</th>
+					<th>Nome Articoli</th>
 				</tr>
 			</thead>
 
@@ -55,6 +57,8 @@
 					<td th:if="${entry.offertaMax > 0}" th:text="${entry.offertaMax}"></td>
 					<td th:if="${entry.offertaMax < 0}">Ancora nessuna offerta</td>
 					<td><a th:href="@{/GoToDettaglioAsta(idasta=${entry.idasta})}">Dettagli</a></td>
+					<td><samp th:each="a : ${articoli}" th:if="${a.idasta == entry.idasta}" th:text="${a.code + ' '}"></samp></td>
+					<td><samp  th:each="a : ${articoli}" th:if="${a.idasta == entry.idasta}" th:text="${a.name + ' '}"></samp></td>
 				</tr>
 
 

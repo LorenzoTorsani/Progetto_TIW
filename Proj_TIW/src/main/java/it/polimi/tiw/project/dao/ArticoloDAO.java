@@ -68,7 +68,7 @@ public class ArticoloDAO {
 					articolo.setPrice(result.getFloat("prezzo"));
 					articolo.setSold(result.getBoolean("venduto"));
 					articolo.setProprietario(result.getString("proprietario"));
-					articolo.setUrlEncodedName();
+					articolo.setIdasta(result.getInt("idasta"));
 					articoli.add(articolo);
 				}
 			} catch (SQLException e) {
@@ -79,13 +79,15 @@ public class ArticoloDAO {
 		return articoli;
 	}
 	
+	public void setVendutiByCodice(int codice) throws SQLException{
+		String query = "UPDATE progetto_tiw.articolo SET progetto_tiw.articolo.venduto = 1 WHERE progetto_tiw.articolo.codice = ?";
+		try(PreparedStatement pstatement = connection.prepareStatement(query)){
+			pstatement.setInt(1, codice);
+			pstatement.executeUpdate();
+		}
+	}
+	
 	public void createArticolo(String description, String name, Double price, String image, boolean sold, String user) throws SQLException, IOException {
-		//ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		//ImageIO.write(image, "png", baos);
-		//byte[] imageBytes = baos.toByteArray();
-		//Blob imageBlob = connection.createBlob();
-		//imageBlob.setBytes(1, imageBytes);
-		
 		String query = "INSERT into articolo (descrizione, nome, prezzo, immagine, venduto, proprietario) VALUES(?, ?, ?, ?, ?, ?)";
 		try (PreparedStatement pstatement = connection.prepareStatement(query)){
 			pstatement.setString(1, description);
@@ -96,6 +98,28 @@ public class ArticoloDAO {
 			pstatement.setBoolean(5, sold);
 			pstatement.setString(6, user);
 			pstatement.executeUpdate();
+		}
+	}
+	
+	public Integer getIdByCodice(int codice) throws SQLException{
+		String query = "SELECT progetto_tiw.articolo.idasta FROM progetto_tiw.articolo WHERE progetto_tiw.articolo.codice = ?";
+		try(PreparedStatement pstatement = connection.prepareStatement(query)){
+			pstatement.setInt(1, codice);
+			try (ResultSet result = pstatement.executeQuery();) {
+				while (result.next()) {
+					int id = result.getInt("idasta");
+					if (result.wasNull()) {
+						return null;
+					}
+					else
+					{
+						return id;
+					}
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return 0;
 		}
 	}
 	

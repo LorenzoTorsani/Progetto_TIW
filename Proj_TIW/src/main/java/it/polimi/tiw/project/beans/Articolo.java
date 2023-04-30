@@ -21,7 +21,7 @@ public class Articolo {
 	private boolean sold;
 	private String proprietario;
 	private String image;
-	private String urlEncodedName;
+	private Integer idasta = null;
 	
 	public int getCode() {
 		return this.code;
@@ -70,14 +70,6 @@ public class Articolo {
 	public void setProprietario(String proprietario) {
 		this.proprietario = proprietario;
 	}
-	
-	public void setUrlEncodedName() {
-		try {
-			urlEncodedName = URLEncoder.encode(this.name, "utf-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-	}
 
 	public String getImage() {
 		return image;
@@ -86,5 +78,12 @@ public class Articolo {
 	public void setImage(String image) {
 		this.image = image;
 	}
-	
+
+	public int getIdasta() {
+		return idasta;
+	}
+
+	public void setIdasta(int idasta) {
+		this.idasta = idasta;
+	}
 }
