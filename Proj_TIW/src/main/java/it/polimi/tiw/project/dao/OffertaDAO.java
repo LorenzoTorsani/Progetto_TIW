@@ -29,9 +29,10 @@ public class OffertaDAO {
 	public List<Offerta> findOfferte(int idAsta) throws SQLException {
 		List<Offerta> offerte = new ArrayList<Offerta>();
 		
-		String query = "SELECT offerente, idasta, quantitaofferta FROM asta JOIN offerta ON "
-				+ "offerta.idasta = asta.idasta "
-				+ "WHERE idasta = ?";
+		String query = "SELECT progetto_tiw.offerta.offerente, progetto_tiw.offerta.idasta, progetto_tiw.offerta.quantitaofferta "
+				+ "FROM progetto_tiw.asta JOIN progetto_tiw.offerta ON "
+				+ "progetto_tiw.offerta.idasta = progetto_tiw.asta.idasta "
+				+ "WHERE progetto_tiw.asta.idasta = ?";
 		
 		try(PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setInt(1, idAsta);

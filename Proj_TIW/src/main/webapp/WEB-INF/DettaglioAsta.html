@@ -51,7 +51,14 @@
 			</tbody>
 		</table>
 	</div>
-	<div th:if="${offerte.size() == 0}">Non hai ancora ricevuto offerte.</div>
+	<div th:if="${offerte.size() == 0}">Non hai ancora ricevuto
+		offerte.</div>
 
+	<div>
+		<form th:action="@{/chiudiAsta}" method="POST">
+			<input type="hidden" name="idasta" th:value="${asta.idasta}">
+			<button type="submit">Chiudi asta</button>
+		</form>
+	</div>
 </body>
 </html>

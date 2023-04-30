@@ -3,9 +3,7 @@ package it.polimi.tiw.project.controllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -16,26 +14,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import it.polimi.tiw.project.beans.Asta;
+import it.polimi.tiw.project.beans.User;
 import it.polimi.tiw.project.dao.AstaDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
-@WebServlet("/cercaAstaPerParola")
-public class FindAstaByWord extends HttpServlet {
+@WebServlet("/chiudiAsta")
+public class ChiudiAsta extends HttpServlet{
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 
-	public FindAstaByWord() {
+	public ChiudiAsta() {
 		super();
 	}
-
+	
 	public void init() throws ServletException {
 		ServletContext servletContext = getServletContext();
 		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
@@ -46,59 +43,52 @@ public class FindAstaByWord extends HttpServlet {
 
 		connection = ConnectionHandler.getConnection(getServletContext());
 	}
-
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		// If the user is not logged in (not present in session) redirect to the login
-		String loginpath = getServletContext().getContextPath() + "/index.html";
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
-		if (session.isNew() || session.getAttribute("user") == null) {
-			response.sendRedirect(loginpath);
-			return;
-		}
-
-	}
-
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		HttpSession session = request.getSession();
-		if (session.isNew() || session.getAttribute("user") == null) {
+		if(session.isNew() || session.getAttribute("user") == null) {
 			String loginpath = getServletContext().getContextPath() + "/index.html";
 			response.sendRedirect(loginpath);
 			return;
 		}
-
-		boolean isBadRequest = false;
-		String parola = null;
+		
+		Integer idAsta = null;
 		try {
-			parola = StringEscapeUtils.escapeJava(request.getParameter("parola"));
-			isBadRequest = parola.isEmpty();
-		} catch (NullPointerException e) {
-			isBadRequest = true;
-			e.printStackTrace();
-		}
-
-		if (isBadRequest) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect or missing param values");
-			return;
-		}
-
-		AstaDAO astaDAO = new AstaDAO(connection);
-		Map<Asta, String> aste = new HashMap<Asta, String>();
-		try {
-			aste = astaDAO.findAstaByWord(parola);
-		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile creare articolo");
+			idAsta = Integer.parseInt(request.getParameter("idasta"));
+		} catch (NumberFormatException | NullPointerException e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
 			return;
 		}
 		
-		String path = "/WEB-INF/Acquisto.html";
-		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("aste", aste);
-		templateEngine.process(path, ctx, response.getWriter());
+		User user = (User) session.getAttribute("user");
+		AstaDAO astaDAO = new AstaDAO(connection);
+		try {
+			Map<Asta, String> asta = astaDAO.findAstaById(idAsta);
+			if (asta == null) {
+				response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Asta non trovata");
+				return;
+			}
+			Asta a = (Asta) asta.keySet();
+			if (!a.getCreatore().equals(user.getUsername())) {
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Non hai il permesso");
+				return;
+			}
+			if (!a.getStato()) {
+				response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Asta già chiusa");
+				return;
+			}
+			
+			astaDAO.chiudiAsta(idAsta);
+		} catch (SQLException e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile chiudere asta");
+			return;
+		}
+		
+		String ctxpath = getServletContext().getContextPath();
+		String path = ctxpath + "/Vendo";
+		response.sendRedirect(path);
 	}
-
+	
 	public void destroy() {
 		try {
 			ConnectionHandler.closeConnection(connection);

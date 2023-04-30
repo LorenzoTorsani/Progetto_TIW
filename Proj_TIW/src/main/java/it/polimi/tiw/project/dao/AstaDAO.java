@@ -36,7 +36,21 @@ public class AstaDAO {
 			pstatement.setBoolean(4, stato);
 			pstatement.setString(5, creatore);
 		}
-
+	}
+	
+	public void chiudiAsta(int idAsta) throws SQLException {
+		String query = "UPDATE progetto_tiw.asta" 
+				+ "SET `stato` = '0', `aggiudicatario` = "
+				+ "(SELECT offerente FROM progetto_tiw.offerta "
+				+ "WHERE progetto_tiw.offerta.idasta = progetto_tiw.asta.idasta "
+				+ "AND quantitaofferta = (SELECT MAX(quantitaofferta) "
+				+ "FROM progetto_tiw.offerta "
+				+ "WHERE progetto_tiw.offerta.idasta = progetto_tiw.asta.idasta)) "
+				+ "WHERE (idasta = ?)";
+		try (PreparedStatement pstatement = connection.prepareStatement(query)){
+			pstatement.setInt(1, idAsta);
+			pstatement.executeUpdate();
+		}
 	}
 
 	public Map<Asta, String> findAstaById(int idAsta) throws SQLException {
@@ -76,8 +90,12 @@ public class AstaDAO {
 	public Map<Asta, String> getAsteAperteByUser(String user) throws SQLException, IOException {
 		Map<Asta, String> asteAperte = new HashMap<Asta, String>();
 
-		String query = "SELECT * " + "FROM progetto_tiw.asta " + "WHERE stato = true AND creatore = ? "
-				+ "ORDER BY scadenza ASC";
+		String query = "SELECT IFNULL(MAX(progetto_tiw.offerta.quantitaofferta), -1) AS max_quantita, progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
+				+ "FROM progetto_tiw.asta "
+				+ "LEFT JOIN progetto_tiw.offerta ON progetto_tiw.asta.idasta = progetto_tiw.offerta.idasta "
+				+ "WHERE progetto_tiw.asta.stato = true AND progetto_tiw.asta.creatore = ? "      
+				+ "GROUP BY progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
+				+ "ORDER BY progetto_tiw.asta.scadenza ASC";
 
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setString(1, user);
@@ -98,8 +116,9 @@ public class AstaDAO {
 					String tempo = giorni + " giorni, " + ore + " ore, " + minuti + " minuti, " + secondi + " secondi";
 					asta.setRialzoMinimo(result.getInt("rialzominimo")); // throws IOException
 					asta.setPrezzoIniziale(result.getFloat("prezzoiniziale"));
-					asta.setStato(result.getBoolean("stato"));
+					//asta.setStato(result.getBoolean("stato"));
 					asta.setCreatore(result.getString("creatore"));
+					asta.setOffertaMax(result.getDouble("max_quantita"));
 					asteAperte.put(asta, tempo);
 				}
 			} catch (SQLException e) {
@@ -109,6 +128,7 @@ public class AstaDAO {
 
 		return asteAperte;
 	}
+	
 
 	/**
 	 * ritorna una mappa con asta e utente aggiudicatario in cui setto solo il suo
@@ -183,9 +203,9 @@ public class AstaDAO {
 	public Map<Asta, String> findAstaByWord(String parola) throws SQLException, IOException {
 		Map<Asta, String> aste = new HashMap<Asta, String>();
 		String query = "SELECT * FROM asta JOIN articolo ON asta.idasta = articolo.idasta "
-				+ "WHERE descrizione LIKE '%?%' ";
+				+ "WHERE descrizione LIKE ? ";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);){
-			pstatement.setString(1, parola);
+			pstatement.setString(1, "%" + parola + "%");
 			try (ResultSet result = pstatement.executeQuery();) {
 				while (result.next()) {
 					Asta asta = new Asta();
@@ -209,7 +229,6 @@ public class AstaDAO {
 			} catch (SQLException e) {
 
 			}
-			
 			return aste;
 		}
 	}

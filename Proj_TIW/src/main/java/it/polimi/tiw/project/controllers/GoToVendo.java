@@ -77,7 +77,7 @@ public class GoToVendo extends HttpServlet {
 			asteAperte = astaDAO.getAsteAperteByUser(user.getUsername());
 			asteChiuse = astaDAO.getAsteChiuseByUser(user.getUsername());
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere articoli");
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere aste");
 			return;
 		}
 

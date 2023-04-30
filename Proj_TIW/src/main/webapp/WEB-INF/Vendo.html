@@ -40,6 +40,7 @@
 					<th>Tempo rimanente</th>
 					<th>Prezzo iniziale</th>
 					<th>Rialzo minimo</th>
+					<th>Offerta massima</th>
 					<th>Link</th>
 				</tr>
 			</thead>
@@ -51,6 +52,8 @@
 					<td th:text="${entry.value}"></td>
 					<td th:text="${entry.key.prezzoIniziale}"></td>
 					<td th:text="${entry.key.rialzoMinimo}"></td>
+					<td th:if="${entry.key.offertaMax > 0}" th:text="${entry.key.offertaMax}"></td>
+					<td th:if="${entry.key.offertaMax < 0}">Ancora nessuna offerta</td>
 					<td><a th:href="@{/GoToDettaglioAsta(idasta=${entry.key.idasta})}">Dettagli</a></td>
 				</tr>
 
