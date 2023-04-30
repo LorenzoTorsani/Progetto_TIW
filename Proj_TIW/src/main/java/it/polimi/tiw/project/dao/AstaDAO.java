@@ -26,83 +26,49 @@ public class AstaDAO {
 		this.connection = connection;
 	}
 
-	public void createAsta(Date scadenza, Float rialzoMinimo, Float prezzoIniziale, boolean stato, String creatore)
+	public int createAsta(Date scadenza, Integer rialzoMinimo, Double prezzoIniziale, String creatore)
 			throws SQLException {
-		String query = "INSERT into asta (scadenza, rialzominimo, prezzoiniziale, stato, creatore) VALUES (?, ?, ?, ?, ?)";
+		String query = "INSERT into asta (scadenza, rialzominimo, prezzoiniziale, stato, creatore) VALUES (?, ?, ?, true, ?)";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setDate(1, scadenza);
-			pstatement.setFloat(2, rialzoMinimo);
-			pstatement.setFloat(3, prezzoIniziale);
-			pstatement.setBoolean(4, stato);
+			pstatement.setInt(2, rialzoMinimo);
+			pstatement.setDouble(3, prezzoIniziale);
 			pstatement.setString(5, creatore);
+			pstatement.executeUpdate();
 		}
+		String query2 = "SELECT MAX(progetto_tiw.asta.idasta) FROM progetto_tiw.asta";
+		
+		try (PreparedStatement pstatement = connection.prepareStatement(query2);) {
+			try (ResultSet result = pstatement.executeQuery();) {
+				if (result.next()) {
+					return result.getInt("idasta");
+				}
+			}
+		}
+		return 0;
 	}
-	
+
 	public void chiudiAsta(int idAsta) throws SQLException {
-		String query = "UPDATE progetto_tiw.asta" 
-				+ "SET `stato` = '0', `aggiudicatario` = "
+		String query = "UPDATE progetto_tiw.asta " + "SET `stato` = '0', `aggiudicatario` = "
 				+ "(SELECT offerente FROM progetto_tiw.offerta "
 				+ "WHERE progetto_tiw.offerta.idasta = progetto_tiw.asta.idasta "
-				+ "AND quantitaofferta = (SELECT MAX(quantitaofferta) "
-				+ "FROM progetto_tiw.offerta "
-				+ "WHERE progetto_tiw.offerta.idasta = progetto_tiw.asta.idasta)) "
-				+ "WHERE (idasta = ?)";
-		try (PreparedStatement pstatement = connection.prepareStatement(query)){
+				+ "AND quantitaofferta = (SELECT MAX(quantitaofferta) FROM progetto_tiw.offerta "
+				+ "WHERE progetto_tiw.offerta.idasta = progetto_tiw.asta.idasta)) WHERE (idasta = ?)";
+		try (PreparedStatement pstatement = connection.prepareStatement(query)) {
 			pstatement.setInt(1, idAsta);
 			pstatement.executeUpdate();
 		}
 	}
 
-	public Map<Asta, String> findAstaById(int idAsta) throws SQLException {
-		Map<Asta, String> asta = new HashMap<Asta, String>();
+	public Asta findAstaById(int idAsta) throws SQLException {
+		Asta asta = new Asta();
 
 		String query = "SELECT * FROM asta WHERE idasta = ?";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setInt(1, idAsta);
 			try (ResultSet result = pstatement.executeQuery();) {
 				if (result.next()) {
-					Asta astaTmp = new Asta();
-					astaTmp.setId(result.getInt("idasta"));
-					Date scadenza = new Date(result.getTimestamp("scadenza").getTime());
-					LocalDate date = scadenza.toLocalDate();
-					astaTmp.setScadenza(scadenza);
-					Instant i = date.atStartOfDay(ZoneOffset.UTC).toInstant();
-					Instant oggi = Instant.now();
-					Duration tempoRimanente = Duration.between(oggi, i);
-					long giorni = tempoRimanente.toDays();
-					long ore = tempoRimanente.toHours() % 24;
-					long minuti = tempoRimanente.toMinutes() % 60;
-					long secondi = tempoRimanente.getSeconds() % 60;
-					String tempo = giorni + " giorni, " + ore + " ore, " + minuti + " minuti, " + secondi + " secondi";
-					astaTmp.setRialzoMinimo(result.getInt("rialzominimo")); // throws IOException
-					astaTmp.setPrezzoIniziale(result.getFloat("prezzoiniziale"));
-					astaTmp.setStato(result.getBoolean("stato"));
-					astaTmp.setCreatore(result.getString("creatore"));
-					asta.put(astaTmp, tempo);
-				}
-			}
-		}
-
-		return asta;
-	}
-
-	// stato == true
-	public Map<Asta, String> getAsteAperteByUser(String user) throws SQLException, IOException {
-		Map<Asta, String> asteAperte = new HashMap<Asta, String>();
-
-		String query = "SELECT IFNULL(MAX(progetto_tiw.offerta.quantitaofferta), -1) AS max_quantita, progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
-				+ "FROM progetto_tiw.asta "
-				+ "LEFT JOIN progetto_tiw.offerta ON progetto_tiw.asta.idasta = progetto_tiw.offerta.idasta "
-				+ "WHERE progetto_tiw.asta.stato = true AND progetto_tiw.asta.creatore = ? "      
-				+ "GROUP BY progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
-				+ "ORDER BY progetto_tiw.asta.scadenza ASC";
-
-		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
-			pstatement.setString(1, user);
-			try (ResultSet result = pstatement.executeQuery();) {
-				while (result.next()) {
-					Asta asta = new Asta();
-					asta.setId(result.getInt("idasta"));
+					asta.setIdAsta(result.getInt("idasta"));
 					Date scadenza = new Date(result.getTimestamp("scadenza").getTime());
 					LocalDate date = scadenza.toLocalDate();
 					asta.setScadenza(scadenza);
@@ -114,12 +80,53 @@ public class AstaDAO {
 					long minuti = tempoRimanente.toMinutes() % 60;
 					long secondi = tempoRimanente.getSeconds() % 60;
 					String tempo = giorni + " giorni, " + ore + " ore, " + minuti + " minuti, " + secondi + " secondi";
+					asta.setTempoMancante(tempo);
 					asta.setRialzoMinimo(result.getInt("rialzominimo")); // throws IOException
 					asta.setPrezzoIniziale(result.getFloat("prezzoiniziale"));
-					//asta.setStato(result.getBoolean("stato"));
+					asta.setStato(result.getBoolean("stato"));
+					asta.setCreatore(result.getString("creatore"));
+				}
+			}
+		}
+
+		return asta;
+	}
+
+	// stato == true
+	public List<Asta> getAsteAperteByUser(String user) throws SQLException, IOException {
+		List<Asta> asteAperte = new ArrayList<Asta>();
+
+		String query = "SELECT IFNULL(MAX(progetto_tiw.offerta.quantitaofferta), -1) AS max_quantita, progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
+				+ "FROM progetto_tiw.asta "
+				+ "LEFT JOIN progetto_tiw.offerta ON progetto_tiw.asta.idasta = progetto_tiw.offerta.idasta "
+				+ "WHERE progetto_tiw.asta.stato = true AND progetto_tiw.asta.creatore = ? "
+				+ "GROUP BY progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
+				+ "ORDER BY progetto_tiw.asta.scadenza ASC";
+
+		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
+			pstatement.setString(1, user);
+			try (ResultSet result = pstatement.executeQuery();) {
+				while (result.next()) {
+					Asta asta = new Asta();
+					asta.setIdAsta(result.getInt("idasta"));
+					Date scadenza = new Date(result.getTimestamp("scadenza").getTime());
+					LocalDate date = scadenza.toLocalDate();
+					asta.setScadenza(scadenza);
+					Instant i = date.atStartOfDay(ZoneOffset.UTC).toInstant();
+					Instant oggi = Instant.now();
+					Duration tempoRimanente = Duration.between(oggi, i);
+					long giorni = tempoRimanente.toDays();
+					long ore = tempoRimanente.toHours() % 24;
+					long minuti = tempoRimanente.toMinutes() % 60;
+					long secondi = tempoRimanente.getSeconds() % 60;
+					String tempo = giorni + " giorni, " + ore + " ore, " + minuti + " minuti, " + secondi + " secondi";
+					asta.setTempoMancante(tempo);
+					asta.setRialzoMinimo(result.getInt("rialzominimo")); // throws IOException
+					asta.setPrezzoIniziale(result.getFloat("prezzoiniziale"));
+					// asta.setStato(result.getBoolean("stato"));
 					asta.setCreatore(result.getString("creatore"));
 					asta.setOffertaMax(result.getDouble("max_quantita"));
-					asteAperte.put(asta, tempo);
+					asteAperte.add(asta);
 				}
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
@@ -128,20 +135,9 @@ public class AstaDAO {
 
 		return asteAperte;
 	}
-	
 
-	/**
-	 * ritorna una mappa con asta e utente aggiudicatario in cui setto solo il suo
-	 * indirizzo perche è l'unica cosa che mostro le aste chiuse sono quelle con
-	 * stato = false
-	 * 
-	 * @param user
-	 * @return
-	 * @throws SQLException
-	 * @throws IOException
-	 */
 	public Map<Asta, User> getAsteChiuseByUser(String user) throws SQLException, IOException {
-		Map<Asta, User> asteChiuse = new HashMap<Asta, User>();
+		Map<Asta, User> asteChiuse= new HashMap<Asta, User>();
 
 		String query = "SELECT * " + "FROM asta JOIN utente ON asta.aggiudicatario = utente.username "
 				+ "WHERE stato = false AND creatore = ? " + "ORDER BY scadenza ASC";
@@ -152,8 +148,8 @@ public class AstaDAO {
 				while (result.next()) {
 					Asta asta = new Asta();
 					User utente = new User();
-					asta.setId(result.getInt("idasta"));
-					asta.setScadenza(new Date(result.getTimestamp("scadenza").getTime()));					
+					asta.setIdAsta(result.getInt("idasta"));
+					asta.setScadenza(new Date(result.getTimestamp("scadenza").getTime()));
 					asta.setRialzoMinimo(result.getInt("rialzominimo")); // throws IOException
 					asta.setPrezzoIniziale(result.getFloat("prezzoiniziale"));
 					asta.setStato(result.getBoolean("stato"));
@@ -172,17 +168,6 @@ public class AstaDAO {
 		return asteChiuse;
 	}
 
-	public void createAsta(Date scadenza, int rialzoMinimo, double prezzoIniziale, User user)
-			throws SQLException, IOException {
-		String query = "INSERT INTO asta (scadenza, rialzominimo, prezzoiniziale, creatore, stato, aggiudicatario) VALUES (?, ?, ?, ?, TRUE, NULL)";
-		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
-			pstatement.setTimestamp(1, new java.sql.Timestamp(scadenza.getTime()));
-			pstatement.setInt(2, rialzoMinimo);
-			pstatement.setDouble(3, prezzoIniziale);
-			pstatement.setString(4, user.getUsername());
-			pstatement.executeUpdate();
-		}
-	}
 
 	public String getCreatorUser(int idAsta) throws SQLException, IOException {
 		String user = null;
@@ -199,17 +184,22 @@ public class AstaDAO {
 		}
 		return user;
 	}
-	
-	public Map<Asta, String> findAstaByWord(String parola) throws SQLException, IOException {
-		Map<Asta, String> aste = new HashMap<Asta, String>();
-		String query = "SELECT * FROM asta JOIN articolo ON asta.idasta = articolo.idasta "
-				+ "WHERE descrizione LIKE ? ";
-		try (PreparedStatement pstatement = connection.prepareStatement(query);){
+
+	public List<Asta> findAstaByWord(String parola) throws SQLException, IOException {
+		List<Asta> aste = new ArrayList<Asta>();
+		String query = "SELECT IFNULL(MAX(progetto_tiw.offerta.quantitaofferta), -1) AS max_quantita, progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
+				+ "FROM progetto_tiw.asta "
+				+ "JOIN progetto_tiw.offerta ON progetto_tiw.asta.idasta = progetto_tiw.offerta.idasta JOIN progetto_tiw.articolo ON progetto_tiw.articolo.idasta = progetto_tiw.asta.idasta "
+				+ "WHERE progetto_tiw.asta.stato = true AND (progetto_tiw.articolo.descrizione LIKE ? OR progetto_tiw.articolo.nome LIKE ?) "
+				+ "GROUP BY progetto_tiw.asta.idasta "
+				+ "ORDER BY progetto_tiw.asta.scadenza ASC";
+		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setString(1, "%" + parola + "%");
+			pstatement.setString(2, "%" + parola + "%");
 			try (ResultSet result = pstatement.executeQuery();) {
 				while (result.next()) {
 					Asta asta = new Asta();
-					asta.setId(result.getInt("idasta"));
+					asta.setIdAsta(result.getInt("idasta"));
 					Date scadenza = new Date(result.getTimestamp("scadenza").getTime());
 					LocalDate date = scadenza.toLocalDate();
 					asta.setScadenza(scadenza);
@@ -221,11 +211,14 @@ public class AstaDAO {
 					long minuti = tempoRimanente.toMinutes() % 60;
 					long secondi = tempoRimanente.getSeconds() % 60;
 					String tempo = giorni + " giorni, " + ore + " ore, " + minuti + " minuti, " + secondi + " secondi";
+					asta.setTempoMancante(tempo);
 					asta.setRialzoMinimo(result.getInt("rialzominimo")); // throws IOException
 					asta.setPrezzoIniziale(result.getFloat("prezzoiniziale"));
 					asta.setStato(result.getBoolean("stato"));
 					asta.setCreatore(result.getString("creatore"));
-					aste.put(asta, tempo);				}
+					asta.setOffertaMax(result.getDouble("max_quantita"));
+					aste.add(asta);
+				}
 			} catch (SQLException e) {
 
 			}

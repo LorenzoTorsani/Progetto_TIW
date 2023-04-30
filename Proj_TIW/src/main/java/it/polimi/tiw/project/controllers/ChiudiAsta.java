@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -52,28 +53,37 @@ public class ChiudiAsta extends HttpServlet{
 			return;
 		}
 		
-		Integer idAsta = null;
+		String id_param = request.getParameter("idAsta");
+		Integer idAsta = -1;
+		boolean bad_request = false;
+		if (id_param == null) {
+			bad_request = true;
+		}
 		try {
-			idAsta = Integer.parseInt(request.getParameter("idasta"));
-		} catch (NumberFormatException | NullPointerException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+			idAsta = Integer.parseInt(id_param);
+		} catch (NumberFormatException e) {
+			bad_request = true;
+		}
+
+		if (bad_request) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter id with format number is required");
 			return;
 		}
 		
 		User user = (User) session.getAttribute("user");
 		AstaDAO astaDAO = new AstaDAO(connection);
 		try {
-			Map<Asta, String> asta = astaDAO.findAstaById(idAsta);
+			
+			Asta asta = astaDAO.findAstaById(idAsta);
 			if (asta == null) {
 				response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Asta non trovata");
 				return;
 			}
-			Asta a = (Asta) asta.keySet();
-			if (!a.getCreatore().equals(user.getUsername())) {
+			if (!asta.getCreatore().equals(user.getUsername())) {
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Non hai il permesso");
 				return;
 			}
-			if (!a.getStato()) {
+			if (!asta.getStato()) {
 				response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Asta già chiusa");
 				return;
 			}

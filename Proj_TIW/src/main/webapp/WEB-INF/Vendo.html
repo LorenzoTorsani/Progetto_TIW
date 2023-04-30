@@ -47,14 +47,14 @@
 
 			<tbody>
 				<tr th:each="entry : ${asteAperte}">
-					<td th:text="${entry.key.idAsta}"></td>
-					<td th:text="${entry.key.scadenza}"></td>
-					<td th:text="${entry.value}"></td>
-					<td th:text="${entry.key.prezzoIniziale}"></td>
-					<td th:text="${entry.key.rialzoMinimo}"></td>
-					<td th:if="${entry.key.offertaMax > 0}" th:text="${entry.key.offertaMax}"></td>
-					<td th:if="${entry.key.offertaMax < 0}">Ancora nessuna offerta</td>
-					<td><a th:href="@{/GoToDettaglioAsta(idasta=${entry.key.idasta})}">Dettagli</a></td>
+					<td th:text="${entry.idAsta}"></td>
+					<td th:text="${entry.scadenza}"></td>
+					<td th:text="${entry.tempoMancante}"></td>
+					<td th:text="${entry.prezzoIniziale}"></td>
+					<td th:text="${entry.rialzoMinimo}"></td>
+					<td th:if="${entry.offertaMax > 0}" th:text="${entry.offertaMax}"></td>
+					<td th:if="${entry.offertaMax < 0}">Ancora nessuna offerta</td>
+					<td><a th:href="@{/GoToDettaglioAsta(idasta=${entry.idasta})}">Dettagli</a></td>
 				</tr>
 
 
@@ -138,7 +138,7 @@
 					<td th:text="${a.price}"></td>
 					<td th:if="${a.sold == true}">Venduto</td>
 					<td th:if="${a.sold == false}">Non venduto</td>
-					<td><a th:href="@{/GetImage(name=${a.name})}">view</a></td>
+					<td><a th:href="@{/GetImage(image=${a.image})}">view</a></td>
 					<!-- TODO: fix the link -->
 				</tr>
 			</tbody>

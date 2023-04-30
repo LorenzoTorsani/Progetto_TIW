@@ -46,6 +46,9 @@ public class CreateAsta extends HttpServlet {
 		Double prezzoIniziale = 0.0;
 		boolean stato = false;
 		java.util.Date tempdate = null;
+		String[] codes = request.getParameterValues("articoli");
+		int[] codici = new int[codes.length];
+		
 		try {
 			try {
 				tempdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(request.getParameter("scadenza"));
@@ -54,8 +57,6 @@ public class CreateAsta extends HttpServlet {
 			}
 			scadenza = new java.sql.Date(tempdate.getTime());
 			rialzoMinimo = Integer.parseInt(request.getParameter("rialzoMinimo"));
-			String[] codes = request.getParameterValues("articoli");
-			int[] codici = new int[codes.length];
 			for(int i = 0; i < codes.length; i++) {
 				codici[i] = Integer.parseInt(codes[i]);
 			}
@@ -80,10 +81,14 @@ public class CreateAsta extends HttpServlet {
 		
 		User user = (User) session.getAttribute("user");
 		AstaDAO astaDAO = new AstaDAO(connection);
+		ArticoloDAO articoloDAO = new ArticoloDAO(connection);
 		try {
 			Date oggi = new Date(System.currentTimeMillis());
 			if(rialzoMinimo > 0 && scadenza.after(oggi)) {
-				astaDAO.createAsta(scadenza, rialzoMinimo, prezzoIniziale, user);
+				int id = astaDAO.createAsta(scadenza, rialzoMinimo, prezzoIniziale, user.getUsername());
+				for(int i = 0; i < codici.length; i++) {
+					articoloDAO.updateArticolo(codici[i], id);
+				}
 			} else {
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
 				return;

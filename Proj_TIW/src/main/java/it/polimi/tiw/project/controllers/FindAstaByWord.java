@@ -84,7 +84,7 @@ public class FindAstaByWord extends HttpServlet {
 		}
 
 		AstaDAO astaDAO = new AstaDAO(connection);
-		Map<Asta, String> aste = new HashMap<Asta, String>();
+		List<Asta> aste = new ArrayList<Asta>();
 		try {
 			aste = astaDAO.findAstaByWord(parola);
 		} catch (SQLException e) {

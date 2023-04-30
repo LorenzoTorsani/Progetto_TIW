@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Asta {
 	private int idAsta;
-	private Date scadenza; //TODO da cambiare in datetime
+	private Date scadenza; 
 	private int rialzoMinimo;
 	private double prezzoIniziale;
 	private boolean stato;
@@ -15,8 +15,9 @@ public class Asta {
 	private String aggiudicatario;
 	private double offertaMax;
 	private List<Articolo> articoli = new ArrayList<Articolo>();
+	private String tempoMancante;
 	
-	public void setId(int idAsta) {
+	public void setIdAsta(int idAsta) {
 		this.idAsta = idAsta;
 	}
 	
@@ -88,6 +89,12 @@ public class Asta {
 		this.articoli.add(articolo);
 	}
 
-	
+	public String getTempoMancante() {
+		return tempoMancante;
+	}
+
+	public void setTempoMancante(String tempoMancante) {
+		this.tempoMancante = tempoMancante;
+	}
 
 }

@@ -71,7 +71,7 @@ public class GoToVendo extends HttpServlet {
 		}
 
 		AstaDAO astaDAO = new AstaDAO(connection);
-		Map<Asta, String> asteAperte = new HashMap<Asta, String>();
+		List<Asta> asteAperte = new ArrayList<Asta>();		
 		Map<Asta, User> asteChiuse = new HashMap<Asta, User>();
 		try {
 			asteAperte = astaDAO.getAsteAperteByUser(user.getUsername());

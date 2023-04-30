@@ -90,7 +90,7 @@ public class GoToAcquisto extends HttpServlet {
 		}
 
 		AstaDAO astaDAO = new AstaDAO(connection);
-		Map<Asta, String> aste = new HashMap<Asta, String>();
+		List<Asta> aste = new ArrayList<Asta>();
 		try {
 			aste = astaDAO.findAstaByWord(parola);
 		} catch (SQLException e) {
@@ -100,10 +100,15 @@ public class GoToAcquisto extends HttpServlet {
 		
 		//TODO da finire
 
-		request.setAttribute("aste", aste);
-		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/Acquisto";
-		request.getRequestDispatcher(path).forward(request, response);
+		final WebContext ctx = new WebContext(request, response, getServletContext(),request.getLocale());
+		if (aste.size() == 0) {
+			ctx.setVariable("NoAsteMsg", "per \"" + parola + "\" non ci sono aste aperte");
+		} else {
+			ctx.setVariable("aste", aste);
+		}
+		
+		String path = "/WEB-INF/Acquisto.html";
+		templateEngine.process(path, ctx, response.getWriter());
 	}
 	
 	public void destroy() {
