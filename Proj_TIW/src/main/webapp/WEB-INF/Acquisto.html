@@ -13,7 +13,7 @@
 	</form>
 	
 	<div th:if="${aste == null}">
-	<p>pisello</p>
+	<p>Nessuna asta trovata.</p>
 	</div>
 	
 	<div th:if="${aste.size() > 0}">
@@ -40,8 +40,6 @@
 					<td th:if="${entry.offertaMax > 0}" th:text="${entry.offertaMax}"></td>
 					<td th:if="${entry.offertaMax < 0}">Ancora nessuna offerta</td>
 				</tr>
-
-
 			</tbody>
 
 		</table>	

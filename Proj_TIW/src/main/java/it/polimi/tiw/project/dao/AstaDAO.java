@@ -64,7 +64,7 @@ public class AstaDAO {
 		try (PreparedStatement pstatement = connection.prepareStatement(query2);) {
 			pstatement.setInt(1, idAsta);
 			try (ResultSet result = pstatement.executeQuery();) {
-				if (result.next()) {
+				while (result.next()) {
 					codici.add(result.getInt("codice"));
 				}
 			}
@@ -199,17 +199,19 @@ public class AstaDAO {
 
 	public List<Asta> findAstaByWord(String parola) throws SQLException, IOException {
 		List<Asta> aste = new ArrayList<Asta>();
-		String query = "SELECT IFNULL(MAX(progetto_tiw.offerta.quantitaofferta), -1) AS max_quantita, progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
+		String query = "SELECT progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
 				+ "FROM progetto_tiw.asta "
-				+ "JOIN progetto_tiw.offerta ON progetto_tiw.asta.idasta = progetto_tiw.offerta.idasta JOIN progetto_tiw.articolo ON progetto_tiw.articolo.idasta = progetto_tiw.asta.idasta "
+				+ "JOIN progetto_tiw.articolo ON progetto_tiw.articolo.idasta = progetto_tiw.asta.idasta "
 				+ "WHERE progetto_tiw.asta.stato = true AND (progetto_tiw.articolo.descrizione LIKE ? OR progetto_tiw.articolo.nome LIKE ?) "
 				+ "GROUP BY progetto_tiw.asta.idasta "
 				+ "ORDER BY progetto_tiw.asta.scadenza ASC";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
-			pstatement.setString(1, "%" + parola + "%");
-			pstatement.setString(2, "%" + parola + "%");
+			parola = "%" + parola + "%";
+			pstatement.setString(1, parola);
+			pstatement.setString(2, parola);
 			try (ResultSet result = pstatement.executeQuery();) {
-				while (result.next()) {
+				while (result.next()) { 
+					// qui dentro ora ci entra
 					Asta asta = new Asta();
 					asta.setIdAsta(result.getInt("idasta"));
 					Date scadenza = new Date(result.getTimestamp("scadenza").getTime());
@@ -228,7 +230,8 @@ public class AstaDAO {
 					asta.setPrezzoIniziale(result.getFloat("prezzoiniziale"));
 					asta.setStato(result.getBoolean("stato"));
 					asta.setCreatore(result.getString("creatore"));
-					asta.setOffertaMax(result.getDouble("max_quantita"));
+					//asta.setOffertaMax(result.getDouble("max_quantita"));
+					// TODO possibile che non crei un asta ???
 					aste.add(asta);
 				}
 			} catch (SQLException e) {
