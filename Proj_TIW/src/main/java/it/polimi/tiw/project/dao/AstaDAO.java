@@ -199,11 +199,12 @@ public class AstaDAO {
 
 	public List<Asta> findAstaByWord(String parola) throws SQLException, IOException {
 		List<Asta> aste = new ArrayList<Asta>();
-		String query = "SELECT progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
+		String query = "SELECT IFNULL(MAX(progetto_tiw.offerta.quantitaofferta), -1) AS max_quantita, progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.stato, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
 				+ "FROM progetto_tiw.asta "
+				+ "LEFT JOIN progetto_tiw.offerta ON progetto_tiw.asta.idasta = progetto_tiw.offerta.idasta "
 				+ "JOIN progetto_tiw.articolo ON progetto_tiw.articolo.idasta = progetto_tiw.asta.idasta "
 				+ "WHERE progetto_tiw.asta.stato = true AND (progetto_tiw.articolo.descrizione LIKE ? OR progetto_tiw.articolo.nome LIKE ?) "
-				+ "GROUP BY progetto_tiw.asta.idasta "
+				+ "GROUP BY progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
 				+ "ORDER BY progetto_tiw.asta.scadenza ASC";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			parola = "%" + parola + "%";
@@ -227,15 +228,14 @@ public class AstaDAO {
 					String tempo = giorni + " giorni, " + ore + " ore, " + minuti + " minuti, " + secondi + " secondi";
 					asta.setTempoMancante(tempo);
 					asta.setRialzoMinimo(result.getInt("rialzominimo")); // throws IOException
-					asta.setPrezzoIniziale(result.getFloat("prezzoiniziale"));
+					asta.setPrezzoIniziale(result.getDouble("prezzoiniziale"));
 					asta.setStato(result.getBoolean("stato"));
 					asta.setCreatore(result.getString("creatore"));
-					//asta.setOffertaMax(result.getDouble("max_quantita"));
-					// TODO possibile che non crei un asta ???
+					asta.setOffertaMax(result.getDouble("max_quantita"));
 					aste.add(asta);
 				}
 			} catch (SQLException e) {
-
+				
 			}
 			return aste;
 		}
