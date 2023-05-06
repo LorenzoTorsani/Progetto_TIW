@@ -1,23 +1,11 @@
 package it.polimi.tiw.project.beans;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.sql.Blob;
-import java.sql.SQLException;
-
-import javax.imageio.ImageIO;
-
-import org.apache.tomcat.util.codec.binary.Base64;
 
 public class Articolo {
 	private int code;
 	private String name;
 	private String description;
-	private Float price;
+	private Double price;
 	private boolean sold;
 	private String proprietario;
 	private String image;
@@ -47,11 +35,11 @@ public class Articolo {
 		this.description = description;
 	}
 
-	public Float getPrice() {
+	public Double getPrice() {
 		return price;
 	}
 
-	public void setPrice(Float price) {
+	public void setPrice(Double price) {
 		this.price = price;
 	}
 

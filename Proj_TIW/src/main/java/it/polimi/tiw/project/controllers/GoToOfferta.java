@@ -3,6 +3,8 @@ package it.polimi.tiw.project.controllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -17,6 +19,8 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import it.polimi.tiw.project.beans.Articolo;
+import it.polimi.tiw.project.dao.ArticoloDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
 @WebServlet("/GoToOfferta")
@@ -61,6 +65,15 @@ public class GoToOfferta extends HttpServlet{
 			return;
 		}
 		
+		List<Articolo> articoli = new ArrayList<Articolo>();
+		ArticoloDAO articoloDAO = new ArticoloDAO(connection);
+		
+		try {
+			articoli = articoloDAO.getArticoliByAsta(idAsta);
+		} catch (SQLException e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere articoli");
+			return;
+		}
 		
 		
 		String path = "/WEB-INF/Offerta.html";
