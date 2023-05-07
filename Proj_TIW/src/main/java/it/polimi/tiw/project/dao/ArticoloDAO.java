@@ -129,9 +129,9 @@ public class ArticoloDAO {
 	
 	public List<Articolo> getArticoliByAsta(int idAsta) throws SQLException {
 		List<Articolo> articoli = new ArrayList<Articolo>();
-		String query = "SELECT articolo.codice, articolo.nome, articolo.descrizione, articolo.prezzo, articolo.image "
+		String query = "SELECT * "
 				+ "FROM articolo JOIN asta ON articolo.idasta = asta.idasta "
-				+ "WHERE idasta = ?";
+				+ "WHERE asta.idasta = ?";
 		try(PreparedStatement pstatement = connection.prepareStatement(query)){
 			pstatement.setInt(1, idAsta);
 			try (ResultSet result = pstatement.executeQuery()){
@@ -142,6 +142,9 @@ public class ArticoloDAO {
 					articolo.setDescription(result.getString("descrizione"));
 					articolo.setPrice(result.getDouble("prezzo"));
 					articolo.setImage(result.getString("immagine"));
+					articolo.setSold(result.getBoolean("venduto"));
+					articolo.setProprietario(result.getString("proprietario"));
+					articolo.setIdasta(result.getInt("idasta"));
 					articoli.add(articolo);
 				}
 			}

@@ -34,7 +34,8 @@ public class OffertaDAO {
 		String query = "SELECT progetto_tiw.offerta.offerente, progetto_tiw.offerta.idasta, progetto_tiw.offerta.quantitaofferta, progetto_tiw.offerta.oraofferta "
 				+ "FROM progetto_tiw.asta JOIN progetto_tiw.offerta ON "
 				+ "progetto_tiw.offerta.idasta = progetto_tiw.asta.idasta "
-				+ "WHERE progetto_tiw.asta.idasta = ?";
+				+ "WHERE progetto_tiw.asta.idasta = ? "
+				+ "ORDER BY oraofferta DESC";
 		
 		try(PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setInt(1, idAsta);

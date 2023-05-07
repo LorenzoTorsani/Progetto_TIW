@@ -20,7 +20,9 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import it.polimi.tiw.project.beans.Articolo;
+import it.polimi.tiw.project.beans.Offerta;
 import it.polimi.tiw.project.dao.ArticoloDAO;
+import it.polimi.tiw.project.dao.OffertaDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
 @WebServlet("/GoToOfferta")
@@ -66,19 +68,24 @@ public class GoToOfferta extends HttpServlet{
 		}
 		
 		List<Articolo> articoli = new ArrayList<Articolo>();
+		List<Offerta> offerte = new ArrayList<Offerta>();
 		ArticoloDAO articoloDAO = new ArticoloDAO(connection);
+		OffertaDAO offertaDAO = new OffertaDAO(connection);
 		
 		try {
 			articoli = articoloDAO.getArticoliByAsta(idAsta);
+			offerte = offertaDAO.findOfferte(idAsta);
 		} catch (SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere articoli");
 			return;
 		}
-		
+	
 		
 		String path = "/WEB-INF/Offerta.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		ctx.setVariable("articoli", articoli);
+		ctx.setVariable("offerte", offerte);
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 	
