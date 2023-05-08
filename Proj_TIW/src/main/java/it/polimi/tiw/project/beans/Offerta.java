@@ -1,6 +1,6 @@
 package it.polimi.tiw.project.beans;
 
-import java.util.Date;
+import java.sql.Date;
 
 public class Offerta {
 	private String offerente;

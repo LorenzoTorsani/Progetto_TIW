@@ -2,7 +2,10 @@ package it.polimi.tiw.project.controllers;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,21 +25,23 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import it.polimi.tiw.project.beans.Articolo;
 import it.polimi.tiw.project.beans.Asta;
 import it.polimi.tiw.project.beans.Offerta;
+import it.polimi.tiw.project.beans.User;
 import it.polimi.tiw.project.dao.ArticoloDAO;
 import it.polimi.tiw.project.dao.AstaDAO;
 import it.polimi.tiw.project.dao.OffertaDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
-@WebServlet("/GoToOfferta")
-public class GoToOfferta extends HttpServlet{
+@WebServlet("/CreateOfferta")
+public class CreateOfferta extends HttpServlet{
 	private static final long serialVersionUID = 1L;
+
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 
-	public GoToOfferta() {
+	public CreateOfferta() {
 		super();
 	}
-
+	
 	public void init() throws ServletException {
 		ServletContext servletContext = getServletContext();
 		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
@@ -48,34 +53,73 @@ public class GoToOfferta extends HttpServlet{
 		connection = ConnectionHandler.getConnection(getServletContext());
 	}
 	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-
-		// If the user is not logged in (not present in session) redirect to the login
-		String loginpath = getServletContext().getContextPath() + "/index.html";
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 		HttpSession session = request.getSession();
-		if (session.isNew() || session.getAttribute("user") == null) {
+		if(session.isNew() || session.getAttribute("user") == null) {
+			String loginpath = getServletContext().getContextPath() + "/index.html";
 			response.sendRedirect(loginpath);
 			return;
 		}
-
-		// get and check params
+		boolean isBadRequest = false;
 		Integer idAsta = null;
+		Double offerta = null;
 		try {
-			idAsta = Integer.parseInt(request.getParameter("idasta"));
-		} catch (NumberFormatException | NullPointerException e) {
-			// only for debugging e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+			idAsta = Integer.parseInt(request.getParameter("idAsta"));
+			System.out.println(idAsta);
+			offerta = Double.parseDouble(request.getParameter("Offerta"));
+			System.out.println(offerta);
+			ArticoloDAO articoloDAO = new ArticoloDAO(connection);
+			isBadRequest = (idAsta == null || offerta == null);
+		} catch(NumberFormatException | NullPointerException e) {
+			isBadRequest = true;
+			e.printStackTrace();
+		}
+		if(isBadRequest) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect or missing param values");
 			return;
 		}
-		
+		User user = (User) session.getAttribute("user");
+		System.out.println(user.getUsername());
+		OffertaDAO offertaDAO = new OffertaDAO(connection);
+		AstaDAO astaDAO = new AstaDAO(connection);
+		Boolean error = false;
+		try {
+			Double off = offertaDAO.getOffertaMaxByAstaid(idAsta);
+			System.out.println("query 1 fatta");
+			if(off > 0) {
+				if(offerta <= off) {
+					error = true;
+				}
+				else {
+					offertaDAO.createOfferta(user.getUsername(), idAsta, offerta);
+					System.out.println("query 2 fatta");
+				}
+			}
+			else {
+				off = astaDAO.findAstaById(idAsta).getPrezzoIniziale();
+				System.out.println("query 3 fatta");
+				if(offerta <= off) {
+					error = true;
+				}
+				else {
+					offertaDAO.createOfferta(user.getUsername(), idAsta, offerta);
+					System.out.println("query 4 fatta");
+				}
+			}
+			if(error) {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Offerta non sufficiente");
+				return;
+			}
+		}catch(SQLException e) {
+			System.out.println(e.getMessage());
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile creare offerta");
+			return;
+		}
 		List<Articolo> articoli = new ArrayList<Articolo>();
 		List<Offerta> offerte = new ArrayList<Offerta>();
 		Asta asta;
 		Double maxOfferta;
 		ArticoloDAO articoloDAO = new ArticoloDAO(connection);
-		OffertaDAO offertaDAO = new OffertaDAO(connection);
-		AstaDAO astaDAO = new AstaDAO(connection);
 		
 		try {
 			articoli = articoloDAO.getArticoliByAsta(idAsta);
@@ -105,5 +149,4 @@ public class GoToOfferta extends HttpServlet{
 			e.printStackTrace();
 		}
 	}
-	
 }

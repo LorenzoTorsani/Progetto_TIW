@@ -50,7 +50,38 @@
 
 		</table>
 	</div>
+	<div th:if="${asteaggiudicate.size() > 0}">
+		<table>
+			<caption>Aste aggiudicate:</caption>
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Scadenza</th>
+					<th>Tempo rimanente</th>
+					<th>Prezzo iniziale</th>
+					<th>Rialzo minimo</th>
+					<th>Offerta massima</th>
+					<th>Prezzo Finale:</th>
+				</tr>
+			</thead>
 
+			<tbody>
+				<tr th:each="entry : ${asteaggiudicate}">
+					<td th:text="${entry.idAsta}"></td>
+					<td th:text="${entry.scadenza}"></td>
+					<td th:text="${entry.tempoMancante}"></td>
+					<td th:text="${entry.prezzoIniziale}"></td>
+					<td th:text="${entry.rialzoMinimo}"></td>
+					<td th:if="${entry.offertaMax > 0}" th:text="${entry.offertaMax}"></td>
+					<td th:if="${entry.offertaMax < 0}">Ancora nessuna offerta</td>
+					<td th:if="${entry.prezzoIniziale + entry.OffertaMassima}"></td>
+					<td></td>
+					<td><a th:href="@{/GoToOfferta(idasta=${entry.idAsta})}">Fai offerta</a></td>
+				</tr>
+			</tbody>
+
+		</table>
+	</div>
 
 </body>
 </html>

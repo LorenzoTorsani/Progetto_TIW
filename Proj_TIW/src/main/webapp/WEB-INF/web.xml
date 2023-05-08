@@ -18,7 +18,7 @@ version="4.0">
   </context-param>
   <context-param>
     <param-name>dbPassword</param-name>
-    <param-value>Politecnico1401</param-value>
+    <param-value>macchinaz</param-value>
   </context-param>
   <context-param>
     <param-name>dbDriver</param-name>

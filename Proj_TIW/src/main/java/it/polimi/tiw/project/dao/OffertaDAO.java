@@ -1,6 +1,7 @@
 package it.polimi.tiw.project.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,14 +18,16 @@ public class OffertaDAO {
 		this.connection = connection;
 	}
 	
-	public void createOfferta(String user, int idAsta, Float offerta) throws SQLException {
+	public void createOfferta(String user, int idAsta, Double offerta) throws SQLException {
 		String query = "INSERT into offerta (offerente, idasta, quantitaofferta, oraofferta) VALUES (?, ?, ?, ?)";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);){
 			pstatement.setString(1, user);
 			pstatement.setInt(2, idAsta);
-			pstatement.setFloat(3, offerta);
+			pstatement.setDouble(3, offerta);
+			Date oggi = new Date(System.currentTimeMillis());
+			pstatement.setDate(4, oggi);
 			// ora e data inserite automaticamente
-			pstatement.executeQuery();
+			pstatement.executeUpdate();
 		}
 	}
 	
@@ -55,6 +58,21 @@ public class OffertaDAO {
 		
 		return offerte;
 	}
-
-
+	
+	public Double getOffertaMaxByAstaid(int idAsta) throws SQLException{
+		Double maxOfferta = 0.0;
+		String query = "SELECT MAX(progetto_tiw.offerta.quantitaofferta) "
+				+ "FROM progetto_tiw.offerta "
+				+ "WHERE progetto_tiw.offerta.idasta = ? "
+				+ "GROUP BY progetto_tiw.offerta.idasta";
+		try(PreparedStatement pstatement = connection.prepareStatement(query);) {
+			pstatement.setInt(1, idAsta);
+			try (ResultSet result = pstatement.executeQuery()){
+					maxOfferta = result.getDouble("MAX(progetto_tiw.offerta.quantitaofferta)");
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+		return maxOfferta;
+	}
 }

@@ -17,6 +17,7 @@ import java.util.Map;
 import java.io.IOException;
 
 import it.polimi.tiw.project.beans.Asta;
+import it.polimi.tiw.project.beans.Offerta;
 import it.polimi.tiw.project.beans.User;
 
 public class AstaDAO {
@@ -74,7 +75,6 @@ public class AstaDAO {
 
 	public Asta findAstaById(int idAsta) throws SQLException {
 		Asta asta = new Asta();
-
 		String query = "SELECT * FROM asta WHERE idasta = ?";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setInt(1, idAsta);
@@ -239,5 +239,32 @@ public class AstaDAO {
 			}
 			return aste;
 		}
+	}
+	
+	public List<Asta> getAsteAggiudicateByUser(String user) throws SQLException{
+		List<Asta> aste = new ArrayList<Asta>();
+		String query = "SELECT progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.stato, progetto_tiw.asta.creatore, progetto_tiw.asta.aggiudicatario "
+				+ "FROM progetto_tiw.asta "
+				+ "WHERE progetto_tiw.asta.aggiudicatario = ?";
+		try(PreparedStatement pstatement = connection.prepareStatement(query);) {
+			pstatement.setString(1, user);
+			try (ResultSet result = pstatement.executeQuery()){
+				while (result.next()) {
+					Asta asta = new Asta();
+					asta.setIdAsta(result.getInt("idasta"));
+					asta.setScadenza(result.getDate("scadenza"));
+					asta.setRialzoMinimo(result.getInt("rialzominimo"));
+					asta.setPrezzoIniziale(result.getDouble("prezzoiniziale"));
+					asta.setStato(result.getBoolean("stato"));
+					asta.setCreatore(result.getString("creatore"));
+					asta.setAggiudicatario(result.getString("aggiudicatario"));
+					aste.add(asta);
+				}
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+		return aste;
+		
 	}
 }

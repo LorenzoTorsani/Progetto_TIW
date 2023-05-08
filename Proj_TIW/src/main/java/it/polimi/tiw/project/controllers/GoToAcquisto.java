@@ -23,6 +23,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import it.polimi.tiw.project.beans.Asta;
+import it.polimi.tiw.project.beans.User;
 import it.polimi.tiw.project.dao.AstaDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
@@ -59,10 +60,20 @@ public class GoToAcquisto extends HttpServlet {
 		}
 
 		// Redirect to the Home page and add missions to the parameters
+		AstaDAO astaDAO = new AstaDAO(connection);
+		User user = (User) session.getAttribute("user");
+		List<Asta> asteAggiudicate = new ArrayList<Asta>();
+		try {
+			asteAggiudicate = astaDAO.getAsteAggiudicateByUser(user.getUsername());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		String path = "/WEB-INF/Acquisto.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		templateEngine.process(path, ctx, response.getWriter());
+		ctx.setVariable("asteaggiudicate", asteAggiudicate);
 	}
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -99,14 +110,21 @@ public class GoToAcquisto extends HttpServlet {
 		}
 		
 		//TODO da finire
-
+		User user = (User) session.getAttribute("user");
+		List<Asta> asteAggiudicate = new ArrayList<Asta>();
+		try {
+			asteAggiudicate = astaDAO.getAsteAggiudicateByUser(user.getUsername());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		final WebContext ctx = new WebContext(request, response, getServletContext(),request.getLocale());
 		if (aste.size() == 0) {
 			ctx.setVariable("NoAsteMsg", "per \"" + parola + "\" non ci sono aste aperte");
 		} else {
 			ctx.setVariable("aste", aste);
 		}
-		
+		ctx.setVariable("asteaggiudicate", asteAggiudicate);
 		String path = "/WEB-INF/Acquisto.html";
 		templateEngine.process(path, ctx, response.getWriter());
 	}
