@@ -1,10 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Offerta</title>
+<link rel="stylesheet" type="text/css" media="all"
+	href="../CSS/mystyle.css" th:href="@{/css/mystyle.css}" />
 </head>
 <body>
+	<h1>Fai la tua offerta</h1>
+	<div th:if="${articoli.size() > 0}">
+		<table>
+			<caption>Articoli nell'asta</caption>
+			<thead>
+				<tr>
+					<th>Codice</th>
+					<th>Nome</th>
+					<th>Descrizione</th>
+					<th>Prezzo</th>
+					<th>Immagine</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="entry : ${articoli}">
+					<td th:text="${entry.code}"></td>
+					<td th:text="${entry.name}"></td>
+					<td th:text="${entry.description}"></td>
+					<td th:text="${entry.price}"></td>
+					<td th:text="${entry.image}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	
+	<br>
 
+	<div th:if="${offerte.size() > 0}">
+		<table>
+			<caption>Offerte ricevute</caption>
+			<thead>
+				<tr>
+					<th>Offerente</th>
+					<th>Quantità offerta</th>
+					<th>Data e ora</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="entry : ${offerte}">
+					<td th:text="${entry.offerente}"></td>
+					<td th:text="${entry.offerta}"></td>
+					<td th:text="${entry.data}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div th:if="${offerte.size() == 0}">Ancora nessuna offerta</div>
+
+	<br>
+	
+	<form action="#" th:action="@{/CreateOfferta(idAsta)}">
+		<input>
+	</form>
 </body>
 </html>

@@ -3,21 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <title>Area acquisti</title>
+<link rel="stylesheet" type="text/css" media="all"
+	href="../CSS/mystyle.css" th:href="@{/css/mystyle.css}" />
 </head>
 <body>
 	<h1>Area acquisti</h1>
 	<p>Ricerca per parola chiave</p>
 	<form method="POST">
-		<input name="parola" type="text" placeholder="Inserisci qui la parola chiave" size="40" maxlength="200" />
-		<button type="submit" th:formaction="@{/Acquisto}">Cerca</button>	
+		<input name="parola" type="text"
+			placeholder="Inserisci qui la parola chiave" size="40"
+			maxlength="200" />
+		<button type="submit" th:formaction="@{/Acquisto}">Cerca</button>
 	</form>
-	
+
 	<div th:if="${aste == null}">
-	<p>pisello</p>
+		<p>Nessuna asta trovata.</p>
 	</div>
-	
+
 	<div th:if="${aste.size() > 0}">
-	<table>
+		<table>
 			<caption>Aste aperte:</caption>
 			<thead>
 				<tr>
@@ -39,14 +43,14 @@
 					<td th:text="${entry.rialzoMinimo}"></td>
 					<td th:if="${entry.offertaMax > 0}" th:text="${entry.offertaMax}"></td>
 					<td th:if="${entry.offertaMax < 0}">Ancora nessuna offerta</td>
+					<td></td>
+					<td><a th:href="@{/GoToOfferta(idasta=${entry.idAsta})}">Fai offerta</a></td>
 				</tr>
-
-
 			</tbody>
 
-		</table>	
+		</table>
 	</div>
 
-	
+
 </body>
 </html>

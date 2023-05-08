@@ -7,14 +7,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-
 import it.polimi.tiw.project.beans.Articolo;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.sql.Blob;
 
 
 public class ArticoloDAO {
@@ -65,7 +60,7 @@ public class ArticoloDAO {
 					articolo.setDescription(result.getString("descrizione"));
 					articolo.setImage(result.getString("immagine"));	// throws IOException
 					articolo.setName(result.getString("nome"));
-					articolo.setPrice(result.getFloat("prezzo"));
+					articolo.setPrice(result.getDouble("prezzo"));
 					articolo.setSold(result.getBoolean("venduto"));
 					articolo.setProprietario(result.getString("proprietario"));
 					articolo.setIdasta(result.getInt("idasta"));
@@ -123,12 +118,40 @@ public class ArticoloDAO {
 		}
 	}
 	
-	public void updateArticolo(int codice, int idAsta) throws SQLException{
+	public void updateArticolo(int codice, int idAsta) throws SQLException {
 		String query = "UPDATE progetto_tiw.articolo SET progetto_tiw.articolo.idasta = ? WHERE progetto_tiw.articolo.codice = ?";
 		try(PreparedStatement pstatement = connection.prepareStatement(query)){
 			pstatement.setInt(1, idAsta);
 			pstatement.setInt(2, codice);
 			pstatement.executeUpdate();
 		}
+	}
+	
+	public List<Articolo> getArticoliByAsta(int idAsta) throws SQLException {
+		List<Articolo> articoli = new ArrayList<Articolo>();
+		String query = "SELECT * "
+				+ "FROM articolo JOIN asta ON articolo.idasta = asta.idasta "
+				+ "WHERE asta.idasta = ?";
+		try(PreparedStatement pstatement = connection.prepareStatement(query)){
+			pstatement.setInt(1, idAsta);
+			try (ResultSet result = pstatement.executeQuery()){
+				while(result.next()) {
+					Articolo articolo = new Articolo();
+					articolo.setCode(result.getInt("codice"));
+					articolo.setName(result.getString("nome"));
+					articolo.setDescription(result.getString("descrizione"));
+					articolo.setPrice(result.getDouble("prezzo"));
+					articolo.setImage(result.getString("immagine"));
+					articolo.setSold(result.getBoolean("venduto"));
+					articolo.setProprietario(result.getString("proprietario"));
+					articolo.setIdasta(result.getInt("idasta"));
+					articoli.add(articolo);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return articoli;
 	}
 }
