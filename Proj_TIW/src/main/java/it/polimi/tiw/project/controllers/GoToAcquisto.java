@@ -72,10 +72,10 @@ public class GoToAcquisto extends HttpServlet {
 		String path = "/WEB-INF/Acquisto.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		ctx.setVariable("asteAggiudicate", asteAggiudicate);
 		templateEngine.process(path, ctx, response.getWriter());
-		ctx.setVariable("asteaggiudicate", asteAggiudicate);
 	}
-	
+
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		HttpSession session = request.getSession();
@@ -108,8 +108,8 @@ public class GoToAcquisto extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile trovare parola");
 			return;
 		}
-		
-		//TODO da finire
+
+		// TODO da finire
 		User user = (User) session.getAttribute("user");
 		List<Asta> asteAggiudicate = new ArrayList<Asta>();
 		try {
@@ -118,17 +118,18 @@ public class GoToAcquisto extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		final WebContext ctx = new WebContext(request, response, getServletContext(),request.getLocale());
+		final WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
 		if (aste.size() == 0) {
 			ctx.setVariable("NoAsteMsg", "per \"" + parola + "\" non ci sono aste aperte");
 		} else {
 			ctx.setVariable("aste", aste);
 		}
-		ctx.setVariable("asteaggiudicate", asteAggiudicate);
+		
+		ctx.setVariable("asteAggiudicate", asteAggiudicate);
 		String path = "/WEB-INF/Acquisto.html";
 		templateEngine.process(path, ctx, response.getWriter());
 	}
-	
+
 	public void destroy() {
 		try {
 			ConnectionHandler.closeConnection(connection);

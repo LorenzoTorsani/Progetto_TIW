@@ -19,13 +19,11 @@ public class OffertaDAO {
 	}
 	
 	public void createOfferta(String user, int idAsta, Double offerta) throws SQLException {
-		String query = "INSERT into offerta (offerente, idasta, quantitaofferta, oraofferta) VALUES (?, ?, ?, ?)";
+		String query = "INSERT into offerta (offerente, idasta, quantitaofferta) VALUES (?, ?, ?)";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);){
 			pstatement.setString(1, user);
 			pstatement.setInt(2, idAsta);
 			pstatement.setDouble(3, offerta);
-			Date oggi = new Date(System.currentTimeMillis());
-			pstatement.setDate(4, oggi);
 			// ora e data inserite automaticamente
 			pstatement.executeUpdate();
 		}

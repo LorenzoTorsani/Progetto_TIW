@@ -243,9 +243,12 @@ public class AstaDAO {
 	
 	public List<Asta> getAsteAggiudicateByUser(String user) throws SQLException{
 		List<Asta> aste = new ArrayList<Asta>();
-		String query = "SELECT progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.stato, progetto_tiw.asta.creatore, progetto_tiw.asta.aggiudicatario "
+		String query = "SELECT IFNULL(MAX(progetto_tiw.offerta.quantitaofferta), -1) AS max_quantita, progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.stato, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore, asta.aggiudicatario "
 				+ "FROM progetto_tiw.asta "
-				+ "WHERE progetto_tiw.asta.aggiudicatario = ?";
+				+ "LEFT JOIN progetto_tiw.offerta ON progetto_tiw.asta.idasta = progetto_tiw.offerta.idasta "
+				+ "WHERE progetto_tiw.asta.stato = false AND asta.aggiudicatario = ? "
+				+ "GROUP BY progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
+				+ "ORDER BY progetto_tiw.asta.scadenza ASC ";
 		try(PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setString(1, user);
 			try (ResultSet result = pstatement.executeQuery()){
@@ -257,6 +260,7 @@ public class AstaDAO {
 					asta.setPrezzoIniziale(result.getDouble("prezzoiniziale"));
 					asta.setStato(result.getBoolean("stato"));
 					asta.setCreatore(result.getString("creatore"));
+					asta.setOffertaMax(result.getDouble("max_quantita"));
 					asta.setAggiudicatario(result.getString("aggiudicatario"));
 					aste.add(asta);
 				}
