@@ -118,13 +118,9 @@ public class GoToAcquisto extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		final WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
-		if (aste.size() == 0) {
-			ctx.setVariable("NoAsteMsg", "per \"" + parola + "\" non ci sono aste aperte");
-		} else {
-			ctx.setVariable("aste", aste);
-		}
 		
+		final WebContext ctx = new WebContext(request, response, getServletContext(), request.getLocale());
+		ctx.setVariable("aste", aste);
 		ctx.setVariable("asteAggiudicate", asteAggiudicate);
 		String path = "/WEB-INF/Acquisto.html";
 		templateEngine.process(path, ctx, response.getWriter());
