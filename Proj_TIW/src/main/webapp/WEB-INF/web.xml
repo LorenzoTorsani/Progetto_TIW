@@ -10,7 +10,7 @@ version="4.0">
 </context-param>
 <context-param>
     <param-name>outputpath</param-name>
-    <param-value>C:\Users\lorif\git\Progetto_TIW\Proj_TIW\src\main\resources\static\images</param-value>
+    <param-value>/Users/simonezacchetti/Desktop/immagini/</param-value>
  </context-param>
   <context-param>
     <param-name>dbUser</param-name>

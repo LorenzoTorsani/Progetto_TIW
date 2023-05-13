@@ -108,14 +108,12 @@ public class GoToAcquisto extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile trovare parola");
 			return;
 		}
-
-		// TODO da finire
+		
 		User user = (User) session.getAttribute("user");
 		List<Asta> asteAggiudicate = new ArrayList<Asta>();
 		try {
 			asteAggiudicate = astaDAO.getAsteAggiudicateByUser(user.getUsername());
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
