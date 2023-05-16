@@ -59,11 +59,11 @@
 					<td th:if="${entry.offertaMax > 0}" th:text="${entry.offertaMax}"></td>
 					<td th:if="${entry.offertaMax < 0}">Ancora nessuna offerta</td>
 					<!-- TODO non è idAsta? -->
-					<td><a th:href="@{/GoToDettaglioAsta(idasta=${entry.idasta})}">Dettagli</a></td>
+					<td><a th:href="@{/GoToDettaglioAsta(idAsta=${entry.idAsta})}">Dettagli</a></td>
 					<td><samp th:each="a : ${articoli}"
-							th:if="${a.idasta == entry.idasta}" th:text="${a.code + ' '}"></samp></td>
+							th:if="${a.idAsta == entry.idAsta}" th:text="${a.code + ' '}"></samp></td>
 					<td><samp th:each="a : ${articoli}"
-							th:if="${a.idasta == entry.idasta}" th:text="${a.name + ' '}"></samp></td>
+							th:if="${a.idAsta == entry.idAsta}" th:text="${a.name + ' '}"></samp></td>
 				</tr>
 
 
@@ -96,7 +96,6 @@
 					<td th:text="${entry.key.rialzoMinimo}"></td>
 					<td th:text="${entry.value.username}"></td>
 					<td th:text="${entry.value.address}"></td>
-					<!-- i nomi delle variabili dopo value sono gli stessi usati nel bean -->
 				</tr>
 			</tbody>
 		</table>

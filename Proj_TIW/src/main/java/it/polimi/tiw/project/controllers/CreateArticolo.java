@@ -69,6 +69,7 @@ public class CreateArticolo extends HttpServlet{
 		} catch (Exception e) {
 			e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while saving file");
+			return;
 		}
 		boolean isBadRequest = false;
 		String name = null;
