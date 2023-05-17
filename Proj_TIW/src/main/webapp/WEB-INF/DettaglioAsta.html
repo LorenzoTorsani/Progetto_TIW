@@ -58,7 +58,7 @@
 		<!-- prova con passaggio parametri a chiudi asta -->
 		<form th:action="@{/chiudiAsta}" method="POST">
 			<input type="hidden" name="idAsta" th:value="${asta.idAsta}">
-			<button type="submit">Chiudi asta</button>
+			<button type="submit" th:attr="disabled=${not chiudibile}">Chiudi asta</button>
 		</form>
 	</div>
 </body>

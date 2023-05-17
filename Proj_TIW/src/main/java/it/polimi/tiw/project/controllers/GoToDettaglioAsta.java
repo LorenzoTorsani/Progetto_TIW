@@ -2,6 +2,7 @@ package it.polimi.tiw.project.controllers;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +96,8 @@ public class GoToDettaglioAsta extends HttpServlet {
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("asta", asta);
 		ctx.setVariable("offerte", offerte);
+		boolean chiudibile = (asta.getScadenza().compareTo(new  Date(System.currentTimeMillis())) < 0);
+		ctx.setVariable("chiudibile", chiudibile);
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 	
