@@ -23,8 +23,8 @@
 				</p>
 				<p th:each="a : ${articoli}">
 					<input type="checkbox" th:id="${a.code}" name="articoli"
-						th:value="${a.code}" th:if="${a.sold} == false"> <label
-						th:for="${a.code}" th:text="${a.name}" th:if="${a.sold} == false"></label>
+						th:value="${a.code}" th:if="${a.sold} == false" th:attr="disabled=${not (a.idasta==null)}"> 
+						<label th:for="${a.code}" th:text="${a.name}" th:if="${a.sold} == false"></label>
 				</p>
 				<input type="submit" name="Crea Asta">
 			</fieldset>

@@ -98,7 +98,7 @@ public class CreateOfferta extends HttpServlet{
 			else {
 				off = astaDAO.findAstaById(idAsta).getPrezzoIniziale();
 				System.out.println("query 3 fatta");
-				if(offerta <= off) {
+				if(offerta <= off + astaDAO.findAstaById(idAsta).getRialzoMinimo()) {
 					error = true;
 				}
 				else {

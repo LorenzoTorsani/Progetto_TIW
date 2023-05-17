@@ -86,6 +86,9 @@ public class GoToVendo extends HttpServlet {
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("articoli", articoli);
+		for(int i = 0; i < articoli.size(); i++) {
+			System.out.println(articoli.get(i).getIdasta());
+		}
 		ctx.setVariable("asteAperte", asteAperte);
 		ctx.setVariable("asteChiuse", asteChiuse);
 		templateEngine.process(path, ctx, response.getWriter());

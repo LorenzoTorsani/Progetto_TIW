@@ -52,25 +52,7 @@ public class CreateArticolo extends HttpServlet{
 			response.sendRedirect(loginpath);
 			return;
 		}
-		Part filePart = request.getPart("file");
-		if(filePart == null || filePart.getSize() <= 0) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing file in request!");
-		}
-		String contentType = filePart.getContentType();
-		if (!contentType.startsWith("image")) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "File format not permitted");
-			return;
-		}
-		String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-		String outputPath = folderPath + fileName;
-		File file = new File(outputPath);
-		try (InputStream fileContent = filePart.getInputStream()) {
-			Files.copy(fileContent, file.toPath());
-		} catch (Exception e) {
-			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while saving file");
-			return;
-		}
+		String fileName = new String();
 		boolean isBadRequest = false;
 		String name = null;
 		String description = null;
@@ -94,8 +76,28 @@ public class CreateArticolo extends HttpServlet{
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect or missing param values");
 			return;
 		}
-		
-		
+		else {
+			Part filePart = request.getPart("file");
+			if(filePart == null || filePart.getSize() <= 0) {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing file in request!");
+				return;
+			}
+			String contentType = filePart.getContentType();
+			if (!contentType.startsWith("image")) {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "File format not permitted");
+				return;
+			}
+			fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+			String outputPath = folderPath + fileName;
+			File file = new File(outputPath);
+			try (InputStream fileContent = filePart.getInputStream()) {
+				Files.copy(fileContent, file.toPath());
+			} catch (Exception e) {
+				e.printStackTrace();
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while saving file");
+				return;
+			}
+		}
 		User user = (User) session.getAttribute("user");
 		ArticoloDAO articoloDAO = new ArticoloDAO(connection);
 		try {

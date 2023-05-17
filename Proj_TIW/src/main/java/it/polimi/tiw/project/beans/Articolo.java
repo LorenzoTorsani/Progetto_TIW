@@ -67,11 +67,11 @@ public class Articolo {
 		this.image = image;
 	}
 
-	public int getIdasta() {
+	public Integer getIdasta() {
 		return idasta;
 	}
 
-	public void setIdasta(int idasta) {
+	public void setIdasta(Integer idasta) {
 		this.idasta = idasta;
 	}
 }

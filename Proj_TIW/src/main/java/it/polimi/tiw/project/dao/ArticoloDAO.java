@@ -63,7 +63,7 @@ public class ArticoloDAO {
 					articolo.setPrice(result.getDouble("prezzo"));
 					articolo.setSold(result.getBoolean("venduto"));
 					articolo.setProprietario(result.getString("proprietario"));
-					articolo.setIdasta(result.getInt("idasta"));
+					articolo.setIdasta((Integer)result.getObject("idasta"));
 					articoli.add(articolo);
 				}
 			} catch (SQLException e) {

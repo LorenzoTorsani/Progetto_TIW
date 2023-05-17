@@ -60,7 +60,7 @@
 	<br>
 	
 	<form action="#" th:action="@{/CreateOfferta(idAsta)}" method="GET">
-		<input type="number" step="0.01" th:min="${maxOfferta > 0 ? maxOfferta + asta.rialzoMinimo : asta.prezzoIniziale}" name="Offerta" required />
+		<input type="number" step="0.01" th:min="${maxOfferta > 0 ? maxOfferta + asta.rialzoMinimo : asta.prezzoIniziale + asta.rialzoMinimo}" name="Offerta" required />
 		<button type="submit" name="idAsta" th:value="${asta.idAsta}">Crea Offerta</button>
 	</form>
 </body>

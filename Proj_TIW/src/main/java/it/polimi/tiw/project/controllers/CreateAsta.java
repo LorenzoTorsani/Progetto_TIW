@@ -46,14 +46,21 @@ public class CreateAsta extends HttpServlet {
 		Double prezzoIniziale = 0.0;
 		boolean stato = false;
 		java.util.Date tempdate = null;
-		String[] codes = request.getParameterValues("articoli");
-		int[] codici = new int[codes.length];
-		
+		String[] codes = null;
+		int[] codici = null;
 		try {
+			try {
+				codes = request.getParameterValues("articoli");
+				codici = new int[codes.length];
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+				isBadRequest = true;
+			}
 			try {
 				tempdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(request.getParameter("scadenza"));
 			} catch (ParseException e) {
 				e.printStackTrace();
+				isBadRequest = true;
 			}
 			scadenza = new java.sql.Date(tempdate.getTime());
 			rialzoMinimo = Integer.parseInt(request.getParameter("rialzoMinimo"));

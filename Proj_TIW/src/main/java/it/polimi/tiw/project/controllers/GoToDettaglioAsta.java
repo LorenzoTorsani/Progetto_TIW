@@ -62,9 +62,9 @@ public class GoToDettaglioAsta extends HttpServlet {
 		// get and check params
 		Integer idAsta = null;
 		try {
-			idAsta = Integer.parseInt(request.getParameter("idasta"));
+			idAsta = Integer.parseInt(request.getParameter("idAsta"));
 		} catch (NumberFormatException | NullPointerException e) {
-			// only for debugging e.printStackTrace();
+			e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
 			return;
 		}
