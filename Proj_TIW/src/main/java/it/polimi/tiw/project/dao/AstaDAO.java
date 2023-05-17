@@ -28,50 +28,134 @@ public class AstaDAO {
 	}
 
 	public int createAsta(Date scadenza, Integer rialzoMinimo, Double prezzoIniziale, String creatore)
-			throws SQLException {
-		String query = "INSERT into asta (scadenza, rialzominimo, prezzoiniziale, stato, creatore) VALUES (?, ?, ?, true, ?)";
-		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
-			pstatement.setDate(1, scadenza);
-			pstatement.setInt(2, rialzoMinimo);
-			pstatement.setDouble(3, prezzoIniziale);
-			pstatement.setString(4, creatore);
-			pstatement.executeUpdate();
-		}
-		System.out.println("eseguita query 1");
-		String query2 = "SELECT MAX(progetto_tiw.asta.idasta) FROM progetto_tiw.asta";
-		try (PreparedStatement pstatement = connection.prepareStatement(query2);) {
-			try (ResultSet result = pstatement.executeQuery();) {
-				if (result.next()) {
-					int id = result.getInt("MAX(progetto_tiw.asta.idasta)");
-					return id;
-				}
-			}
-		}
-		return 0;
+	        throws SQLException {
+	    connection.setAutoCommit(false);
+
+	    String query = "INSERT into asta (scadenza, rialzominimo, prezzoiniziale, stato, creatore) VALUES (?, ?, ?, true, ?)";
+	    PreparedStatement insertStatement = null;
+
+	    String query2 = "SELECT MAX(progetto_tiw.asta.idasta) FROM progetto_tiw.asta";
+	    PreparedStatement selectStatement = null;
+	    ResultSet resultSet = null;
+	    
+	    int id = 0; // Valore di default se la query non restituisce risultati
+
+	    try {
+	        insertStatement = connection.prepareStatement(query);
+	        insertStatement.setDate(1, scadenza);
+	        insertStatement.setInt(2, rialzoMinimo);
+	        insertStatement.setDouble(3, prezzoIniziale);
+	        insertStatement.setString(4, creatore);
+	        insertStatement.executeUpdate();
+
+	        selectStatement = connection.prepareStatement(query2);
+	        resultSet = selectStatement.executeQuery();
+
+	        if (resultSet.next()) {
+	            id = resultSet.getInt("MAX(progetto_tiw.asta.idasta)");
+	        }
+
+	        connection.commit();
+	    } catch (SQLException e) {
+	        connection.rollback();
+	        throw e;
+	    } finally {
+	        connection.setAutoCommit(true);
+
+	        if (resultSet != null) {
+	            try {
+	                resultSet.close();
+	            } catch (Exception e) {
+	                throw e;
+	            }
+	        }
+
+	        if (selectStatement != null) {
+	            try {
+	                selectStatement.close();
+	            } catch (Exception e) {
+	                throw e;
+	            }
+	        }
+
+	        if (insertStatement != null) {
+	            try {
+	                insertStatement.close();
+	            } catch (Exception e) {
+	                throw e;
+	            }
+	        }
+	    }
+
+	    return id;
 	}
 
+
 	public List<Integer> chiudiAsta(int idAsta) throws SQLException {
-		List<Integer> codici = new ArrayList<Integer>();
-		String query = "UPDATE progetto_tiw.asta " + "SET `stato` = '0', `aggiudicatario` = "
-				+ "(SELECT offerente FROM progetto_tiw.offerta "
-				+ "WHERE progetto_tiw.offerta.idasta = progetto_tiw.asta.idasta "
-				+ "AND quantitaofferta = (SELECT MAX(quantitaofferta) FROM progetto_tiw.offerta "
-				+ "WHERE progetto_tiw.offerta.idasta = progetto_tiw.asta.idasta)) WHERE (idasta = ?)";
-		try (PreparedStatement pstatement = connection.prepareStatement(query)) {
-			pstatement.setInt(1, idAsta);
-			pstatement.executeUpdate();
-		}
-		String query2 = "SELECT progetto_tiw.articolo.codice FROM progetto_tiw.asta JOIN progetto_tiw.articolo ON progetto_tiw.asta.idasta = progetto_tiw.articolo.idasta WHERE progetto_tiw.asta.idasta = ?";
-		try (PreparedStatement pstatement = connection.prepareStatement(query2);) {
-			pstatement.setInt(1, idAsta);
-			try (ResultSet result = pstatement.executeQuery();) {
-				while (result.next()) {
-					codici.add(result.getInt("codice"));
-				}
-			}
-		}
-		return codici;
+	    connection.setAutoCommit(false);
+	    
+	    List<Integer> codici = new ArrayList<Integer>();
+	    String updateQuery = "UPDATE progetto_tiw.asta " + "SET `stato` = '0', `aggiudicatario` = "
+	            + "(SELECT offerente FROM progetto_tiw.offerta "
+	            + "WHERE progetto_tiw.offerta.idasta = progetto_tiw.asta.idasta "
+	            + "AND quantitaofferta = (SELECT MAX(quantitaofferta) FROM progetto_tiw.offerta "
+	            + "WHERE progetto_tiw.offerta.idasta = progetto_tiw.asta.idasta)) WHERE (idasta = ?)";
+	    
+	    String selectQuery = "SELECT progetto_tiw.articolo.codice FROM progetto_tiw.asta JOIN progetto_tiw.articolo ON progetto_tiw.asta.idasta = progetto_tiw.articolo.idasta WHERE progetto_tiw.asta.idasta = ?";
+	    
+	    PreparedStatement updateStatement = null;
+	    PreparedStatement selectStatement = null;
+	    ResultSet resultSet = null;
+	    
+	    try {
+	        updateStatement = connection.prepareStatement(updateQuery);
+	        updateStatement.setInt(1, idAsta);
+	        updateStatement.executeUpdate();
+	        
+	        // Se la prima query ha avuto successo, esegui la seconda query
+	        selectStatement = connection.prepareStatement(selectQuery);
+	        selectStatement.setInt(1, idAsta);
+	        resultSet = selectStatement.executeQuery();
+	        
+	        while (resultSet.next()) {
+	            codici.add(resultSet.getInt("codice"));
+	        }
+	        
+	        connection.commit();
+	    } catch (SQLException e) {
+	        connection.rollback();
+	        throw e;
+	    } finally {
+	        connection.setAutoCommit(true);
+	        
+	        if (resultSet != null) {
+	            try {
+	                resultSet.close();
+	            } catch (Exception e) {
+	                throw e;
+	            }
+	        }
+	        
+	        if (selectStatement != null) {
+	            try {
+	                selectStatement.close();
+	            } catch (Exception e) {
+	                throw e;
+	            }
+	        }
+	        
+	        if (updateStatement != null) {
+	            try {
+	                updateStatement.close();
+	            } catch (Exception e) {
+	                throw e;
+	            }
+	        }
+	    }
+	    
+	    return codici;
 	}
+
 
 	public Asta findAstaById(int idAsta) throws SQLException {
 		Asta asta = new Asta();
@@ -243,9 +327,12 @@ public class AstaDAO {
 	
 	public List<Asta> getAsteAggiudicateByUser(String user) throws SQLException{
 		List<Asta> aste = new ArrayList<Asta>();
-		String query = "SELECT progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.stato, progetto_tiw.asta.creatore, progetto_tiw.asta.aggiudicatario "
+		String query = "SELECT IFNULL(MAX(progetto_tiw.offerta.quantitaofferta), -1) AS max_quantita, progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.stato, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore, asta.aggiudicatario "
 				+ "FROM progetto_tiw.asta "
-				+ "WHERE progetto_tiw.asta.aggiudicatario = ?";
+				+ "LEFT JOIN progetto_tiw.offerta ON progetto_tiw.asta.idasta = progetto_tiw.offerta.idasta "
+				+ "WHERE progetto_tiw.asta.stato = false AND asta.aggiudicatario = ? "
+				+ "GROUP BY progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
+				+ "ORDER BY progetto_tiw.asta.scadenza ASC ";
 		try(PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setString(1, user);
 			try (ResultSet result = pstatement.executeQuery()){
@@ -257,6 +344,7 @@ public class AstaDAO {
 					asta.setPrezzoIniziale(result.getDouble("prezzoiniziale"));
 					asta.setStato(result.getBoolean("stato"));
 					asta.setCreatore(result.getString("creatore"));
+					asta.setOffertaMax(result.getDouble("max_quantita"));
 					asta.setAggiudicatario(result.getString("aggiudicatario"));
 					aste.add(asta);
 				}

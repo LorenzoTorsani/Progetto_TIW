@@ -23,6 +23,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import it.polimi.tiw.project.beans.Asta;
+import it.polimi.tiw.project.beans.User;
 import it.polimi.tiw.project.dao.AstaDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
@@ -84,11 +85,20 @@ public class FindAstaByWord extends HttpServlet {
 		}
 
 		AstaDAO astaDAO = new AstaDAO(connection);
+		User user = (User) session.getAttribute("user");
 		List<Asta> aste = new ArrayList<Asta>();
+		List<Asta> asteAggiudicate = new ArrayList<Asta>();
 		try {
 			aste = astaDAO.findAstaByWord(parola);
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile creare articolo");
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile trovare asta");
+			return;
+		}
+		
+		try {
+			asteAggiudicate = astaDAO.getAsteAggiudicateByUser(user.getUsername());
+		} catch (SQLException e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile caricare aste aggiudicate");
 			return;
 		}
 		
@@ -96,6 +106,7 @@ public class FindAstaByWord extends HttpServlet {
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("aste", aste);
+		ctx.setVariable("asteAggiudicate", asteAggiudicate);
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 

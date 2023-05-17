@@ -8,6 +8,8 @@
 </head>
 <body>
 	<h1>Dettagli asta</h1>
+	<a th:href="@{/Home}">Torna alla home</a>
+
 	<div>
 		<table>
 			<caption>La tua asta</caption>
@@ -55,7 +57,6 @@
 		offerte.</div>
 
 	<div>
-		<!-- prova con passaggio parametri a chiudi asta -->
 		<form th:action="@{/chiudiAsta}" method="POST">
 			<input type="hidden" name="idAsta" th:value="${asta.idAsta}">
 			<button type="submit" th:attr="disabled=${not chiudibile}">Chiudi asta</button>
