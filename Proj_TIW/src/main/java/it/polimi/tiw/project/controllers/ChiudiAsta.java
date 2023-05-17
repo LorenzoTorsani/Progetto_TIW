@@ -5,9 +5,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -23,12 +21,11 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import it.polimi.tiw.project.beans.Asta;
 import it.polimi.tiw.project.beans.User;
-import it.polimi.tiw.project.dao.ArticoloDAO;
 import it.polimi.tiw.project.dao.AstaDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
 @WebServlet("/chiudiAsta")
-public class ChiudiAsta extends HttpServlet{
+public class ChiudiAsta extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
@@ -36,7 +33,7 @@ public class ChiudiAsta extends HttpServlet{
 	public ChiudiAsta() {
 		super();
 	}
-	
+
 	public void init() throws ServletException {
 		ServletContext servletContext = getServletContext();
 		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
@@ -47,7 +44,7 @@ public class ChiudiAsta extends HttpServlet{
 
 		connection = ConnectionHandler.getConnection(getServletContext());
 	}
-	
+
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
 		if(session.isNew() || session.getAttribute("user") == null) {
@@ -91,14 +88,9 @@ public class ChiudiAsta extends HttpServlet{
 				return;
 			}
 			if(asta.getScadenza().compareTo(new  Date(System.currentTimeMillis())) < 0) {
-				codici = astaDAO.chiudiAsta(idAsta);
-				ArticoloDAO articoloDAO = new ArticoloDAO(connection);
 				try {
-					for(int i = 0; i < codici.size(); i++) {
-						articoloDAO.setVendutiByCodice(codici.get(i));
-					}
-				}
-				catch(SQLException e) {
+					codici = astaDAO.chiudiAsta(idAsta);
+				} catch(SQLException e) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile vendere articolo");
 					return;
 				}
@@ -116,7 +108,7 @@ public class ChiudiAsta extends HttpServlet{
 		String path = ctxpath + "/Vendo";
 		response.sendRedirect(path);
 	}
-	
+
 	public void destroy() {
 		try {
 			ConnectionHandler.closeConnection(connection);

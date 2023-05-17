@@ -1,7 +1,6 @@
 package it.polimi.tiw.project.dao;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +16,10 @@ public class OffertaDAO {
 	public OffertaDAO(Connection connection) {
 		this.connection = connection;
 	}
-	
+
 	public void createOfferta(String user, int idAsta, Double offerta) throws SQLException {
 		String query = "INSERT into offerta (offerente, idasta, quantitaofferta) VALUES (?, ?, ?)";
-		try (PreparedStatement pstatement = connection.prepareStatement(query);){
+		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setString(1, user);
 			pstatement.setInt(2, idAsta);
 			pstatement.setDouble(3, offerta);
@@ -28,19 +27,18 @@ public class OffertaDAO {
 			pstatement.executeUpdate();
 		}
 	}
-	
+
 	public List<Offerta> findOfferte(int idAsta) throws SQLException {
 		List<Offerta> offerte = new ArrayList<Offerta>();
-		
-		String query = "SELECT progetto_tiw.offerta.offerente, progetto_tiw.offerta.idasta, progetto_tiw.offerta.quantitaofferta, progetto_tiw.offerta.oraofferta "
-				+ "FROM progetto_tiw.asta JOIN progetto_tiw.offerta ON "
-				+ "progetto_tiw.offerta.idasta = progetto_tiw.asta.idasta "
-				+ "WHERE progetto_tiw.asta.idasta = ? "
+
+		String query = "SELECT offerta.offerente, offerta.idasta, offerta.quantitaofferta, offerta.oraofferta "
+				+ "FROM asta JOIN offerta ON "
+				+ "offerta.idasta = asta.idasta " + "WHERE asta.idasta = ? "
 				+ "ORDER BY oraofferta DESC";
-		
-		try(PreparedStatement pstatement = connection.prepareStatement(query);) {
+
+		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setInt(1, idAsta);
-			try (ResultSet result = pstatement.executeQuery()){
+			try (ResultSet result = pstatement.executeQuery()) {
 				while (result.next()) {
 					Offerta offerta = new Offerta();
 					offerta.setOfferente(result.getString("offerente"));
@@ -53,22 +51,24 @@ public class OffertaDAO {
 				System.out.println(e.getMessage());
 			}
 		}
-		
+
 		return offerte;
 	}
-	
-	public Double getOffertaMaxByAstaid(int idAsta) throws SQLException{
+
+	public Double getOffertaMaxByAstaid(int idAsta) throws SQLException {
 		Double maxOfferta = 0.0;
-		String query = "SELECT MAX(progetto_tiw.offerta.quantitaofferta) "
-				+ "FROM progetto_tiw.offerta "
-				+ "WHERE progetto_tiw.offerta.idasta = ? "
-				+ "GROUP BY progetto_tiw.offerta.idasta";
-		try(PreparedStatement pstatement = connection.prepareStatement(query);) {
+		String query = "SELECT MAX(offerta.quantitaofferta) AS maxOfferta "
+				+ "FROM offerta "
+				+ "WHERE offerta.idasta = ? "
+				+ "GROUP BY offerta.idasta";
+		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setInt(1, idAsta);
-			try (ResultSet result = pstatement.executeQuery()){
-					maxOfferta = result.getDouble("MAX(progetto_tiw.offerta.quantitaofferta)");
+			try (ResultSet result = pstatement.executeQuery()) {
+				while (result.next()) {
+					maxOfferta = result.getDouble("maxOfferta");
+
+				}
 			} catch (SQLException e) {
-				System.out.println(e.getMessage());
 			}
 		}
 		return maxOfferta;

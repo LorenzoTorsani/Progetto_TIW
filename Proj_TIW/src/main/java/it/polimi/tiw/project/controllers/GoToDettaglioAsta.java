@@ -78,11 +78,11 @@ public class GoToDettaglioAsta extends HttpServlet {
 		try {
 			asta = astaDAO.findAstaById(idAsta);
 			if (asta == null) {
-				response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
+				response.sendError(HttpServletResponse.SC_NOT_FOUND, "Risorsa non trovata");
 				return;
 			}
 			if (!astaDAO.getCreatorUser(idAsta).equals(user.getUsername()) ) {
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not allowed");
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Utente non autorizzato");
 				return;
 			}
 			offerte = offertaDAO.findOfferte(idAsta);

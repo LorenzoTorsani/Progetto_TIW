@@ -65,7 +65,7 @@ public class GoToOfferta extends HttpServlet{
 			idAsta = Integer.parseInt(request.getParameter("idasta"));
 		} catch (NumberFormatException | NullPointerException e) {
 			// only for debugging e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Valori parametri incorretti");
 			return;
 		}
 		
@@ -81,6 +81,7 @@ public class GoToOfferta extends HttpServlet{
 			articoli = articoloDAO.getArticoliByAsta(idAsta);
 			offerte = offertaDAO.findOfferte(idAsta);
 			maxOfferta = offertaDAO.getOffertaMaxByAstaid(idAsta);
+			System.out.println(maxOfferta);
 			asta = astaDAO.findAstaById(idAsta);
 		} catch (SQLException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere articoli");

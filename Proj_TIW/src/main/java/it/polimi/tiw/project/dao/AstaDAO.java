@@ -14,10 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 import java.io.IOException;
 
 import it.polimi.tiw.project.beans.Asta;
-import it.polimi.tiw.project.beans.Offerta;
 import it.polimi.tiw.project.beans.User;
 
 public class AstaDAO {
@@ -34,7 +34,7 @@ public class AstaDAO {
 	    String query = "INSERT into asta (scadenza, rialzominimo, prezzoiniziale, stato, creatore) VALUES (?, ?, ?, true, ?)";
 	    PreparedStatement insertStatement = null;
 
-	    String query2 = "SELECT MAX(progetto_tiw.asta.idasta) FROM progetto_tiw.asta";
+	    String query2 = "SELECT MAX(asta.idasta) FROM asta";
 	    PreparedStatement selectStatement = null;
 	    ResultSet resultSet = null;
 	    
@@ -52,7 +52,7 @@ public class AstaDAO {
 	        resultSet = selectStatement.executeQuery();
 
 	        if (resultSet.next()) {
-	            id = resultSet.getInt("MAX(progetto_tiw.asta.idasta)");
+	            id = resultSet.getInt("MAX(asta.idasta)");
 	        }
 
 	        connection.commit();
@@ -95,13 +95,13 @@ public class AstaDAO {
 	    connection.setAutoCommit(false);
 	    
 	    List<Integer> codici = new ArrayList<Integer>();
-	    String updateQuery = "UPDATE progetto_tiw.asta " + "SET `stato` = '0', `aggiudicatario` = "
-	            + "(SELECT offerente FROM progetto_tiw.offerta "
-	            + "WHERE progetto_tiw.offerta.idasta = progetto_tiw.asta.idasta "
-	            + "AND quantitaofferta = (SELECT MAX(quantitaofferta) FROM progetto_tiw.offerta "
-	            + "WHERE progetto_tiw.offerta.idasta = progetto_tiw.asta.idasta)) WHERE (idasta = ?)";
+	    String updateQuery = "UPDATE asta " + "SET `stato` = '0', `aggiudicatario` = "
+	            + "(SELECT offerente FROM offerta "
+	            + "WHERE offerta.idasta = asta.idasta "
+	            + "AND quantitaofferta = (SELECT MAX(quantitaofferta) FROM offerta "
+	            + "WHERE offerta.idasta = asta.idasta)) WHERE (idasta = ?)";
 	    
-	    String selectQuery = "SELECT progetto_tiw.articolo.codice FROM progetto_tiw.asta JOIN progetto_tiw.articolo ON progetto_tiw.asta.idasta = progetto_tiw.articolo.idasta WHERE progetto_tiw.asta.idasta = ?";
+	    String selectQuery = "SELECT articolo.codice FROM asta JOIN articolo ON asta.idasta = articolo.idasta WHERE asta.idasta = ?";
 	    
 	    PreparedStatement updateStatement = null;
 	    PreparedStatement selectStatement = null;
@@ -120,6 +120,12 @@ public class AstaDAO {
 	        while (resultSet.next()) {
 	            codici.add(resultSet.getInt("codice"));
 	        }
+	        
+	        // setta come venduti gli articoli contenuti nell'asta
+	        ArticoloDAO articoloDAO = new ArticoloDAO(connection);
+	        for(int i = 0; i < codici.size(); i++) {
+				articoloDAO.setVendutiByCodice(codici.get(i));
+			}
 	        
 	        connection.commit();
 	    } catch (SQLException e) {
@@ -192,12 +198,12 @@ public class AstaDAO {
 	public List<Asta> getAsteAperteByUser(String user) throws SQLException, IOException {
 		List<Asta> asteAperte = new ArrayList<Asta>();
 
-		String query = "SELECT IFNULL(MAX(progetto_tiw.offerta.quantitaofferta), -1) AS max_quantita, progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
-				+ "FROM progetto_tiw.asta "
-				+ "LEFT JOIN progetto_tiw.offerta ON progetto_tiw.asta.idasta = progetto_tiw.offerta.idasta "
-				+ "WHERE progetto_tiw.asta.stato = true AND progetto_tiw.asta.creatore = ? "
-				+ "GROUP BY progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
-				+ "ORDER BY progetto_tiw.asta.scadenza ASC";
+		String query = "SELECT IFNULL(MAX(offerta.quantitaofferta), -1) AS max_quantita, asta.idasta, asta.scadenza, asta.rialzominimo, asta.prezzoiniziale, asta.creatore "
+				+ "FROM asta "
+				+ "LEFT JOIN offerta ON asta.idasta = offerta.idasta "
+				+ "WHERE asta.stato = true AND asta.creatore = ? "
+				+ "GROUP BY asta.idasta, asta.scadenza, asta.rialzominimo, asta.prezzoiniziale, asta.creatore "
+				+ "ORDER BY asta.scadenza ASC";
 
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setString(1, user);
@@ -283,13 +289,13 @@ public class AstaDAO {
 
 	public List<Asta> findAstaByWord(String parola) throws SQLException, IOException {
 		List<Asta> aste = new ArrayList<Asta>();
-		String query = "SELECT IFNULL(MAX(progetto_tiw.offerta.quantitaofferta), -1) AS max_quantita, progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.stato, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
-				+ "FROM progetto_tiw.asta "
-				+ "LEFT JOIN progetto_tiw.offerta ON progetto_tiw.asta.idasta = progetto_tiw.offerta.idasta "
-				+ "JOIN progetto_tiw.articolo ON progetto_tiw.articolo.idasta = progetto_tiw.asta.idasta "
-				+ "WHERE progetto_tiw.asta.stato = true AND (progetto_tiw.articolo.descrizione LIKE ? OR progetto_tiw.articolo.nome LIKE ?) "
-				+ "GROUP BY progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
-				+ "ORDER BY progetto_tiw.asta.scadenza ASC";
+		String query = "SELECT IFNULL(MAX(offerta.quantitaofferta), -1) AS max_quantita, asta.idasta, asta.scadenza, asta.rialzominimo, asta.stato, asta.prezzoiniziale, asta.creatore "
+				+ "FROM asta "
+				+ "LEFT JOIN offerta ON asta.idasta = offerta.idasta "
+				+ "JOIN articolo ON articolo.idasta = asta.idasta "
+				+ "WHERE asta.stato = true AND (articolo.descrizione LIKE ? OR articolo.nome LIKE ?) "
+				+ "GROUP BY asta.idasta, asta.scadenza, asta.rialzominimo, asta.prezzoiniziale, asta.creatore "
+				+ "ORDER BY asta.scadenza ASC";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			parola = "%" + parola + "%";
 			pstatement.setString(1, parola);
@@ -327,12 +333,12 @@ public class AstaDAO {
 	
 	public List<Asta> getAsteAggiudicateByUser(String user) throws SQLException{
 		List<Asta> aste = new ArrayList<Asta>();
-		String query = "SELECT IFNULL(MAX(progetto_tiw.offerta.quantitaofferta), -1) AS max_quantita, progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.stato, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore, asta.aggiudicatario "
-				+ "FROM progetto_tiw.asta "
-				+ "LEFT JOIN progetto_tiw.offerta ON progetto_tiw.asta.idasta = progetto_tiw.offerta.idasta "
-				+ "WHERE progetto_tiw.asta.stato = false AND asta.aggiudicatario = ? "
-				+ "GROUP BY progetto_tiw.asta.idasta, progetto_tiw.asta.scadenza, progetto_tiw.asta.rialzominimo, progetto_tiw.asta.prezzoiniziale, progetto_tiw.asta.creatore "
-				+ "ORDER BY progetto_tiw.asta.scadenza ASC ";
+		String query = "SELECT IFNULL(MAX(offerta.quantitaofferta), -1) AS max_quantita, asta.idasta, asta.scadenza, asta.rialzominimo, asta.stato, asta.prezzoiniziale, asta.creatore, asta.aggiudicatario "
+				+ "FROM asta "
+				+ "LEFT JOIN offerta ON asta.idasta = offerta.idasta "
+				+ "WHERE asta.stato = false AND asta.aggiudicatario = ? "
+				+ "GROUP BY asta.idasta, asta.scadenza, asta.rialzominimo, asta.prezzoiniziale, asta.creatore "
+				+ "ORDER BY asta.scadenza ASC ";
 		try(PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setString(1, user);
 			try (ResultSet result = pstatement.executeQuery()){
@@ -349,7 +355,6 @@ public class AstaDAO {
 					aste.add(asta);
 				}
 			} catch (SQLException e) {
-				System.out.println(e.getMessage());
 			}
 		}
 		return aste;

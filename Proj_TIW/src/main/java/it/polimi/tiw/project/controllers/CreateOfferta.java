@@ -2,12 +2,7 @@ package it.polimi.tiw.project.controllers;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -53,6 +48,7 @@ public class CreateOfferta extends HttpServlet{
 		connection = ConnectionHandler.getConnection(getServletContext());
 	}
 	
+	/*
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 		HttpSession session = request.getSession();
 		if(session.isNew() || session.getAttribute("user") == null) {
@@ -75,35 +71,30 @@ public class CreateOfferta extends HttpServlet{
 			e.printStackTrace();
 		}
 		if(isBadRequest) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect or missing param values");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Valori parametri mancanti o incorretti");
 			return;
 		}
 		User user = (User) session.getAttribute("user");
-		System.out.println(user.getUsername());
 		OffertaDAO offertaDAO = new OffertaDAO(connection);
 		AstaDAO astaDAO = new AstaDAO(connection);
 		Boolean error = false;
 		try {
 			Double off = offertaDAO.getOffertaMaxByAstaid(idAsta);
-			System.out.println("query 1 fatta");
 			if(off > 0) {
 				if(offerta <= off) {
 					error = true;
 				}
 				else {
 					offertaDAO.createOfferta(user.getUsername(), idAsta, offerta);
-					System.out.println("query 2 fatta");
 				}
 			}
 			else {
 				off = astaDAO.findAstaById(idAsta).getPrezzoIniziale();
-				System.out.println("query 3 fatta");
 				if(offerta <= off + astaDAO.findAstaById(idAsta).getRialzoMinimo()) {
 					error = true;
 				}
 				else {
 					offertaDAO.createOfferta(user.getUsername(), idAsta, offerta);
-					System.out.println("query 4 fatta");
 				}
 			}
 			if(error) {
@@ -111,7 +102,6 @@ public class CreateOfferta extends HttpServlet{
 				return;
 			}
 		}catch(SQLException e) {
-			System.out.println(e.getMessage());
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile creare offerta");
 			return;
 		}
@@ -132,6 +122,7 @@ public class CreateOfferta extends HttpServlet{
 		}
 	
 		
+		
 		String path = "/WEB-INF/Offerta.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
@@ -140,6 +131,70 @@ public class CreateOfferta extends HttpServlet{
 		ctx.setVariable("maxOfferta", maxOfferta);
 		ctx.setVariable("asta", asta);
 		templateEngine.process(path, ctx, response.getWriter());
+	}
+	*/
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+		HttpSession session = request.getSession();
+		if(session.isNew() || session.getAttribute("user") == null) {
+			String loginpath = getServletContext().getContextPath() + "/index.html";
+			response.sendRedirect(loginpath);
+			return;
+		}
+		
+		boolean isBadRequest = false;
+		Integer idAsta = null;
+		Double offerta = null;
+		try {
+			idAsta = Integer.parseInt(request.getParameter("idAsta"));
+			offerta = Double.parseDouble(request.getParameter("Offerta"));
+			ArticoloDAO articoloDAO = new ArticoloDAO(connection);
+			isBadRequest = (idAsta == null || offerta == null);
+		} catch(NumberFormatException | NullPointerException e) {
+			isBadRequest = true;
+			e.printStackTrace();
+		}
+		if(isBadRequest) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Valori parametri mancanti o incorretti");
+			return;
+		}
+		
+		User user = (User) session.getAttribute("user");
+		OffertaDAO offertaDAO = new OffertaDAO(connection);
+		AstaDAO astaDAO = new AstaDAO(connection);
+		Boolean error = false;
+		try {
+			Double off = offertaDAO.getOffertaMaxByAstaid(idAsta);
+			if(off > 0) {
+				if(offerta <= off) {
+					error = true;
+				}
+				else {
+					offertaDAO.createOfferta(user.getUsername(), idAsta, offerta);
+				}
+			}
+			else {
+				off = astaDAO.findAstaById(idAsta).getPrezzoIniziale();
+				if(offerta <= off + astaDAO.findAstaById(idAsta).getRialzoMinimo()) {
+					error = true;
+				}
+				else {
+					offertaDAO.createOfferta(user.getUsername(), idAsta, offerta);
+				}
+			}
+			if(error) {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Offerta non sufficiente");
+				return;
+			}
+		}catch(SQLException e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile creare offerta");
+			return;
+		}
+		
+		String ctxpath = getServletContext().getContextPath();
+		String path = ctxpath + "/GoToOfferta?idasta=" + idAsta;
+		response.sendRedirect(path);
+		
 	}
 	
 	public void destroy() {

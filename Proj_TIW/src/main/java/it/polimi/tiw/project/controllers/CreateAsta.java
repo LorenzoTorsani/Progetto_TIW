@@ -44,7 +44,6 @@ public class CreateAsta extends HttpServlet {
 		Date scadenza = null;
 		Integer rialzoMinimo = 0;
 		Double prezzoIniziale = 0.0;
-		boolean stato = false;
 		java.util.Date tempdate = null;
 		String[] codes = null;
 		int[] codici = null;
@@ -74,14 +73,13 @@ public class CreateAsta extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ottenere prezzo iniziale");
 				return;
 			}
-			stato = true;
 			isBadRequest = scadenza == null;
 		} catch(NumberFormatException | NullPointerException e) {
 			isBadRequest = true;
 			e.printStackTrace();
 		}
 		if(isBadRequest) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect or missing param values");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Valori parametri mancanti o incorretti");
 			return;
 		}
 		
@@ -95,7 +93,6 @@ public class CreateAsta extends HttpServlet {
 			if(rialzoMinimo > 0 && scadenza.after(oggi)) {
 				for(int i = 0; i < codici.length; i++) {
 					Integer check = articoloDAO.getIdByCodice(codici[i]);
-					System.out.println(check);
 					if(check != null) {
 						error = true;
 					}
@@ -107,7 +104,7 @@ public class CreateAsta extends HttpServlet {
 					}
 				}
 			} else {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values");
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Valore parametri incorretto");
 				return;
 			}
 			if(error) {

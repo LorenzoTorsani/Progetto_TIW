@@ -1,6 +1,5 @@
 package it.polimi.tiw.project.controllers;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,11 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.sql.Date;
 
-import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -52,20 +47,18 @@ public class CreateArticolo extends HttpServlet{
 			response.sendRedirect(loginpath);
 			return;
 		}
+		
 		String fileName = new String();
 		boolean isBadRequest = false;
 		String name = null;
 		String description = null;
 		Double price = 0.0;
 		boolean sold = false;
-		//Part bits = null;
-		//BufferedImage image = null;
+		
 		try {
 			name = StringEscapeUtils.escapeJava(request.getParameter("name"));
 			description = StringEscapeUtils.escapeJava(request.getParameter("description"));
 			price = Double.parseDouble(request.getParameter("price"));
-			//bits = request.getPart("image");
-			//image = ImageIO.read(bits.getInputStream());
 			sold = false;
 			isBadRequest = name.isEmpty() || description.isEmpty();
 		} catch(NumberFormatException | NullPointerException e) {
@@ -73,18 +66,18 @@ public class CreateArticolo extends HttpServlet{
 			e.printStackTrace();
 		}
 		if(isBadRequest) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect or missing param values");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Valori parametri mancanti o incorretti");
 			return;
 		}
 		else {
 			Part filePart = request.getPart("file");
 			if(filePart == null || filePart.getSize() <= 0) {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing file in request!");
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "File mancante");
 				return;
 			}
 			String contentType = filePart.getContentType();
 			if (!contentType.startsWith("image")) {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "File format not permitted");
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Formato file non permesso");
 				return;
 			}
 			fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
@@ -94,7 +87,7 @@ public class CreateArticolo extends HttpServlet{
 				Files.copy(fileContent, file.toPath());
 			} catch (Exception e) {
 				e.printStackTrace();
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while saving file");
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Errore nel salvataggio file");
 				return;
 			}
 		}

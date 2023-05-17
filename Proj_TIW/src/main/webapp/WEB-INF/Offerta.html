@@ -27,12 +27,12 @@
 					<td th:text="${entry.name}"></td>
 					<td th:text="${entry.description}"></td>
 					<td th:text="${entry.price}"></td>
-					<td th:text="${entry.image}"></td>
+					<td><a th:href="@{/GetImage(image=${entry.image})}">Vedi immagine</a></td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
-	
+
 	<br>
 
 	<div th:if="${offerte.size() > 0}">
@@ -56,12 +56,16 @@
 	</div>
 
 	<div th:if="${offerte.size() == 0}">Ancora nessuna offerta</div>
-
+	<p th:text="${maxOfferta}"></p>
 	<br>
-	
-	<form action="#" th:action="@{/CreateOfferta(idAsta)}" method="GET">
-		<input type="number" step="0.01" th:min="${maxOfferta > 0 ? maxOfferta + asta.rialzoMinimo : asta.prezzoIniziale + asta.rialzoMinimo}" name="Offerta" required />
-		<button type="submit" name="idAsta" th:value="${asta.idAsta}">Crea Offerta</button>
+
+	<form action="#" th:action="@{/CreateOfferta}" method="POST">
+		<input type="number" step="0.01"
+			th:min="${maxOfferta > 0 ? maxOfferta + asta.rialzoMinimo : asta.prezzoIniziale + asta.rialzoMinimo}"
+			name="Offerta" required /> <input type="hidden" name="idAsta"
+			th:value="${asta.idAsta}" />
+		<button type="submit">Crea Offerta</button>
 	</form>
+
 </body>
 </html>

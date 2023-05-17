@@ -75,7 +75,7 @@ public class ArticoloDAO {
 	}
 	
 	public void setVendutiByCodice(int codice) throws SQLException{
-		String query = "UPDATE progetto_tiw.articolo SET progetto_tiw.articolo.venduto = 1 WHERE progetto_tiw.articolo.codice = ?";
+		String query = "UPDATE articolo SET articolo.venduto = 1 WHERE articolo.codice = ?";
 		try(PreparedStatement pstatement = connection.prepareStatement(query)){
 			pstatement.setInt(1, codice);
 			pstatement.executeUpdate();
@@ -97,7 +97,7 @@ public class ArticoloDAO {
 	}
 	
 	public Integer getIdByCodice(int codice) throws SQLException{
-		String query = "SELECT progetto_tiw.articolo.idasta FROM progetto_tiw.articolo WHERE progetto_tiw.articolo.codice = ?";
+		String query = "SELECT articolo.idasta FROM articolo WHERE articolo.codice = ?";
 		try(PreparedStatement pstatement = connection.prepareStatement(query)){
 			pstatement.setInt(1, codice);
 			try (ResultSet result = pstatement.executeQuery();) {
@@ -119,7 +119,7 @@ public class ArticoloDAO {
 	}
 	
 	public void updateArticolo(int codice, int idAsta) throws SQLException {
-		String query = "UPDATE progetto_tiw.articolo SET progetto_tiw.articolo.idasta = ? WHERE progetto_tiw.articolo.codice = ?";
+		String query = "UPDATE articolo SET articolo.idasta = ? WHERE articolo.codice = ?";
 		try(PreparedStatement pstatement = connection.prepareStatement(query)){
 			pstatement.setInt(1, idAsta);
 			pstatement.setInt(2, codice);
