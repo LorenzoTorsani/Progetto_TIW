@@ -43,23 +43,29 @@
 				<tr>
 					<th>Offerente</th>
 					<th>Offerta</th>
+					<th>Data e ora</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr th:each="offerta : ${offerte}">
 					<td th:text="${offerta.offerente}"></td>
 					<td th:text="${offerta.offerta}"></td>
+					<td><span
+						th:text="${offerta.data}"></span>
+					</td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
+
 	<div th:if="${offerte.size() == 0}">Non hai ancora ricevuto
 		offerte.</div>
 
 	<div>
 		<form th:action="@{/chiudiAsta}" method="POST">
 			<input type="hidden" name="idAsta" th:value="${asta.idAsta}">
-			<button type="submit" th:attr="disabled=${not chiudibile}">Chiudi asta</button>
+			<button type="submit" th:attr="disabled=${not chiudibile}">Chiudi
+				asta</button>
 		</form>
 	</div>
 </body>

@@ -2,6 +2,7 @@ package it.polimi.tiw.project.dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,11 +45,15 @@ public class OffertaDAO {
 					offerta.setOfferente(result.getString("offerente"));
 					offerta.setIdAsta(result.getInt("idasta"));
 					offerta.setOfferta(result.getDouble("quantitaofferta"));
-					offerta.setData(result.getDate("oraofferta"));
+					java.sql.Timestamp timestamp = result.getTimestamp("oraofferta");
+					java.util.Date utilDate = new java.util.Date(timestamp.getTime());
+					java.time.LocalDateTime localDateTime = utilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+					java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+					offerta.setData(localDateTime.format(formatter));
+
 					offerte.add(offerta);
 				}
 			} catch (SQLException e) {
-				System.out.println(e.getMessage());
 			}
 		}
 

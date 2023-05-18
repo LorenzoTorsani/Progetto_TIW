@@ -82,6 +82,14 @@ public class ArticoloDAO {
 		}
 	}
 	
+	public void setInvendutiByCodice(int codice) throws SQLException{
+		String query = "UPDATE articolo SET articolo.idasta = NULL WHERE articolo.codice = ?";
+		try(PreparedStatement pstatement = connection.prepareStatement(query)){
+			pstatement.setInt(1, codice);
+			pstatement.executeUpdate();
+		}
+	}
+	
 	public void createArticolo(String description, String name, Double price, String image, boolean sold, String user) throws SQLException, IOException {
 		String query = "INSERT into articolo (descrizione, nome, prezzo, immagine, venduto, proprietario) VALUES(?, ?, ?, ?, ?, ?)";
 		try (PreparedStatement pstatement = connection.prepareStatement(query)){

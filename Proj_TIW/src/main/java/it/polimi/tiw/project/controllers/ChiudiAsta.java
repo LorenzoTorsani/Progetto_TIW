@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,7 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import it.polimi.tiw.project.beans.Asta;
 import it.polimi.tiw.project.beans.User;
 import it.polimi.tiw.project.dao.AstaDAO;
+import it.polimi.tiw.project.dao.OffertaDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
 @WebServlet("/chiudiAsta")
@@ -69,9 +72,9 @@ public class ChiudiAsta extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter id with format number is required");
 			return;
 		}
-		List<Integer> codici = new ArrayList<Integer>();
 		User user = (User) session.getAttribute("user");
 		AstaDAO astaDAO = new AstaDAO(connection);
+		OffertaDAO offertaDAO = new OffertaDAO(connection);
 		try {
 			
 			Asta asta = astaDAO.findAstaById(idAsta);
@@ -87,9 +90,21 @@ public class ChiudiAsta extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Asta già chiusa");
 				return;
 			}
-			if(asta.getScadenza().compareTo(new  Date(System.currentTimeMillis())) < 0) {
+			java.util.Date tempdate = null;
+			try {
+				tempdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(asta.getScadenza());
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			if(tempdate.compareTo(new  Date(System.currentTimeMillis())) < 0) {
 				try {
-					codici = astaDAO.chiudiAsta(idAsta);
+					if(offertaDAO.getOffertaMaxByAstaid(idAsta) != 0.0) {
+						astaDAO.chiudiAsta(idAsta);
+					} else {
+						astaDAO.chiudiAstaNoOff(idAsta);
+					}
+					
 				} catch(SQLException e) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile vendere articolo");
 					return;

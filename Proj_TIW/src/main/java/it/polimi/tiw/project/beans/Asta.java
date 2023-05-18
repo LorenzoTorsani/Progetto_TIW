@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Asta {
 	private int idAsta;
-	private Date scadenza; 
+	private String scadenza; 
 	private int rialzoMinimo;
 	private double prezzoIniziale;
 	private boolean stato;
@@ -21,7 +21,7 @@ public class Asta {
 		this.idAsta = idAsta;
 	}
 	
-	public void setScadenza(Date date) {
+	public void setScadenza(String date) {
 		this.scadenza = date;
 	}
 	
@@ -41,7 +41,7 @@ public class Asta {
 		return this.idAsta;
 	}
 	
-	public Date getScadenza() {
+	public String getScadenza() {
 		return this.scadenza;
 	}
 

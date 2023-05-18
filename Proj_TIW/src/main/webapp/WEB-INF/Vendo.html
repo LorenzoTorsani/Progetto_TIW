@@ -83,7 +83,7 @@
 					<th>Id</th>
 					<th>Scadenza</th>
 					<th>Prezzo iniziale</th>
-					<th>Rialzo minimo</th>
+					<th>Prezzo finale</th>
 					<th>Aggiudicatario</th>
 					<th>Indirizzo</th>
 				</tr>
@@ -93,7 +93,7 @@
 					<td th:text="${entry.key.idAsta}"></td>
 					<td th:text="${entry.key.scadenza}"></td>
 					<td th:text="${entry.key.prezzoIniziale}"></td>
-					<td th:text="${entry.key.rialzoMinimo}"></td>
+					<td th:text="${entry.key.offertaMax}"></td>
 					<td th:text="${entry.value.username}"></td>
 					<td th:text="${entry.value.address}"></td>
 				</tr>

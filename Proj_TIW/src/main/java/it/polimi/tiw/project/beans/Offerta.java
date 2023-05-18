@@ -1,12 +1,13 @@
 package it.polimi.tiw.project.beans;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 public class Offerta {
 	private String offerente;
 	private int idAsta;
 	private double offerta;
-	private Date data;
+	private String data;
 	
 	public void setOfferente(String offerente) {
 		this.offerente = offerente;
@@ -34,12 +35,12 @@ public class Offerta {
 	}
 
 
-	public Date getData() {
+	public String getData() {
 		return data;
 	}
 
 
-	public void setData(Date data) {
+	public void setData(String data) {
 		this.data = data;
 	}
 }
