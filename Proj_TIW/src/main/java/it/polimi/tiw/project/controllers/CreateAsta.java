@@ -6,6 +6,8 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -41,11 +43,11 @@ public class CreateAsta extends HttpServlet {
 			return;
 		}
 		boolean isBadRequest = false;
-		Date scadenza = null;
 		Integer rialzoMinimo = 0;
 		Double prezzoIniziale = 0.0;
 		java.util.Date tempdate = null;
 		String[] codes = null;
+		Instant scadenza = null;
 		int[] codici = null;
 		try {
 			try {
@@ -56,12 +58,13 @@ public class CreateAsta extends HttpServlet {
 				isBadRequest = true;
 			}
 			try {
-				tempdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(request.getParameter("scadenza"));
+				tempdate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(request.getParameter("scadenza"));
+
 			} catch (ParseException e) {
 				e.printStackTrace();
 				isBadRequest = true;
 			}
-			scadenza = new java.sql.Date(tempdate.getTime());
+			scadenza = tempdate.toInstant();
 			rialzoMinimo = Integer.parseInt(request.getParameter("rialzoMinimo"));
 			for(int i = 0; i < codes.length; i++) {
 				codici[i] = Integer.parseInt(codes[i]);
@@ -89,8 +92,8 @@ public class CreateAsta extends HttpServlet {
 		ArticoloDAO articoloDAO = new ArticoloDAO(connection);
 		try {
 			Boolean error = false;
-			Date oggi = new Date(System.currentTimeMillis());
-			if(rialzoMinimo > 0 && scadenza.after(oggi)) {
+			Instant oggi = new java.util.Date(System.currentTimeMillis()).toInstant();
+			if(rialzoMinimo > 0 && scadenza.isAfter(oggi)) {
 				for(int i = 0; i < codici.length; i++) {
 					Integer check = articoloDAO.getIdByCodice(codici[i]);
 					if(check != null) {

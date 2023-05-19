@@ -52,7 +52,7 @@
 			<tbody>
 				<tr th:each="entry : ${asteAperte}">
 					<td th:text="${entry.idAsta}"></td>
-					<td th:text="${entry.scadenza}"></td>
+					<td th:text="${entry.scad}"></td>
 					<td th:text="${entry.tempoMancante}"></td>
 					<td th:text="${entry.prezzoIniziale}"></td>
 					<td th:text="${entry.rialzoMinimo}"></td>
@@ -91,7 +91,7 @@
 			<tbody>
 				<tr th:each="entry : ${asteChiuse}">
 					<td th:text="${entry.key.idAsta}"></td>
-					<td th:text="${entry.key.scadenza}"></td>
+					<td th:text="${entry.key.scad}"></td>
 					<td th:text="${entry.key.prezzoIniziale}"></td>
 					<td th:text="${entry.key.offertaMax}"></td>
 					<td th:text="${entry.value.username}"></td>

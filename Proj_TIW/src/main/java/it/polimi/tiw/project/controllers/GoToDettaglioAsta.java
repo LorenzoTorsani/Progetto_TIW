@@ -98,16 +98,8 @@ public class GoToDettaglioAsta extends HttpServlet {
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("asta", asta);
 		ctx.setVariable("offerte", offerte);
-		java.util.Date tempdate = null;
-		try {
-			tempdate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(asta.getScadenza());
-			System.out.println(asta.getScadenza());
-			System.out.println(tempdate);
-		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		boolean chiudibile = (tempdate.compareTo(new  Date(System.currentTimeMillis())) < 0);
+		java.util.Date currentDate = new Date(System.currentTimeMillis());
+		boolean chiudibile = (asta.getScadenza().getTime() - currentDate.getTime() <= 0);
 		ctx.setVariable("chiudibile", chiudibile);
 		templateEngine.process(path, ctx, response.getWriter());
 	}

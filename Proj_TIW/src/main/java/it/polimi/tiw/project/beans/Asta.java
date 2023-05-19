@@ -7,7 +7,8 @@ import java.util.List;
 
 public class Asta {
 	private int idAsta;
-	private String scadenza; 
+	private java.util.Date scadenza;
+	private String scad;
 	private int rialzoMinimo;
 	private double prezzoIniziale;
 	private boolean stato;
@@ -16,15 +17,15 @@ public class Asta {
 	private double offertaMax;
 	private List<Articolo> articoli = new ArrayList<Articolo>();
 	private String tempoMancante;
-	
+
 	public void setIdAsta(int idAsta) {
 		this.idAsta = idAsta;
 	}
-	
-	public void setScadenza(String date) {
-		this.scadenza = date;
+
+	public void setScadenza(java.util.Date scadenza2) {
+		this.scadenza = scadenza2;
 	}
-	
+
 	public void setRialzoMinimo(int rialzoMinimo) {
 		this.rialzoMinimo = rialzoMinimo;
 	}
@@ -32,27 +33,27 @@ public class Asta {
 	public void setPrezzoIniziale(double prezzoIniziale) {
 		this.prezzoIniziale = prezzoIniziale;
 	}
-	
+
 	public void setStato(boolean stato) {
 		this.stato = stato;
 	}
-	
+
 	public int getIdAsta() {
 		return this.idAsta;
 	}
-	
-	public String getScadenza() {
+
+	public java.util.Date getScadenza() {
 		return this.scadenza;
 	}
 
 	public int getRialzoMinimo() {
 		return this.rialzoMinimo;
 	}
-	
+
 	public double getPrezzoIniziale() {
 		return this.prezzoIniziale;
 	}
-	
+
 	public boolean getStato() {
 		return this.stato;
 	}
@@ -95,6 +96,14 @@ public class Asta {
 
 	public void setTempoMancante(String tempoMancante) {
 		this.tempoMancante = tempoMancante;
+	}
+
+	public String getScad() {
+		return scad;
+	}
+
+	public void setScad(String scad) {
+		this.scad = scad;
 	}
 
 }

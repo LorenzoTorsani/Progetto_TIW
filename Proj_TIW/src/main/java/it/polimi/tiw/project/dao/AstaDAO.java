@@ -27,7 +27,7 @@ public class AstaDAO {
 		this.connection = connection;
 	}
 
-	public int createAsta(Date scadenza, Integer rialzoMinimo, Double prezzoIniziale, String creatore)
+	public int createAsta(Instant scadenza, Integer rialzoMinimo, Double prezzoIniziale, String creatore)
 			throws SQLException {
 		connection.setAutoCommit(false);
 
@@ -42,7 +42,7 @@ public class AstaDAO {
 
 		try {
 			insertStatement = connection.prepareStatement(query);
-			insertStatement.setDate(1, scadenza);
+			insertStatement.setObject(1, scadenza);
 			insertStatement.setInt(2, rialzoMinimo);
 			insertStatement.setDouble(3, prezzoIniziale);
 			insertStatement.setString(4, creatore);
@@ -232,20 +232,25 @@ public class AstaDAO {
 				if (result.next()) {
 					asta.setIdAsta(result.getInt("idasta"));
 					java.sql.Timestamp timestamp = result.getTimestamp("scadenza");
-					LocalDate scadenza = new Date(timestamp.getTime()).toLocalDate();
-					java.util.Date utilDate = new java.util.Date(timestamp.getTime());
-					java.time.LocalDateTime localDateTime = utilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-					java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-					asta.setScadenza(localDateTime.format(formatter));
-					Instant i = scadenza.atStartOfDay(ZoneOffset.UTC).toInstant();
-					Instant oggi = Instant.now();
-					Duration tempoRimanente = Duration.between(oggi, i);
-					long giorni = tempoRimanente.toDays();
-					long ore = tempoRimanente.toHours() % 24;
-					long minuti = tempoRimanente.toMinutes() % 60;
-					long secondi = tempoRimanente.getSeconds() % 60;
+					java.util.Date scadenza = new java.util.Date(timestamp.getTime());
+					java.util.Date oggi = new Date(System.currentTimeMillis());
+
+					// Calcolo della differenza di tempo
+					long millisecondiRimanenti = scadenza.getTime() - oggi.getTime();
+					long giorni = millisecondiRimanenti / (24 * 60 * 60 * 1000);
+					long ore = (millisecondiRimanenti / (60 * 60 * 1000)) % 24;
+					long minuti = (millisecondiRimanenti / (60 * 1000)) % 60;
+					long secondi = (millisecondiRimanenti / 1000) % 60;
 					String tempo = giorni + " giorni, " + ore + " ore, " + minuti + " minuti, " + secondi + " secondi";
 					asta.setTempoMancante(tempo);
+
+					asta.setScadenza(scadenza);
+					java.time.LocalDateTime localDateTime = scadenza.toInstant().atZone(ZoneId.systemDefault())
+							.toLocalDateTime();
+					java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
+							.ofPattern("dd/MM/yyyy HH:mm:ss");
+					asta.setScad(localDateTime.format(formatter));
+
 					asta.setRialzoMinimo(result.getInt("rialzominimo")); // throws IOException
 					asta.setPrezzoIniziale(result.getFloat("prezzoiniziale"));
 					asta.setStato(result.getBoolean("stato"));
@@ -274,23 +279,26 @@ public class AstaDAO {
 					Asta asta = new Asta();
 					asta.setIdAsta(result.getInt("idasta"));
 					java.sql.Timestamp timestamp = result.getTimestamp("scadenza");
-					LocalDate scadenza = new Date(timestamp.getTime()).toLocalDate();
-					java.util.Date utilDate = new java.util.Date(timestamp.getTime());
-					java.time.LocalDateTime localDateTime = utilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-					java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-					asta.setScadenza(localDateTime.format(formatter));
-					Instant i = scadenza.atStartOfDay(ZoneOffset.UTC).toInstant();
-					Instant oggi = Instant.now();
-					Duration tempoRimanente = Duration.between(oggi, i);
-					long giorni = tempoRimanente.toDays();
-					long ore = tempoRimanente.toHours() % 24;
-					long minuti = tempoRimanente.toMinutes() % 60;
-					long secondi = tempoRimanente.getSeconds() % 60;
+					java.util.Date scadenza = new java.util.Date(timestamp.getTime());
+					java.util.Date oggi = new Date(System.currentTimeMillis());
+
+					// Calcolo della differenza di tempo
+					long millisecondiRimanenti = scadenza.getTime() - oggi.getTime();
+					long giorni = millisecondiRimanenti / (24 * 60 * 60 * 1000);
+					long ore = (millisecondiRimanenti / (60 * 60 * 1000)) % 24;
+					long minuti = (millisecondiRimanenti / (60 * 1000)) % 60;
+					long secondi = (millisecondiRimanenti / 1000) % 60;
 					String tempo = giorni + " giorni, " + ore + " ore, " + minuti + " minuti, " + secondi + " secondi";
 					asta.setTempoMancante(tempo);
-					asta.setRialzoMinimo(result.getInt("rialzominimo")); // throws IOException
+
+					asta.setScadenza(scadenza);
+					java.time.LocalDateTime localDateTime = scadenza.toInstant().atZone(ZoneId.systemDefault())
+							.toLocalDateTime();
+					java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
+							.ofPattern("dd/MM/yyyy HH:mm:ss");
+					asta.setScad(localDateTime.format(formatter));
+					asta.setRialzoMinimo(result.getInt("rialzominimo"));
 					asta.setPrezzoIniziale(result.getFloat("prezzoiniziale"));
-					// asta.setStato(result.getBoolean("stato"));
 					asta.setCreatore(result.getString("creatore"));
 					asta.setOffertaMax(result.getDouble("max_quantita"));
 					asteAperte.add(asta);
@@ -308,7 +316,7 @@ public class AstaDAO {
 
 		String query = "SELECT IFNULL(MAX(offerta.quantitaofferta), -1) AS max_quantita, asta.idasta, asta.scadenza, asta.prezzoiniziale, asta.rialzominimo, asta.stato, asta.creatore, asta.aggiudicatario, utente.username, utente.indirizzo "
 				+ "FROM asta LEFT JOIN offerta ON asta.idasta = offerta.idasta JOIN utente ON asta.aggiudicatario = utente.username "
-				+ "WHERE stato = false AND creatore = ? " 
+				+ "WHERE stato = false AND creatore = ? "
 				+ "GROUP BY asta.idasta, asta.scadenza, asta.rialzominimo, asta.prezzoiniziale, asta.creatore "
 				+ "ORDER BY scadenza ASC";
 
@@ -321,9 +329,11 @@ public class AstaDAO {
 					asta.setIdAsta(result.getInt("idasta"));
 					java.sql.Timestamp timestamp = result.getTimestamp("scadenza");
 					java.util.Date utilDate = new java.util.Date(timestamp.getTime());
-					java.time.LocalDateTime localDateTime = utilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-					java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-					asta.setScadenza(localDateTime.format(formatter));
+					java.time.LocalDateTime localDateTime = utilDate.toInstant().atZone(ZoneId.systemDefault())
+							.toLocalDateTime();
+					java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
+							.ofPattern("dd/MM/yyyy HH:mm:ss");
+					asta.setScad(localDateTime.format(formatter));
 					asta.setRialzoMinimo(result.getInt("rialzominimo")); // throws IOException
 					asta.setPrezzoIniziale(result.getFloat("prezzoiniziale"));
 					asta.setStato(result.getBoolean("stato"));
@@ -378,9 +388,11 @@ public class AstaDAO {
 					java.sql.Timestamp timestamp = result.getTimestamp("scadenza");
 					LocalDate scadenza = new Date(timestamp.getTime()).toLocalDate();
 					java.util.Date utilDate = new java.util.Date(timestamp.getTime());
-					java.time.LocalDateTime localDateTime = utilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-					java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-					asta.setScadenza(localDateTime.format(formatter));
+					java.time.LocalDateTime localDateTime = utilDate.toInstant().atZone(ZoneId.systemDefault())
+							.toLocalDateTime();
+					java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
+							.ofPattern("dd/MM/yyyy HH:mm:ss");
+					asta.setScad(localDateTime.format(formatter));
 					Instant i = scadenza.atStartOfDay(ZoneOffset.UTC).toInstant();
 					Instant oggi = Instant.now();
 					Duration tempoRimanente = Duration.between(oggi, i);
@@ -419,9 +431,11 @@ public class AstaDAO {
 					asta.setIdAsta(result.getInt("idasta"));
 					java.sql.Timestamp timestamp = result.getTimestamp("scadenza");
 					java.util.Date utilDate = new java.util.Date(timestamp.getTime());
-					java.time.LocalDateTime localDateTime = utilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-					java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-					asta.setScadenza(localDateTime.format(formatter));
+					java.time.LocalDateTime localDateTime = utilDate.toInstant().atZone(ZoneId.systemDefault())
+							.toLocalDateTime();
+					java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
+							.ofPattern("dd/MM/yyyy HH:mm:ss");
+					asta.setScad(localDateTime.format(formatter));
 					asta.setRialzoMinimo(result.getInt("rialzominimo"));
 					asta.setPrezzoIniziale(result.getDouble("prezzoiniziale"));
 					asta.setStato(result.getBoolean("stato"));

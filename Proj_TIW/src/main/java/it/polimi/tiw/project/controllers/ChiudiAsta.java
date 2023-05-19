@@ -48,17 +48,19 @@ public class ChiudiAsta extends HttpServlet {
 		connection = ConnectionHandler.getConnection(getServletContext());
 	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		HttpSession session = request.getSession();
-		if(session.isNew() || session.getAttribute("user") == null) {
+		if (session.isNew() || session.getAttribute("user") == null) {
 			String loginpath = getServletContext().getContextPath() + "/index.html";
 			response.sendRedirect(loginpath);
 			return;
 		}
-		
+
 		String id_param = request.getParameter("idAsta");
 		Integer idAsta = -1;
 		boolean bad_request = false;
+		java.util.Date currentDate = null;
 		if (id_param == null) {
 			bad_request = true;
 		}
@@ -76,7 +78,7 @@ public class ChiudiAsta extends HttpServlet {
 		AstaDAO astaDAO = new AstaDAO(connection);
 		OffertaDAO offertaDAO = new OffertaDAO(connection);
 		try {
-			
+
 			Asta asta = astaDAO.findAstaById(idAsta);
 			if (asta == null) {
 				response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Asta non trovata");
@@ -90,27 +92,20 @@ public class ChiudiAsta extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Asta già chiusa");
 				return;
 			}
-			java.util.Date tempdate = null;
-			try {
-				tempdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(asta.getScadenza());
-			} catch (ParseException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			if(tempdate.compareTo(new  Date(System.currentTimeMillis())) < 0) {
+			currentDate = new java.util.Date(System.currentTimeMillis());
+			if (asta.getScadenza().getTime() - currentDate.getTime() <= 0) {
 				try {
-					if(offertaDAO.getOffertaMaxByAstaid(idAsta) != 0.0) {
+					if (offertaDAO.getOffertaMaxByAstaid(idAsta) != 0.0) {
 						astaDAO.chiudiAsta(idAsta);
 					} else {
 						astaDAO.chiudiAstaNoOff(idAsta);
 					}
-					
-				} catch(SQLException e) {
+
+				} catch (SQLException e) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile vendere articolo");
 					return;
 				}
-			}
-			else {
+			} else {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Asta non ancora scaduta");
 				return;
 			}
@@ -118,7 +113,7 @@ public class ChiudiAsta extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile chiudere asta");
 			return;
 		}
-		
+
 		String ctxpath = getServletContext().getContextPath();
 		String path = ctxpath + "/Vendo";
 		response.sendRedirect(path);
