@@ -8,6 +8,7 @@
 		} else {
 			pageOrchestrator.start(); // initialize the components
 			pageOrchestrator.refresh();
+		
 		} // display initial content
 	}, false);
 
@@ -29,7 +30,7 @@
 
 		this.show = function(next) {
 			var self = this;
-			makeCall("GET", "GoToVendo", null,
+			makeCall("GET", "Vendo", null,
 				function(req) {
 					if (req.readyState == 4) {
 						var message = req.responseText;
@@ -45,8 +46,7 @@
 						} else if (req.status == 403) {
 							window.location.href = req.getResponseHeader("Location");
 							window.sessionStorage.removeItem('username');
-						}
-						else {
+						} else {
 							self.alert.textContent = message;
 						}
 					}
@@ -103,13 +103,14 @@
 
 		}
 	}
+	
 	function PageOrchestrator() {
 		var alertContainer = document.getElementById("id_alert");
 
 		this.start = function() {
-			personalMessage = new PersonalMessage(sessionStorage.getItem('username'),
-				document.getElementById("id_username"));
-			personalMessage.show();
+			//personalMessage = new PersonalMessage(sessionStorage.getItem('username'),
+			//	document.getElementById("id_username"));
+			//personalMessage.show();
 
 			astaList = new AstaList(
 				alertContainer,
@@ -119,5 +120,9 @@
 				window.sessionStorage.removeItem('username');
 			})
 		};
+		
+		this.refresh = function() {
+			astaList.show();
+		}
 	}
 };

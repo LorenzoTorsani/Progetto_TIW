@@ -37,7 +37,7 @@
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>LoginChecker</filter-name>
-		<url-pattern>/CloseMission</url-pattern>
+		<url-pattern>/Vendo</url-pattern>
 		<url-pattern>/CreateExpensesReport</url-pattern>
 		<url-pattern>/CreateMission</url-pattern>
 		<url-pattern>/GetMissionDetailsData</url-pattern>
