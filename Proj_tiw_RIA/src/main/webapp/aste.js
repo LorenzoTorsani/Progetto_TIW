@@ -1,6 +1,6 @@
 {
 	// page components
-	let astaList, pageOrchestrator = new PageOrchestrator(); // main controller
+	let asteAperteList, asteChiuselist, pageOrchestrator = new PageOrchestrator(); // main controller
 
 	window.addEventListener("load", () => {
 		if (sessionStorage.getItem("username") == null) {
@@ -8,7 +8,7 @@
 		} else {
 			pageOrchestrator.start(); // initialize the components
 			pageOrchestrator.refresh();
-		
+
 		} // display initial content
 	}, false);
 
@@ -19,7 +19,7 @@
 		}
 	}
 
-	function AstaList(_alert, _listcontainer, _listcontainerbody) {
+	function AsteAperteList(_alert, _listcontainer, _listcontainerbody) {
 		this.alert = _alert;
 		this.listcontainer = _listcontainer;
 		this.listcontainerbody = _listcontainerbody;
@@ -36,11 +36,19 @@
 						var message = req.responseText;
 						if (req.status == 200) {
 							var asteToShow = JSON.parse(req.responseText);
+							//		console.log(JSON.parse(req.responseText));
 							if (asteToShow.length == 0) {
-								self.alert.textContent = "Nessuna asta";
+								self.alert.textContent = "Nessuna asta aperta";
 								return;
 							}
-							self.update(asteToShow);
+							/*if (asteToShow.asteChiuse.length == 0) {
+								self.alert.textContent = "Nessuna asta chiusa";
+								return;
+							}
+							*/
+							self.updateAsteAperte(asteToShow);
+							console.log(asteToShow.idAsta);
+							//self.updateAsteChiuse(asteToShow.astechiuse);
 							if (next) next();
 
 						} else if (req.status == 403) {
@@ -54,7 +62,7 @@
 			);
 		};
 
-		this.update = function(arrayAste) {
+		this.updateAsteAperte = function(arrayAste) {
 			var elem, i, row, destcell, datecell, linkcell, anchor;
 			this.listcontainerbody.innerHTML = ""; // empty the table body
 			// build updated list
@@ -64,14 +72,41 @@
 				destcell = document.createElement("td");
 				destcell.textContent = asta.idAsta;
 				row.appendChild(destcell);
+
 				datecell = document.createElement("td");
 				datecell.textContent = asta.scad;
 				row.appendChild(datecell);
+
+				datecell = document.createElement("td");
+				datecell.textContent = asta.tempoMancante;
+				row.appendChild(datecell);
+
+				datecell = document.createElement("td");
+				datecell.textContent = asta.tempoMancante;
+				row.appendChild(datecell);
+
+				datecell = document.createElement("td");
+				datecell.textContent = asta.prezzoIniziale;
+				row.appendChild(datecell);
+
+				datecell = document.createElement("td");
+				datecell.textContent = asta.rialzoMinimo;
+				row.appendChild(datecell);
+
+				datecell = document.createElement("td");
+				if (asta.offertaMax > 0) {
+					datecell.textContent = asta.offertaMax;
+				} else {
+					datecell.textContent = "Ancora nessuna offerta";
+				}
+				row.appendChild(datecell);
+
 				linkcell = document.createElement("td");
 				anchor = document.createElement("a");
 				linkcell.appendChild(anchor);
 				linkText = document.createTextNode("Show");
 				anchor.appendChild(linkText);
+
 				anchor.setAttribute('asta_id', asta.asta_id); // set a custom HTML attribute
 				anchor.addEventListener("click", (e) => {
 					astaApertaDetails.show(e.target.getAttribute("asta_id")); // the list must know the details container
@@ -102,8 +137,56 @@
 			this.listcontainer.style.visibility = "visible";
 
 		}
+
+/*
+		this.updateAsteChiuse = function(arrayAste) {
+			var elem, i, row, destcell, datecell, linkcell, anchor;
+			this.listcontainerbody.innerHTML = "";
+			var self = this;
+
+		}
+		
+		*/
 	}
+
+	/*
+		function AsteChiuseList(_alert, _listcontainer, _listcontainerbody) {
+			this.alert = _alert;
+			this.listcontainer = _listcontainer;
+			this.listcontainerbody = _listcontainerbody;
+			
+			this.reset = function() {
+				this.listcontainer.style.visibility = "hidden";
+			}
+			
+			this.show = function(next) {
+				var self = this;
+				makeCall("GET", "Vendo", null,
+					function(req) {
+						if (req.readyState == 4) {
+							var message = req.responseText;
+							if (req.status == 200) {
+								var asteToShow = JSON.parse(req.responseText);
+								if (asteToShow.length == 0) {
+									self.alert.textContent = "Nessuna asta";
+									return;
+								}
+								self.update(asteToShow);
+								if (next) next();
 	
+							} else if (req.status == 403) {
+								window.location.href = req.getResponseHeader("Location");
+								window.sessionStorage.removeItem('username');
+							} else {
+								self.alert.textContent = message;
+							}
+						}
+					}
+				);
+			};
+		}
+		*/
+
 	function PageOrchestrator() {
 		var alertContainer = document.getElementById("id_alert");
 
@@ -112,17 +195,24 @@
 			//	document.getElementById("id_username"));
 			//personalMessage.show();
 
-			astaList = new AstaList(
+			asteAperteList = new AsteAperteList(
 				alertContainer,
-				document.getElementById("id_listcontainer"),
-				document.getElementById("id_listcontainerbody"));
+				document.getElementById("id_openlistcontainer"),
+				document.getElementById("id_openlistcontainerbody"));
 			document.querySelector("a[href='Logout']").addEventListener('click', () => {
 				window.sessionStorage.removeItem('username');
 			})
+
+			/*			asteChiuseList = new AsteChiuseList(
+							alertContainer,
+							document.getElementById("id_closedlistcontainer"),
+							document.getElementById("id_openlistcontainer"));
+							*/
 		};
-		
+
 		this.refresh = function() {
-			astaList.show();
+			asteAperteList.show();
+			//			asteChiuseList.show();
 		}
 	}
 };

@@ -40,6 +40,20 @@ public class GoToVendo extends HttpServlet {
 	public GoToVendo() {
 		super();
 	}
+	
+	/*
+	class RispostaJson {
+	    private List<Asta> asteAperte;
+	    private Map<Asta, User> asteChiuse;
+	    List<Articolo> articoli;
+	    
+	    public RispostaJson(List<Asta> asteAperte, Map<Asta, User> asteChiuse, List<Articolo> articoli) {
+	        this.asteAperte = asteAperte;
+	        this.asteChiuse = asteChiuse;
+	        this.articoli = articoli;
+	    }
+	}
+	*/
 
 	public void init() throws ServletException {
 		ServletContext servletContext = getServletContext();
@@ -83,6 +97,9 @@ public class GoToVendo extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere aste");
 			return;
 		}
+		
+		// RispostaJson risposta = new RispostaJson(asteAperte, asteChiuse, articoli);
+
 
 		// Redirect to the Home page and add missions to the parameters
 		Gson gson = new GsonBuilder()

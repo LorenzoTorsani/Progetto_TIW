@@ -1,7 +1,5 @@
 package it.polimi.tiw.project.beans;
 
-import java.sql.Date;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 

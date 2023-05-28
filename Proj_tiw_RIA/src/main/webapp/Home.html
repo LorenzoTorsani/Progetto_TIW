@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Home</title>
+<link rel="stylesheet" type="text/css" media="all"
+	href="css/mystyle.css" />
 <script src="utils.js" charset="utf-8" defer></script>
 <script src="aste.js" charset="utf-8" defer></script>
 </head>
@@ -12,20 +14,45 @@
 	</div>
 	<div id="id_alert" class="alertmessage"></div>
 
-	<h1>Lista di tutte le aste Aperte</h1>
-	<table class="tableList" id="id_listcontainer">
+	<h1>Area vendita</h1>
+
+	<p>Le tue aste:</p>
+
+	<table class="tableList" id="id_openlistcontainer">
+		<caption>Le tue aste aperte:</caption>
+
 		<thead>
 			<tr>
-				<th>id Asta</th>
-				<th>scadenza</th>
+				<th>Id</th>
+				<th>Scadenza</th>
+				<th>Tempo rimanente</th>
+				<th>Prezzo iniziale</th>
+				<th>Rialzo minimo</th>
+				<th>Offerta massima</th>
 				<th>Link</th>
-				<th>Chiudi</th>
-
+				<th>Codici articoli</th>
+				<th>Nome articoli</th>
 			</tr>
 		</thead>
-		<tbody id="id_listcontainerbody">
+		<tbody id="id_openlistcontainerbody">
 		</tbody>
 	</table>
 
+	<table class="tableList" id="id_closedlistcontainer">
+		<caption>Le tue aste chiuse:</caption>
+
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Scadenza</th>
+				<th>Prezzo iniziale</th>
+				<th>Rialzo finale</th>
+				<th>Aggiudicatario</th>
+				<th>indirizzo</th>
+			</tr>
+		</thead>
+		<tbody id="id_closedlistcontainerbody">
+		</tbody>
+	</table>
 </body>
 </html>
