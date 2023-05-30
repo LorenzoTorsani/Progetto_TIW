@@ -311,8 +311,8 @@ public class AstaDAO {
 		return asteAperte;
 	}
 
-	public Map<Asta, User> getAsteChiuseByUser(String user) throws SQLException, IOException {
-		Map<Asta, User> asteChiuse = new HashMap<Asta, User>();
+	public List<Asta> getAsteChiuseByUser(String user) throws SQLException, IOException {
+		List<Asta> asteChiuse = new ArrayList<Asta>();
 
 		String query = "SELECT IFNULL(MAX(offerta.quantitaofferta), -1) AS max_quantita, asta.idasta, asta.scadenza, asta.prezzoiniziale, asta.rialzominimo, asta.stato, asta.creatore, asta.aggiudicatario, utente.username, utente.indirizzo "
 				+ "FROM asta LEFT JOIN offerta ON asta.idasta = offerta.idasta JOIN utente ON asta.aggiudicatario = utente.username "
@@ -340,9 +340,8 @@ public class AstaDAO {
 					asta.setCreatore(result.getString("creatore"));
 					asta.setAggiudicatario(result.getString("aggiudicatario"));
 					asta.setOffertaMax(result.getDouble("max_quantita"));
-					utente.setAddress(result.getString("indirizzo"));
-					utente.setUsername(result.getString("username"));
-					asteChiuse.put(asta, utente);
+					asta.setIndirizzo(result.getString("indirizzo"));
+					asteChiuse.add(asta);
 				}
 			} catch (SQLException e) {
 

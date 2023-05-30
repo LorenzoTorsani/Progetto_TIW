@@ -15,7 +15,9 @@ public class Asta {
 	private double offertaMax;
 	private List<Articolo> articoli = new ArrayList<Articolo>();
 	private String tempoMancante;
+	private String indirizzo; 
 
+	
 	public void setIdAsta(int idAsta) {
 		this.idAsta = idAsta;
 	}
@@ -102,6 +104,14 @@ public class Asta {
 
 	public void setScad(String scad) {
 		this.scad = scad;
+	}
+
+	public String getIndirizzo() {
+		return indirizzo;
+	}
+
+	public void setIndirizzo(String indirizzo) {
+		this.indirizzo = indirizzo;
 	}
 
 }

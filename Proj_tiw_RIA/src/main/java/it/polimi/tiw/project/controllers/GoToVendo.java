@@ -23,6 +23,7 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import it.polimi.tiw.project.beans.Articolo;
 import it.polimi.tiw.project.beans.Asta;
@@ -41,19 +42,19 @@ public class GoToVendo extends HttpServlet {
 		super();
 	}
 	
-	/*
+	
 	class RispostaJson {
 	    private List<Asta> asteAperte;
-	    private Map<Asta, User> asteChiuse;
+	    private List<Asta> asteChiuse;
 	    List<Articolo> articoli;
 	    
-	    public RispostaJson(List<Asta> asteAperte, Map<Asta, User> asteChiuse, List<Articolo> articoli) {
+	    public RispostaJson(List<Asta> asteAperte, List<Asta> asteChiuse, List<Articolo> articoli) {
 	        this.asteAperte = asteAperte;
 	        this.asteChiuse = asteChiuse;
 	        this.articoli = articoli;
 	    }
 	}
-	*/
+	
 
 	public void init() throws ServletException {
 		ServletContext servletContext = getServletContext();
@@ -89,7 +90,7 @@ public class GoToVendo extends HttpServlet {
 
 		AstaDAO astaDAO = new AstaDAO(connection);
 		List<Asta> asteAperte = new ArrayList<Asta>();		
-		Map<Asta, User> asteChiuse = new HashMap<Asta, User>();
+		List<Asta> asteChiuse = new ArrayList<Asta>();
 		try {
 			asteAperte = astaDAO.getAsteAperteByUser(user.getUsername());
 			asteChiuse = astaDAO.getAsteChiuseByUser(user.getUsername());
@@ -98,13 +99,15 @@ public class GoToVendo extends HttpServlet {
 			return;
 		}
 		
-		// RispostaJson risposta = new RispostaJson(asteAperte, asteChiuse, articoli);
+		RispostaJson risposta = new RispostaJson(asteAperte, asteChiuse, articoli);
 
 
 		// Redirect to the Home page and add missions to the parameters
 		Gson gson = new GsonBuilder()
 				   .setDateFormat("yyyy MMM dd").create();
-		String json = gson.toJson(asteAperte);
+		String json = gson.toJson(risposta);		
+		System.out.println(json);
+
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().write(json);
