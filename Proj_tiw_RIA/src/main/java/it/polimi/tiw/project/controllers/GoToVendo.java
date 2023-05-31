@@ -106,7 +106,6 @@ public class GoToVendo extends HttpServlet {
 		Gson gson = new GsonBuilder()
 				   .setDateFormat("yyyy MMM dd").create();
 		String json = gson.toJson(risposta);		
-		System.out.println(json);
 
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");

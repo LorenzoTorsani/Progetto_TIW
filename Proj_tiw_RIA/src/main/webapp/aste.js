@@ -1,6 +1,6 @@
 {
 	// page components
-	let goToVendo, pageOrchestrator = new PageOrchestrator(); // main controller
+	let goToVendo, asteWizard, pageOrchestrator = new PageOrchestrator(); // main controller
 
 	window.addEventListener("load", () => {
 		if (sessionStorage.getItem("username") == null) {
@@ -42,6 +42,7 @@
 								self.alert.textContent = "Nessuna asta chiusa";
 								return;
 							}
+							console.log(window.location.pathname + window.location.search);
 							self.updateAsteAperte(asteToShow.asteAperte, asteToShow.articoli);
 							self.updateAsteChiuse(asteToShow.asteChiuse);
 							self.updateArticoli(asteToShow.articoli);
@@ -222,12 +223,15 @@
 
 				// Crea una cella con un link
 				linkcell = document.createElement("td");
-				anchor = document.createElement("a");
-				anchor.href = articolo.immagineUrl; // Assumendo che asta.immagineUrl sia l'URL dell'immagine
-				anchor.target = "_blank"; // Apre il link in una nuova scheda
-				linkText = document.createTextNode("Visualizza immagine"); // Testo del link
-				anchor.appendChild(linkText);
-				linkcell.appendChild(anchor);
+				linkcell.appendChild(document.createElement("img")).src = "file:///Users/simonezacchetti/Desktop/immagini/Unknown.jpeg";
+				//anchor = document.createElement("a");
+				//var folderPath = "/Users/simonezacchetti/Desktop/immagini/";
+				//var immagineUrl = folderPath + articolo.image;
+				//anchor.href = immagineUrl; // Assumendo che asta.immagineUrl sia l'URL dell'immagine
+				//anchor.target = "_blank"; // Apre il link in una nuova scheda
+				//linkText = document.createTextNode("Visualizza immagine"); // Testo del link
+				//anchor.appendChild(linkText);
+				//linkcell.appendChild(anchor);
 				row.appendChild(linkcell);
 
 				self.articolicontainerbody.appendChild(row);
@@ -236,6 +240,11 @@
 			this.articolicontainer.style.visibility = "visible";
 		}
 
+	}
+	
+	function AsteWizard(wizardId, alert) {
+		this.wizard = wizardId;
+	    this.alert = alert;
 	}
 
 
@@ -257,6 +266,9 @@
 				document.getElementById("id_articolicontainer"),
 				document.getElementById("id_articolicontainerbody")
 			);
+			
+			asteWizard = new AsteWizard(document.getElementById("id_astewizard"), alertContainer);
+			//asteWizard.registerEvent(this);
 
 			document.querySelector("a[href='Logout']").addEventListener('click', () => {
 				window.sessionStorage.removeItem('username');

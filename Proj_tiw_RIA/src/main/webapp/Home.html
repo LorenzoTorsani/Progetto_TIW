@@ -16,6 +16,27 @@
 
 	<h1>Area vendita</h1>
 
+	<div>
+		<form id="id_astaform" action="#">
+			<fieldset>
+				<p>
+					Scadenza: <input type="text" name="scadenza" required />
+				</p>
+				<p>
+					Rialzo minimo: <input type="number" step="1" min=1
+						name="rialzoMinimo" required />
+				</p>
+				
+				<p class="wizard" id="id_astewizard">
+					
+				</p>
+				<input type="hidden" name="astaid"> <input type="button"
+					name="Crea asta" value="Crea">
+
+			</fieldset>
+		</form>
+	</div>
+
 	<p>Le tue aste:</p>
 
 	<table class="tableList" id="id_openlistcontainer">
@@ -54,13 +75,13 @@
 		<tbody id="id_closedlistcontainerbody">
 		</tbody>
 	</table>
-	
+
 	<br>
 	<hr>
 	<br>
 
 	<p>I tuoi articoli:</p>
-	
+
 	<table class="articoli" id="id_articolicontainer">
 		<thead>
 			<tr>
