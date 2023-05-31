@@ -12,7 +12,7 @@
 		} // display initial content
 	}, false);
 
-	function GoToVendo(_alert, _openlistcontainer, _openlistcontainerbody, _closedlistcontainer, _closedlistcontainerbody, _articolicontainer, _articolicontainerbody) {
+	function GoToVendo(_alert, _openlistcontainer, _openlistcontainerbody, _closedlistcontainer, _closedlistcontainerbody, _articolicontainer, _articolicontainerbody, _astewizard) {
 		this.alert = _alert;
 		this.openlistcontainer = _openlistcontainer;
 		this.openlistcontainerbody = _openlistcontainerbody;
@@ -20,6 +20,10 @@
 		this.closedlistcontainerbody = _closedlistcontainerbody;
 		this.articolicontainer = _articolicontainer;
 		this.articolicontainerbody = _articolicontainerbody;
+		this.astewizard = _astewizard;
+
+		var now = new Date(),
+			formattedDate = now.toISOString().substring(0, 10);
 
 		this.reset = function() {
 			this.listcontainer.style.visibility = "hidden";
@@ -46,6 +50,7 @@
 							self.updateAsteAperte(asteToShow.asteAperte, asteToShow.articoli);
 							self.updateAsteChiuse(asteToShow.asteChiuse);
 							self.updateArticoli(asteToShow.articoli);
+							self.updateAsteWizard(asteToShow.articoli);
 							if (next) next();
 
 						} else if (req.status == 403) {
@@ -223,7 +228,7 @@
 
 				// Crea una cella con un link
 				linkcell = document.createElement("td");
-				linkcell.appendChild(document.createElement("img")).src = "file:///Users/simonezacchetti/Desktop/immagini/Unknown.jpeg";
+				linkcell.appendChild(document.createElement("img")).src = "/Proj_tiw_RIA/resources/static/images/" + articolo.image;
 				//anchor = document.createElement("a");
 				//var folderPath = "/Users/simonezacchetti/Desktop/immagini/";
 				//var immagineUrl = folderPath + articolo.image;
@@ -240,12 +245,37 @@
 			this.articolicontainer.style.visibility = "visible";
 		}
 
+		this.updateAsteWizard = function(arrayArticoli) {
+			var self = this;
+			this.astewizard.innerHTML = "";
+			arrayArticoli.forEach(function(articolo) {
+				var checkbox = document.createElement("input");
+				checkbox.setAttribute("type", "checkbox");
+				checkbox.setAttribute("name", articolo.name);
+
+				var label = document.createElement("label");
+				label.textContent = articolo.name;
+
+				var br = document.createElement("br");
+
+				self.astewizard.appendChild(checkbox);
+				self.astewizard.appendChild(label);
+				self.astewizard.appendChild(br);
+			});
+
+			this.astewizard.style.visibility = "visible";
+		}
+
 	}
-	
-	function AsteWizard(wizardId, alert) {
+
+	/*function AsteWizard(wizardId, alert, arrayArticoli) {
 		this.wizard = wizardId;
-	    this.alert = alert;
-	}
+		this.alert = alert;
+		arrayArticoli.forEach(function(articolo){
+			this.wizard.querySelector('input[type="checkbox"].articolo.name').setAttribute("text", articolo.name);
+			
+		});
+	}*/
 
 
 
@@ -264,10 +294,11 @@
 				document.getElementById("id_closedlistcontainer"),
 				document.getElementById("id_closedlistcontainerbody"),
 				document.getElementById("id_articolicontainer"),
-				document.getElementById("id_articolicontainerbody")
+				document.getElementById("id_articolicontainerbody"),
+				document.getElementById("id_astewizard")
 			);
-			
-			asteWizard = new AsteWizard(document.getElementById("id_astewizard"), alertContainer);
+
+			//asteWizard = new AsteWizard(document.getElementById("id_astewizard"), alertContainer, arrayArticoli);
 			//asteWizard.registerEvent(this);
 
 			document.querySelector("a[href='Logout']").addEventListener('click', () => {
