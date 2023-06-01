@@ -266,6 +266,39 @@
 			this.astewizard.style.visibility = "visible";
 		}
 
+		this.registerEvent1 = function(orchestrator){
+			this.astewizard.querySelector("input[type='button'].submit").addEventListener('click', (e)=> {
+				var eventfieldset = e.target.closest("fieldset"),
+				valid = true;
+				for(i = 0; i < eventfieldset.elements.length; i++){
+					if(!eventfieldset.elements[i].checkValidity()){
+						eventfieldset.elements[i].reportValidity();
+						valid = false;
+						break;
+					}
+				}
+				if(valid){
+					var self = this;
+					makeCall("POST", 'CreateAsta', e.target.closest("form"),
+					function(req){
+						if(req.readyState == XMLHttpRequest.DONE){
+							var message = req.responseText; // error message or mission id
+								if (req.status == 200) {
+									orchestrator.refresh(message);
+								}
+								if (req.status == 403) {
+									window.location.href = req.getResponseHeader("Location");
+									window.sessionStorage.removeItem('username');
+								}
+								else if (req.status != 200) {
+									self.alert.textContent = message;
+									self.reset();
+								}
+						}
+					});
+				}
+			});
+		}
 	}
 
 	/*function AsteWizard(wizardId, alert, arrayArticoli) {
