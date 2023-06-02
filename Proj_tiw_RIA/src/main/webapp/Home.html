@@ -81,7 +81,7 @@
 
 		<p>I tuoi articoli:</p>
 
-		<table class="articoli" id="id_articolicontainer">
+		<table class="tableList" id="id_articolicontainer">
 			<thead>
 				<tr>
 					<th>Codice</th>
@@ -96,20 +96,42 @@
 			</tbody>
 		</table>
 	</div>
-	
-	<div id="acquisto">
+
+	<div class="acquisto">
 		<h1>Area acquisti</h1>
-		
+
+
+		<form id="id_cercaform" action="#">
+			<fieldset>
+				<p>Ricerca per parola chiave</p>
+				<p class="wizard" id="id_cercaastewizard"></p>
+				<input name="parola" type="text"
+					placeholder="Inserisci qui la parola chiave" size="40"
+					maxlength="200" required /> 
+					<input type="hidden" name="astaid"> <!-- serve? -->
+				
+				<input type="button" name="Cerca asta" value="Cerca">
+
+			</fieldset>
+		</form>
+
 		<hr>
 		<br>
-		<table>
+		<table class="tableList" id="id_asteaggiudicatecontainer">
+			<caption>Aste aggiudicate:</caption>
 			<thead>
 				<tr>
-				<th>Id</th>
-				<th>
+					<th>Id</th>
+					<th>Scadenza</th>
+					<th>Prezzo iniziale</th>
+					<th>Rialzo minimo</th>
+					<th>Prezzo finale</th>
 				</tr>
+			</thead>
+			<tbody id="id_asteaggiudicatecontainerbody">
+			</tbody>
 		</table>
 	</div>
-	
+
 </body>
 </html>

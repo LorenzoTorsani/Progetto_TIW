@@ -20,6 +20,9 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import it.polimi.tiw.project.beans.Asta;
 import it.polimi.tiw.project.beans.User;
 import it.polimi.tiw.project.dao.AstaDAO;
@@ -67,11 +70,13 @@ public class GoToAcquisto extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String path = "/WEB-INF/Acquisto.html";
-		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("asteAggiudicate", asteAggiudicate);
-		templateEngine.process(path, ctx, response.getWriter());
+		
+		System.out.println(asteAggiudicate);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy MMM dd").create();
+		String json = gson.toJson(asteAggiudicate);	
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
