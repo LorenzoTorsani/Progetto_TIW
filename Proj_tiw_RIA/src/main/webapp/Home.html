@@ -14,87 +14,124 @@
 	</div>
 	<div id="id_alert" class="alertmessage"></div>
 
-	<h1>Area vendita</h1>
+	<div id="vendo">
+		<h1>Area vendita</h1>
 
-	<div>
-		<form id="id_astaform" action="#">
+		<div>
+			<form id="id_astaform" action="#">
+				<fieldset>
+					<p>
+						Scadenza: <input type="text" name="scadenza" required />
+					</p>
+					<p>
+						Rialzo minimo: <input type="number" step="1" min=1
+							name="rialzoMinimo" required />
+					</p>
+
+					<p class="wizard" id="id_astewizard"></p>
+					<input type="hidden" name="astaid"> <input type="button"
+						name="Crea asta" value="Crea">
+
+				</fieldset>
+			</form>
+		</div>
+
+		<p>Le tue aste:</p>
+
+		<table class="tableList" id="id_openlistcontainer">
+			<caption>Le tue aste aperte:</caption>
+
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Scadenza</th>
+					<th>Tempo rimanente</th>
+					<th>Prezzo iniziale</th>
+					<th>Rialzo minimo</th>
+					<th>Offerta massima</th>
+					<th>Link</th>
+					<th>Codici articoli</th>
+					<th>Nome articoli</th>
+				</tr>
+			</thead>
+			<tbody id="id_openlistcontainerbody">
+			</tbody>
+		</table>
+
+		<table class="tableList" id="id_closedlistcontainer">
+			<caption>Le tue aste chiuse:</caption>
+
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Scadenza</th>
+					<th>Prezzo iniziale</th>
+					<th>Rialzo finale</th>
+					<th>Aggiudicatario</th>
+					<th>indirizzo</th>
+				</tr>
+			</thead>
+			<tbody id="id_closedlistcontainerbody">
+			</tbody>
+		</table>
+
+		<br>
+		<hr>
+		<br>
+
+		<p>I tuoi articoli:</p>
+
+		<table class="tableList" id="id_articolicontainer">
+			<thead>
+				<tr>
+					<th>Codice</th>
+					<th>Nome</th>
+					<th>Descrizione</th>
+					<th>Prezzo</th>
+					<th>Stato</th>
+					<th>Immagine</th>
+				</tr>
+			</thead>
+			<tbody id="id_articolicontainerbody">
+			</tbody>
+		</table>
+	</div>
+
+	<div class="acquisto">
+		<h1>Area acquisti</h1>
+
+
+		<form id="id_cercaform" action="#">
 			<fieldset>
-				<p>
-					Scadenza: <input type="text" name="scadenza" required />
-				</p>
-				<p>
-					Rialzo minimo: <input type="number" step="1" min=1
-						name="rialzoMinimo" required />
-				</p>
+				<p>Ricerca per parola chiave</p>
+				<p class="wizard" id="id_cercaastewizard"></p>
+				<input name="parola" type="text"
+					placeholder="Inserisci qui la parola chiave" size="40"
+					maxlength="200" required /> 
+					<input type="hidden" name="astaid"> <!-- serve? -->
 				
-				<p class="wizard" id="id_astewizard">
-					
-				</p>
-				<input type="hidden" name="astaid"> <input type="button"
-					name="Crea asta" value="Crea">
+				<input type="button" name="Cerca asta" value="Cerca">
 
 			</fieldset>
 		</form>
+
+		<hr>
+		<br>
+		<table class="tableList" id="id_asteaggiudicatecontainer">
+			<caption>Aste aggiudicate:</caption>
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Scadenza</th>
+					<th>Prezzo iniziale</th>
+					<th>Rialzo minimo</th>
+					<th>Prezzo finale</th>
+				</tr>
+			</thead>
+			<tbody id="id_asteaggiudicatecontainerbody">
+			</tbody>
+		</table>
 	</div>
 
-	<p>Le tue aste:</p>
-
-	<table class="tableList" id="id_openlistcontainer">
-		<caption>Le tue aste aperte:</caption>
-
-		<thead>
-			<tr>
-				<th>Id</th>
-				<th>Scadenza</th>
-				<th>Tempo rimanente</th>
-				<th>Prezzo iniziale</th>
-				<th>Rialzo minimo</th>
-				<th>Offerta massima</th>
-				<th>Link</th>
-				<th>Codici articoli</th>
-				<th>Nome articoli</th>
-			</tr>
-		</thead>
-		<tbody id="id_openlistcontainerbody">
-		</tbody>
-	</table>
-
-	<table class="tableList" id="id_closedlistcontainer">
-		<caption>Le tue aste chiuse:</caption>
-
-		<thead>
-			<tr>
-				<th>Id</th>
-				<th>Scadenza</th>
-				<th>Prezzo iniziale</th>
-				<th>Rialzo finale</th>
-				<th>Aggiudicatario</th>
-				<th>indirizzo</th>
-			</tr>
-		</thead>
-		<tbody id="id_closedlistcontainerbody">
-		</tbody>
-	</table>
-
-	<br>
-	<hr>
-	<br>
-
-	<p>I tuoi articoli:</p>
-
-	<table class="articoli" id="id_articolicontainer">
-		<thead>
-			<tr>
-				<th>Codice</th>
-				<th>Nome</th>
-				<th>Descrizione</th>
-				<th>Prezzo</th>
-				<th>Stato</th>
-				<th>Immagine</th>
-			</tr>
-		</thead>
-		<tbody id="id_articolicontainerbody">
-		</tbody>
-	</table>
 </body>
 </html>

@@ -58,7 +58,6 @@
 					<td th:text="${entry.rialzoMinimo}"></td>
 					<td th:if="${entry.offertaMax > 0}" th:text="${entry.offertaMax}"></td>
 					<td th:if="${entry.offertaMax < 0}">Ancora nessuna offerta</td>
-					<!-- TODO non è idAsta? -->
 					<td><a th:href="@{/GoToDettaglioAsta(idAsta=${entry.idAsta})}">Dettagli</a></td>
 					<td><samp th:each="a : ${articoli}"
 							th:if="${a.idAsta == entry.idAsta}" th:text="${a.code + ' '}"></samp></td>
