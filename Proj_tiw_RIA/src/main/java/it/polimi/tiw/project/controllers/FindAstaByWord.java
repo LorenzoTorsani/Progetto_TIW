@@ -5,14 +5,17 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.thymeleaf.TemplateEngine;
@@ -20,11 +23,15 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import it.polimi.tiw.project.beans.Asta;
 import it.polimi.tiw.project.beans.User;
 import it.polimi.tiw.project.dao.AstaDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
+@MultipartConfig
 @WebServlet("/cercaAstaPerParola")
 public class FindAstaByWord extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -70,7 +77,9 @@ public class FindAstaByWord extends HttpServlet {
 		boolean isBadRequest = false;
 		String parola = null;
 		try {
-			parola = StringEscapeUtils.escapeJava(request.getParameter("parola"));
+			Part Pparola = request.getPart("parola");
+			Scanner s = new Scanner(Pparola.getInputStream());
+			parola = s.nextLine();
 			isBadRequest = parola.isEmpty();
 		} catch (NullPointerException e) {
 			isBadRequest = true;
@@ -99,13 +108,11 @@ public class FindAstaByWord extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile caricare aste aggiudicate");
 			return;
 		}
-		
-		String path = "/WEB-INF/Acquisto.html";
-		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("aste", aste);
-		ctx.setVariable("asteAggiudicate", asteAggiudicate);
-		templateEngine.process(path, ctx, response.getWriter());
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd hh:mm:ss a").create();
+		String json = gson.toJson(aste);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json);
 	}
 
 	public void destroy() {

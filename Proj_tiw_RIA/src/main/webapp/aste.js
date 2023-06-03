@@ -472,11 +472,17 @@
 		this.alert = alertContainer;
 		this.keyword = null;
 
-		this.registerEvents = function(orchestrator) {
+		this.registerEvent = function(orchestrator) {
 			this.astabykeywordformId.querySelector("input[type='button']").addEventListener('click', (e) => {
 				var self = this;
 				this.keyword = document.getElementById("id_cercaform").elements['parola'].value;
-				makeCall("POST", "FindAstaByWord", e.target.closest("form"),
+				console.log(this.keyword);
+				console.log(e.target.closest("form"));
+				var formData = new FormData(e.target.closest("form"));
+				for (var pair of formData.entries()) {
+					console.log(pair[0] + ', ' + pair[1]);
+				}
+				makeCall("POST", 'cercaAstaPerParola', e.target.closest("form"),
 					function(req) {
 						if (req.readyState == XMLHttpRequest.DONE) {
 							var message = req.responseText; // error message or mission id
@@ -496,11 +502,11 @@
 					});
 			});
 		};
-		
+
 		this.updateOfferteAfterOffertaCorrect = function() {
-			makeCall("POST", "FindAstaByWord?parola=" + this.keyword, null, 
-			function(req){
-				if (req.readyState == XMLHttpRequest.DONE) {
+			makeCall("POST", "cercaAstaPerParola?parola=" + this.keyword, null,
+				function(req) {
+					if (req.readyState == XMLHttpRequest.DONE) {
 						var message = req.responseText; // error message or mission id
 						if (req.status == 200) {
 							var asteKeyword = JSON.parse(req.responseText);
@@ -511,14 +517,43 @@
 							self.alert.textContent = message;
 						}
 					}
-			});
+				});
 		}
 	}
-	
+
 	function ListAsteByKeyword(listaAsteKeyword, alert, listKeywordContainerBody) {
 		this.alert = alert;
 		this.listaAsteKeyword = listKeywordContainerBody;
-		//TODO da FINIRE!
+		this.listKeywordContainerBody = listKeywordContainerBody;
+
+		this.reset = function() {
+			this.listaAsteKeyword.style.visibility = "hidden";
+		}
+
+		this.update = function(arrayAsteKeyword) {
+			var row, destcell, datecell, linkcell, anchor;
+			this.listKeywordContainerBody.innerHTML = "";
+			var self = this;
+			arrayAsteKeyword.forEach(function(asta) {
+				destcell = document.createElement("td");
+				destcell.textContent = asta.scad;
+				row.appendChild(destcell);
+
+				destcell = document.createElement("td");
+				destcell.textContent = asta.prezzoIniziale;
+				row.appendChild(destcell);
+
+				destcell = document.createElement("td");
+				destcell.textContent = asta.rialzoMinimo;
+				row.appendChild(destcell);
+
+				destcell = document.createElement("td");
+				destcell.textContent = asta.offertaMax;
+				row.appendChild(destcell);
+				this.listaAsteKeyword.style.visibility = "visible";
+			});
+
+		}
 	}
 
 	function PageOrchestrator() {
@@ -551,6 +586,15 @@
 
 			articoliWizard = new ArticoliWizard(document.getElementById("id_articoloform"), alertContainer);
 			articoliWizard.registerEvents(this);
+
+			listaByKeyword = new ListAsteByKeyword(
+				document.getElementById("id_listcontainerAsteRicercate"),
+				alertContainer,
+				document.getElementById("id_listcontainerbodyAsteRicercate")
+			)
+
+			astaKeywordForm = new AstaByKeywordForm(document.getElementById("id_cercaform"), alertContainer);
+			astaKeywordForm.registerEvent(this);
 
 			document.querySelector("a[href='Logout']").addEventListener('click', () => {
 				window.sessionStorage.removeItem('username');

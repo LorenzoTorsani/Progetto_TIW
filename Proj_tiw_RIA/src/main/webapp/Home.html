@@ -92,8 +92,8 @@
 					<p>
 						Prezzo: <input type="text" name="price" min=0.1 step=0.01 required />
 					</p>
-					<input type="file" name="file" required /> <br /> 
-					<input type="submit" name="Crea Articolo" />
+					<input type="file" name="file" required /> <br /> <input
+						type="submit" name="Crea Articolo" />
 				</fieldset>
 			</form>
 		</div>
@@ -125,30 +125,47 @@
 				<p class="wizard" id="id_cercaastewizard"></p>
 				<input name="parola" type="text" id="parola"
 					placeholder="Inserisci qui la parola chiave" size="40"
-					maxlength="200" required /> <input type="hidden" name="astaid">
+					maxlength="200" required />
 				<!-- serve? -->
 
 				<input type="button" name="Cerca asta" value="Cerca">
 
 			</fieldset>
 		</form>
-
-		<hr>
 		<br>
-		<table class="tableList" id="id_asteaggiudicatecontainer">
-			<caption>Aste aggiudicate:</caption>
-			<thead>
-				<tr>
-					<th>Id</th>
-					<th>Scadenza</th>
-					<th>Prezzo iniziale</th>
-					<th>Rialzo minimo</th>
-					<th>Prezzo finale</th>
-				</tr>
-			</thead>
-			<tbody id="id_asteaggiudicatecontainerbody">
-			</tbody>
-		</table>
+		<tr>
+			<td>
+				<table class="tableList" id="id_listcontainerAsteRicercate">
+					<thead>
+						<tr>
+							<th>Id</th>
+							<th>Scadenza</th>
+							<th>Tempo rimanente</th>
+							<th>Prezzo iniziale</th>
+							<th>Rialzo minimo</th>
+							<th>Offerta massima</th>
+						</tr>
+					</thead>
+					<tbody id="id_listcontainerbodyAsteRicercate">
+					</tbody>
+				</table>
+			</td>
+			<hr>
+			<br>
+			<table class="tableList" id="id_asteaggiudicatecontainer">
+				<caption>Aste aggiudicate:</caption>
+				<thead>
+					<tr>
+						<th>Id</th>
+						<th>Scadenza</th>
+						<th>Prezzo iniziale</th>
+						<th>Rialzo minimo</th>
+						<th>Prezzo finale</th>
+					</tr>
+				</thead>
+				<tbody id="id_asteaggiudicatecontainerbody">
+				</tbody>
+			</table>
 	</div>
 
 </body>
