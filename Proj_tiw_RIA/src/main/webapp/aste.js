@@ -406,7 +406,7 @@
 			);
 
 			//asteWizard = new AsteWizard(document.getElementById("id_astewizard"), alertContainer, arrayArticoli);
-			//asteWizard.registerEvent(this);
+			//asteWizard.registerEvent1(this);
 
 			goToAcquisto = new GoToAcquisto(
 				alertContainer,
@@ -426,6 +426,9 @@
 		};
 
 		this.refresh = function() {
+			alertContainer.textContent = ""; 
+			goToAcquisto.reset();
+			goToVendo.reset();
 			goToVendo.show();
 			goToAcquisto.show();
 		}
