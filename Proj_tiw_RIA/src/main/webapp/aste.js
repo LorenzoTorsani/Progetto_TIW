@@ -223,7 +223,7 @@
 
 				// Crea una cella con un link
 				linkcell = document.createElement("td");
-				linkcell.appendChild(document.createElement("img")).src = "file:///Users/simonezacchetti/Desktop/immagini/Unknown.jpeg";
+				linkcell.appendChild(document.createElement("img")).src = "file:\\\C:\Users\lorif\git\Progetto_TIW_RIA\Proj_tiw_RIA\src\main\resources\static\images\Unknown.jpeg";
 				//anchor = document.createElement("a");
 				//var folderPath = "/Users/simonezacchetti/Desktop/immagini/";
 				//var immagineUrl = folderPath + articolo.image;
