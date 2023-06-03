@@ -28,10 +28,10 @@
 							name="rialzoMinimo" required />
 					</p>
 
-					<p class="wizard" id="id_astewizard"></p>
-					<input type="hidden" name="astaid"> <input type="button"
-						name="Crea asta" value="Crea">
-
+					<p>
+						<input type="hidden" name="astaid"> <input type="button"
+							name="submit" value="submit">
+					</p>
 				</fieldset>
 			</form>
 		</div>
@@ -78,7 +78,25 @@
 		<br>
 		<hr>
 		<br>
-
+		<div>
+			<p>Crea un articolo:</p>
+			<form action="#" id="id_articoloform">
+				<!--enctype="multipart/form-data"  -->
+				<fieldset>
+					<p>
+						Nome: <input type="text" name="name" required />
+					</p>
+					<p>
+						Descrizione: <input type="text" name="description" required />
+					</p>
+					<p>
+						Prezzo: <input type="text" name="price" min=0.1 step=0.01 required />
+					</p>
+					<input type="file" name="file" required /> <br /> 
+					<input type="submit" name="Crea Articolo" />
+				</fieldset>
+			</form>
+		</div>
 		<p>I tuoi articoli:</p>
 
 		<table class="tableList" id="id_articolicontainer">
@@ -105,11 +123,11 @@
 			<fieldset>
 				<p>Ricerca per parola chiave</p>
 				<p class="wizard" id="id_cercaastewizard"></p>
-				<input name="parola" type="text"
+				<input name="parola" type="text" id="parola"
 					placeholder="Inserisci qui la parola chiave" size="40"
-					maxlength="200" required /> 
-					<input type="hidden" name="astaid"> <!-- serve? -->
-				
+					maxlength="200" required /> <input type="hidden" name="astaid">
+				<!-- serve? -->
+
 				<input type="button" name="Cerca asta" value="Cerca">
 
 			</fieldset>

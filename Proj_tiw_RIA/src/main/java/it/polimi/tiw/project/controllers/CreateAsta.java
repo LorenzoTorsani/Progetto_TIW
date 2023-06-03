@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.Arrays;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -51,6 +52,9 @@ public class CreateAsta extends HttpServlet {
 		int[] codici = null;
 		try {
 			try {
+				System.out.println(request.getParameter("scadenza"));
+				System.out.println(request.getParameter("rialzoMinimo"));
+				System.out.println(Arrays.toString(request.getParameterValues("articoli")));
 				codes = request.getParameterValues("articoli");
 				codici = new int[codes.length];
 			} catch (NullPointerException e) {
@@ -118,9 +122,9 @@ public class CreateAsta extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile creare asta");
 			return;
 		}
-		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/Vendo";
-		response.sendRedirect(path);
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
 	}
 	
 	public void destroy() {
