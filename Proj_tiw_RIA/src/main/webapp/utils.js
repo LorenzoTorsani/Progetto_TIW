@@ -11,6 +11,11 @@ function makeCall(method, url, formElement, cback, reset = true) {
     if (formElement == null) {
       req.send();
     } else {
+		console.log(formElement);
+		var formData = new FormData(formElement);
+						for (var pair of formData.entries()) {
+							console.log(pair[0] + ', ' + pair[1]);
+						}
       req.send(new FormData(formElement));
     }
     if (formElement !== null && reset === true) {

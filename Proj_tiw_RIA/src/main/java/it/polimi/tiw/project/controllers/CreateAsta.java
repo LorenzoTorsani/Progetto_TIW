@@ -8,19 +8,24 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Scanner;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import it.polimi.tiw.project.beans.User;
 import it.polimi.tiw.project.dao.ArticoloDAO;
 import it.polimi.tiw.project.dao.AstaDAO;
 import it.polimi.tiw.project.util.ConnectionHandler;
 
+@MultipartConfig
 @WebServlet("/CreateAsta")
 public class CreateAsta extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -51,7 +56,18 @@ public class CreateAsta extends HttpServlet {
 		int[] codici = null;
 		try {
 			try {
-				codes = request.getParameterValues("articoli");
+				Part Pscadenza = request.getPart("scadenza");
+				Scanner s = new Scanner(Pscadenza.getInputStream());
+				String scad = s.nextLine();
+				Part PrialzoMinimo = request.getPart("rialzoMinimo");
+				Scanner s1 = new Scanner(PrialzoMinimo.getInputStream());
+				String rialzoMin = s1.nextLine();
+				Part Particoli = request.getPart("articoli");
+				Scanner s2 = new Scanner(Particoli.getInputStream());
+				//String articoli = s.nextLine();
+				System.out.println(scad);
+				System.out.println(rialzoMin);
+				//System.out.println(articoli);
 				codici = new int[codes.length];
 			} catch (NullPointerException e) {
 				e.printStackTrace();
@@ -118,9 +134,9 @@ public class CreateAsta extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile creare asta");
 			return;
 		}
-		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/Vendo";
-		response.sendRedirect(path);
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
 	}
 	
 	public void destroy() {

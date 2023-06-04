@@ -81,7 +81,7 @@ public class CreateArticolo extends HttpServlet{
 				return;
 			}
 			fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-			String outputPath = folderPath + fileName;
+			String outputPath = "C://Users//lorif//git//Progetto_TIW_RIA//Proj_tiw_RIA//src//main//webapp//resources//static//images/" + fileName;
 			File file = new File(outputPath);
 			try (InputStream fileContent = filePart.getInputStream()) {
 				Files.copy(fileContent, file.toPath());
@@ -99,9 +99,9 @@ public class CreateArticolo extends HttpServlet{
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile creare articolo");
 			return;
 		}
-		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/Vendo";
-		response.sendRedirect(path);
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
 	}
 	
 	public void destroy() {

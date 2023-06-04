@@ -247,57 +247,95 @@
 		this.updateAsteWizard = function(arrayArticoli) {
 			var self = this;
 			this.astewizard.innerHTML = "";
+			var fieldset = document.createElement("fieldset");
+			var scadenzaInput = document.createElement("input");
+			scadenzaInput.setAttribute("type", "text");
+			scadenzaInput.setAttribute("name", "scadenza");
+			scadenzaInput.setAttribute("required", "required");
+			fieldset.appendChild(scadenzaInput);
+			fieldset.appendChild(document.createElement("br"));
+
+			var rialzoMinimoInput = document.createElement("input");
+			rialzoMinimoInput.setAttribute("type", "number");
+			rialzoMinimoInput.setAttribute("name", "rialzoMinimo");
+			rialzoMinimoInput.setAttribute("step", "1");
+			rialzoMinimoInput.setAttribute("min", "1");
+			rialzoMinimoInput.setAttribute("required", "required");
+			fieldset.appendChild(rialzoMinimoInput);
+			fieldset.appendChild(document.createElement("br"));
+
 			arrayArticoli.forEach(function(articolo) {
 				var checkbox = document.createElement("input");
 				checkbox.setAttribute("type", "checkbox");
-				checkbox.setAttribute("name", articolo.name);
+				checkbox.setAttribute("name", "articoli");
+				checkbox.setAttribute("id", articolo.code);
+				checkbox.setAttribute("value", articolo.code);
 
 				var label = document.createElement("label");
 				label.textContent = articolo.name;
 
-				var br = document.createElement("br");
+				fieldset.appendChild(checkbox);
+				fieldset.appendChild(label);
+				fieldset.appendChild(document.createElement("br"));
 
-				self.astewizard.appendChild(checkbox);
-				self.astewizard.appendChild(label);
-				self.astewizard.appendChild(br);
 			});
+
+			var submitButton = document.createElement("input");
+			submitButton.setAttribute("type", "button");
+			submitButton.setAttribute("name", "submit");
+			submitButton.setAttribute("value", "submit");
+
+			fieldset.appendChild(submitButton);
+			fieldset.appendChild(document.createElement("br"));
+
+			this.astewizard.appendChild(fieldset);
 
 			this.astewizard.style.visibility = "visible";
 		}
 
 		this.registerEvent1 = function(orchestrator) {
-			this.astewizard.querySelector("input[type='button'].submit").addEventListener('click', (e) => {
-				var eventfieldset = e.target.closest("fieldset"),
-					valid = true;
-				for (i = 0; i < eventfieldset.elements.length; i++) {
-					if (!eventfieldset.elements[i].checkValidity()) {
-						eventfieldset.elements[i].reportValidity();
-						valid = false;
-						break;
+			this.astewizard.addEventListener('click', (e) => {
+				if (e.target && e.target.matches("input[type='button']")) {
+					var eventfieldset = e.target.closest("fieldset"),
+						valid = true;
+					for (i = 0; i < eventfieldset.elements.length; i++) {
+						if (!eventfieldset.elements[i].checkValidity()) {
+							eventfieldset.elements[i].reportValidity();
+							valid = false;
+							break;
+						}
+					}
+					if (valid) {
+						var self = this;
+						console.log(e.target.closest("form"));
+						var formData = new FormData(e.target.closest("form"));
+						for (var pair of formData.entries()) {
+							console.log(pair[0] + ', ' + pair[1]);
+						}
+						makeCall("POST", 'CreateAsta', e.target.closest("form"),
+							function(req) {
+								if (req.readyState == XMLHttpRequest.DONE) {
+									var message = req.responseText; // error message or mission id
+									if (req.status == 200) {
+										orchestrator.refresh(message);
+									}
+									if (req.status == 403) {
+										window.location.href = req.getResponseHeader("Location");
+										window.sessionStorage.removeItem('username');
+									}
+									else if (req.status != 200) {
+										self.alert.textContent = message;
+										self.reset();
+									}
+								}
+							});
+
 					}
 				}
-				if (valid) {
-					var self = this;
-					makeCall("POST", 'CreateAsta', e.target.closest("form"),
-						function(req) {
-							if (req.readyState == XMLHttpRequest.DONE) {
-								var message = req.responseText; // error message or mission id
-								if (req.status == 200) {
-									orchestrator.refresh(message);
-								}
-								if (req.status == 403) {
-									window.location.href = req.getResponseHeader("Location");
-									window.sessionStorage.removeItem('username');
-								}
-								else if (req.status != 200) {
-									self.alert.textContent = message;
-									self.reset();
-								}
-							}
-						});
-				}
+
 			});
 		}
+
 	}
 
 	/*function AsteWizard(wizardId, alert, arrayArticoli) {
@@ -384,7 +422,139 @@
 
 	}
 
+	function ArticoliWizard(wizardId, alert) {
+		this.wizard = wizardId;
+		this.alert = alert;
 
+		this.registerEvents = function(orchestrator) {
+			this.wizard.querySelector("input[type='submit']").addEventListener('click', (e) => {
+				var eventfieldset = e.target.closest("fieldset"),
+					valid = true;
+				for (i = 0; i < eventfieldset.elements.length; i++) {
+					if (!eventfieldset.elements[i].checkValidity()) {
+						eventfieldset.elements[i].reportValidity();
+						valid = false;
+						break;
+					}
+				}
+				if (valid) {
+					var self = this;
+					makeCall("POST", 'CreateArticolo', e.target.closest("form"),
+						function(req) {
+							if (req.readyState == XMLHttpRequest.DONE) { }
+							var message = req.responseText;
+							if (req.status == 200) {
+								orchestrator.refresh(message);
+							}
+							if (req.status == 403) {
+								window.location.href = req.getResponseHeader("Location");
+								window.sessionStorage.removeItem('username');
+							}
+							else if (req.status != 200) {
+								self.alert.textContent = message;
+								self.reset();
+							}
+						}
+					);
+				}
+			});
+			this.reset = function() {
+				var fieldsets = document.querySelectorAll("#" + this.wizard.id + " fieldset");
+				fieldsets[0].hidden = false;
+				//fieldsets[1].hidden = true;
+				//fieldsets[2].hidden = true;
+			}
+		}
+	}
+
+	function AstaByKeywordForm(astabykeywordformId, alertContainer) {
+		this.astabykeywordformId = astabykeywordformId;
+		this.alert = alertContainer;
+		this.keyword = null;
+
+		this.registerEvent = function(orchestrator) {
+			this.astabykeywordformId.querySelector("input[type='button']").addEventListener('click', (e) => {
+				var self = this;
+				this.keyword = document.getElementById("id_cercaform").elements['parola'].value;
+				console.log(this.keyword);
+				console.log(e.target.closest("form"));
+				var formData = new FormData(e.target.closest("form"));
+				for (var pair of formData.entries()) {
+					console.log(pair[0] + ', ' + pair[1]);
+				}
+				makeCall("POST", 'cercaAstaPerParola', e.target.closest("form"),
+					function(req) {
+						if (req.readyState == XMLHttpRequest.DONE) {
+							var message = req.responseText; // error message or mission id
+							if (req.status == 200) {
+								//salvo la keyword
+								//this.keyword = document.getElementById("keyword").value;
+								var asteKeyword = JSON.parse(req.responseText);
+								//resetta le possibili offerte gia stampate a schermo
+								orchestrator.refresh(message);
+								listaByKeyword.update(asteKeyword);
+							}
+							else {
+								self.alert.textContent = message;
+
+							}
+						}
+					});
+			});
+		};
+
+		this.updateOfferteAfterOffertaCorrect = function() {
+			makeCall("POST", "cercaAstaPerParola?parola=" + this.keyword, null,
+				function(req) {
+					if (req.readyState == XMLHttpRequest.DONE) {
+						var message = req.responseText; // error message or mission id
+						if (req.status == 200) {
+							var asteKeyword = JSON.parse(req.responseText);
+							//resetta le possibili offerte gia stampate a schermo
+							listaByKeyword.update(asteKeyword);
+						}
+						else {
+							self.alert.textContent = message;
+						}
+					}
+				});
+		}
+	}
+
+	function ListAsteByKeyword(listaAsteKeyword, alert, listKeywordContainerBody) {
+		this.alert = alert;
+		this.listaAsteKeyword = listKeywordContainerBody;
+		this.listKeywordContainerBody = listKeywordContainerBody;
+
+		this.reset = function() {
+			this.listaAsteKeyword.style.visibility = "hidden";
+		}
+
+		this.update = function(arrayAsteKeyword) {
+			var row, destcell, datecell, linkcell, anchor;
+			this.listKeywordContainerBody.innerHTML = "";
+			var self = this;
+			arrayAsteKeyword.forEach(function(asta) {
+				destcell = document.createElement("td");
+				destcell.textContent = asta.scad;
+				row.appendChild(destcell);
+
+				destcell = document.createElement("td");
+				destcell.textContent = asta.prezzoIniziale;
+				row.appendChild(destcell);
+
+				destcell = document.createElement("td");
+				destcell.textContent = asta.rialzoMinimo;
+				row.appendChild(destcell);
+
+				destcell = document.createElement("td");
+				destcell.textContent = asta.offertaMax;
+				row.appendChild(destcell);
+				this.listaAsteKeyword.style.visibility = "visible";
+			});
+
+		}
+	}
 
 	function PageOrchestrator() {
 		var alertContainer = document.getElementById("id_alert");
@@ -402,9 +572,9 @@
 				document.getElementById("id_closedlistcontainerbody"),
 				document.getElementById("id_articolicontainer"),
 				document.getElementById("id_articolicontainerbody"),
-				document.getElementById("id_astewizard")
+				document.getElementById("id_astaform")
 			);
-
+			goToVendo.registerEvent1(this);
 			//asteWizard = new AsteWizard(document.getElementById("id_astewizard"), alertContainer, arrayArticoli);
 			//asteWizard.registerEvent1(this);
 
@@ -413,6 +583,18 @@
 				document.getElementById("id_asteaggiudicatecontainer"),
 				document.getElementById("id_asteaggiudicatecontainerbody")
 			);
+
+			articoliWizard = new ArticoliWizard(document.getElementById("id_articoloform"), alertContainer);
+			articoliWizard.registerEvents(this);
+
+			listaByKeyword = new ListAsteByKeyword(
+				document.getElementById("id_listcontainerAsteRicercate"),
+				alertContainer,
+				document.getElementById("id_listcontainerbodyAsteRicercate")
+			)
+
+			astaKeywordForm = new AstaByKeywordForm(document.getElementById("id_cercaform"), alertContainer);
+			astaKeywordForm.registerEvent(this);
 
 			document.querySelector("a[href='Logout']").addEventListener('click', () => {
 				window.sessionStorage.removeItem('username');
@@ -431,6 +613,7 @@
 			goToVendo.reset();
 			goToVendo.show();
 			goToAcquisto.show();
-		}
+			articoliWizard.reset();
+		};
 	}
 };
