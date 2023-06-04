@@ -252,6 +252,9 @@
 			scadenzaInput.setAttribute("type", "text");
 			scadenzaInput.setAttribute("name", "scadenza");
 			scadenzaInput.setAttribute("required", "required");
+			var label1 = document.createElement("label");
+			label1.textContent = "Scadenza: ";
+			fieldset.appendChild(label1);
 			fieldset.appendChild(scadenzaInput);
 			fieldset.appendChild(document.createElement("br"));
 
@@ -261,6 +264,9 @@
 			rialzoMinimoInput.setAttribute("step", "1");
 			rialzoMinimoInput.setAttribute("min", "1");
 			rialzoMinimoInput.setAttribute("required", "required");
+			var label2 = document.createElement("label");
+			label2.textContent = "Rialzo minimo: ";
+			fieldset.appendChild(label2);
 			fieldset.appendChild(rialzoMinimoInput);
 			fieldset.appendChild(document.createElement("br"));
 
@@ -535,24 +541,35 @@
 			this.listKeywordContainerBody.innerHTML = "";
 			var self = this;
 			arrayAsteKeyword.forEach(function(asta) {
+				row = document.createElement("tr");
+				destcell = document.createElement("td");
+				destcell.textContent = asta.idAsta;
+				row.appendChild(destcell);
+
 				destcell = document.createElement("td");
 				destcell.textContent = asta.scad;
 				row.appendChild(destcell);
 
 				destcell = document.createElement("td");
-				destcell.textContent = asta.prezzoIniziale;
+				destcell.textContent = asta.tempoMancante;
 				row.appendChild(destcell);
 
+				destcell = document.createElement("td");
+				destcell.textContent = asta.prezzoIniziale;
+				row.appendChild(destcell);
+				
 				destcell = document.createElement("td");
 				destcell.textContent = asta.rialzoMinimo;
 				row.appendChild(destcell);
-
+				
 				destcell = document.createElement("td");
 				destcell.textContent = asta.offertaMax;
 				row.appendChild(destcell);
-				this.listaAsteKeyword.style.visibility = "visible";
+				
+				
+				self.listKeywordContainerBody.appendChild(row);
 			});
-
+			this.listaAsteKeyword.style.visibility = "visible";
 		}
 	}
 

@@ -56,18 +56,9 @@ public class CreateAsta extends HttpServlet {
 		int[] codici = null;
 		try {
 			try {
-				Part Pscadenza = request.getPart("scadenza");
-				Scanner s = new Scanner(Pscadenza.getInputStream());
-				String scad = s.nextLine();
-				Part PrialzoMinimo = request.getPart("rialzoMinimo");
-				Scanner s1 = new Scanner(PrialzoMinimo.getInputStream());
-				String rialzoMin = s1.nextLine();
-				Part Particoli = request.getPart("articoli");
-				Scanner s2 = new Scanner(Particoli.getInputStream());
-				//String articoli = s.nextLine();
-				System.out.println(scad);
-				System.out.println(rialzoMin);
-				//System.out.println(articoli);
+				System.out.println(request.getParameter("scadenza"));
+				System.out.println(request.getParameter("rialzoMinimo"));
+				codes = request.getParameterValues("articoli");
 				codici = new int[codes.length];
 			} catch (NullPointerException e) {
 				e.printStackTrace();

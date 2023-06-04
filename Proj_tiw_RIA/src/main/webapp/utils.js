@@ -8,6 +8,7 @@ function makeCall(method, url, formElement, cback, reset = true) {
       cback(req)
     }; // closure
     req.open(method, url);
+    req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
     if (formElement == null) {
       req.send();
     } else {
@@ -16,7 +17,7 @@ function makeCall(method, url, formElement, cback, reset = true) {
 						for (var pair of formData.entries()) {
 							console.log(pair[0] + ', ' + pair[1]);
 						}
-      req.send(new FormData(formElement));
+      req.send(new URLSearchParams(new FormData(formElement)));
     }
     if (formElement !== null && reset === true) {
       formElement.reset();
