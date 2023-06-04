@@ -77,9 +77,8 @@ public class FindAstaByWord extends HttpServlet {
 		boolean isBadRequest = false;
 		String parola = null;
 		try {
-			Part Pparola = request.getPart("parola");
-			Scanner s = new Scanner(Pparola.getInputStream());
-			parola = s.nextLine();
+			parola = StringEscapeUtils.escapeJava(request.getParameter("parola"));
+			System.out.println(parola);
 			isBadRequest = parola.isEmpty();
 		} catch (NullPointerException e) {
 			isBadRequest = true;
