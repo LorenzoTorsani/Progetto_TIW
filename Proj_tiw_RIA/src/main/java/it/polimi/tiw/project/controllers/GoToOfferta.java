@@ -19,6 +19,9 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import it.polimi.tiw.project.beans.Articolo;
 import it.polimi.tiw.project.beans.Asta;
 import it.polimi.tiw.project.beans.Offerta;
@@ -35,6 +38,20 @@ public class GoToOfferta extends HttpServlet{
 
 	public GoToOfferta() {
 		super();
+	}
+	
+	class RispostaJson {
+		private List<Articolo> articoli;
+		private List<Offerta> offerte;
+		Asta asta;
+		Double maxOfferta;
+		
+		public RispostaJson(List<Articolo> articoli, List<Offerta> offerte, Asta asta, Double maxOfferta) {
+			this.articoli = articoli;
+			this.offerte = offerte;
+			this.asta = asta;
+			this.maxOfferta = maxOfferta;
+		}
 	}
 
 	public void init() throws ServletException {
@@ -88,15 +105,14 @@ public class GoToOfferta extends HttpServlet{
 			return;
 		}
 	
+		RispostaJson risposta = new RispostaJson(articoli, offerte, asta, maxOfferta);
 		
-		String path = "/WEB-INF/Offerta.html";
-		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("articoli", articoli);
-		ctx.setVariable("offerte", offerte);
-		ctx.setVariable("maxOfferta", maxOfferta);
-		ctx.setVariable("asta", asta);
-		templateEngine.process(path, ctx, response.getWriter());
+		Gson gson = new GsonBuilder().setDateFormat("yyyy MMM dd").create();
+		String json = gson.toJson(risposta);
+		
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json);
 	}
 	
 	public void destroy() {

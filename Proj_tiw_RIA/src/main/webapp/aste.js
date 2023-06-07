@@ -439,6 +439,8 @@
 
 		}
 	}
+	
+	function ListaArticoliAstaRicercata(_alert, )
 
 	// form per creare un nuovo articolo
 	function ArticoliWizard(wizardId, alert) {
@@ -559,6 +561,11 @@
 			var self = this;
 			arrayAsteKeyword.forEach(function(asta) {
 				row = document.createElement("tr");
+				
+				destcell = document.createElement("td");
+				destcell.textContent = "";
+				row.appendChild(destcell);
+				
 				destcell = document.createElement("td");
 				destcell.textContent = asta.idAsta;
 				row.appendChild(destcell);
@@ -586,7 +593,16 @@
 					destcell.textContent = asta.offertaMax;
 				}
 				row.appendChild(destcell);
-
+				
+				linkcell = document.createElement("td");
+				anchor = document.createElement("a");
+				linkcell.appendChild(anchor);
+				linkText = document.createTextNode("Fai offerta");
+				anchor.appendChild(linkText);
+				anchor.setAttribute('idasta', asta.idAsta);
+				anchor.addEventListener("click", (e) => {
+					//TODO finire
+				})
 
 				self.listKeywordContainerBody.appendChild(row);
 			});
