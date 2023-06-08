@@ -514,7 +514,7 @@
 		}
 	}
 	
-	function ListaArticoliAstaRicercata(_alert, )
+	// function ListaArticoliAstaRicercata(_alert, )
 
 	// form per creare un nuovo articolo
 	function ArticoliWizard(wizardId, alert) {
