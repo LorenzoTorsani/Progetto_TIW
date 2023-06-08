@@ -14,7 +14,8 @@
 	}, false);
 
 	// carica la pagina vendo
-	function GoToVendo(_alert, _openlistcontainer, _openlistcontainerbody, _closedlistcontainer, _closedlistcontainerbody, _articolicontainer, _articolicontainerbody, _astewizard) {
+	function GoToVendo(_alert, _openlistcontainer, _openlistcontainerbody, _closedlistcontainer, _closedlistcontainerbody,
+		_articolicontainer, _articolicontainerbody, _astewizard, _detailcontainer, _detailcontainerbody) {
 		this.alert = _alert;
 		this.openlistcontainer = _openlistcontainer;
 		this.openlistcontainerbody = _openlistcontainerbody;
@@ -22,7 +23,9 @@
 		this.closedlistcontainerbody = _closedlistcontainerbody;
 		this.articolicontainer = _articolicontainer;
 		this.articolicontainerbody = _articolicontainerbody;
-		this.astewizard = _astewizard;
+		this.astewizard = _astewizard,
+			this.detailcontainer = _detailcontainer,
+			this.detailcontainerbody = _detailcontainerbody;
 
 		var now = new Date(),
 			formattedDate = now.toISOString().substring(0, 10);
@@ -128,12 +131,12 @@
 				anchor.appendChild(linkText);
 				// make list item clickable
 				anchor.setAttribute('asta_id', asta.idAsta);
-				anchor.addEventListener("click", (e) => {
+				anchor.addEventListener("click", () => {
 					// quando clicco chiudo e aggiorno
-					listaAsteChiuse.reset();
-					listaAsteAperte.reset();
-					listaAsteAperte.close(e.target.getAttribute("asta_id"));
-
+					//	listaAsteChiuse.reset();
+					//	listaAsteAperte.reset();
+					//	listaAsteAperte.close(e.target.getAttribute("asta_id"));
+					self.showDettagliAsta(asta.idAsta);
 				}, false);
 				anchor.href = "#";
 				row.appendChild(linkcell);
@@ -209,7 +212,7 @@
 
 		// mostra la lista degli articoli di un utente
 		this.updateArticoli = function(arrayArticoli) {
-			var row, destcell, datecell, linkcell, anchor, linkText;
+			var row, destcell, linkcell;
 			var self = this;
 			this.articolicontainerbody.innerHTML = "";
 
@@ -238,7 +241,6 @@
 					destcell.textContent = "non venduto";
 
 				}
-
 				row.appendChild(destcell);
 
 				// Crea una cella con l'immagine
@@ -255,6 +257,78 @@
 
 			this.articolicontainer.style.visibility = "visible";
 		}
+
+		this.showDettagliAsta = function(_idAsta, next) {
+			var self = this;
+			this.idAsta = _idAsta;
+			makeCall("GET", "GoToDettaglioAsta?idAsta=" + this.idAsta, null,
+				function(req) {
+					if (req.readyState == 4) {
+						var message = req.responseText;
+						if (req.status == 200) {
+							var dettagli = JSON.parse(req.responseText);
+							if (dettagli.length == 0) {
+								self.alert.textContent = "Offerte non disponibili";
+								return;
+							}
+							self.updateDettagliAsta(dettagli); // self visible by closure
+							if (next) next(); // show the default element of the list if present
+
+						} else if (req.status == 403) {
+							window.location.href = req.getResponseHeader("Location");
+							window.sessionStorage.removeItem('username');
+						}
+						else {
+							self.alert.textContent = message;
+						}
+					}
+				}
+			)
+
+		}
+
+		this.updateDettagliAsta = function(offerte) {
+			var row, destcell;
+			var self = this;
+			this.articolicontainerbody.innerHTML = "";
+
+			if (this.detailcontainer.style.display == "block") {
+				this.detailcontainer.style.display = "none";
+				return;
+			}
+
+			offerte.forEach(function(offerta) {
+				// Verifica se la riga esiste già
+				var existingRow = Array.from(self.detailcontainerbody.children).find(function(row) {
+					var offerenteCell = row.querySelector("td:nth-child(1)");
+					var offertaCell = row.querySelector("td:nth-child(2)");
+					var dataCell = row.querySelector("td:nth-child(3)");
+					return (
+						offerenteCell.textContent == offerta.offerente &&
+						offertaCell.textContent == offerta.offerta &&
+						dataCell.textContent == offerta.data
+					);
+				});
+
+				if (!existingRow) {
+					row = document.createElement("tr");
+					destcell = document.createElement("td");
+					destcell.textContent = offerta.offerente;
+					row.appendChild(destcell);
+					destcell = document.createElement("td");
+					destcell.textContent = offerta.offerta;
+					row.appendChild(destcell);
+					destcell = document.createElement("td");
+					destcell.textContent = offerta.data;
+					row.appendChild(destcell);
+
+					self.detailcontainerbody.appendChild(row);
+				}
+			});
+
+			this.detailcontainer.style.display = "block";
+		}
+
 
 		// form per creare un'asta
 		this.updateAsteWizard = function(arrayArticoli) {
@@ -608,7 +682,9 @@
 				document.getElementById("id_closedlistcontainerbody"),
 				document.getElementById("id_articolicontainer"),
 				document.getElementById("id_articolicontainerbody"),
-				document.getElementById("id_astaform")
+				document.getElementById("id_astaform"),
+				document.getElementById("id_detailcontainer"),
+				document.getElementById("id_detailcontainerbody")
 			);
 			goToVendo.registerEvent1(this);
 

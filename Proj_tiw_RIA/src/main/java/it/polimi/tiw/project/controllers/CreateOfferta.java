@@ -90,7 +90,7 @@ public class CreateOfferta extends HttpServlet{
 			}
 			else {
 				off = astaDAO.findAstaById(idAsta).getPrezzoIniziale();
-				if(offerta <= off + astaDAO.findAstaById(idAsta).getRialzoMinimo()) {
+				if(offerta < off + astaDAO.findAstaById(idAsta).getRialzoMinimo()) {
 					error = true;
 				}
 				else {

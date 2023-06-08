@@ -87,7 +87,6 @@ public class GoToOfferta extends HttpServlet{
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Impossibile ricevere articoli");
 			return;
 		}
-	
 		
 		String path = "/WEB-INF/Offerta.html";
 		ServletContext servletContext = getServletContext();

@@ -10,8 +10,7 @@
 </head>
 <body>
 	<div align="right">
-		<a href="Logout">Logout</a>
-		<a href="#" id="id_gotoAcquisto">Acquisto</a>
+		<a href="Logout">Logout</a> <a href="#" id="id_gotoAcquisto">Acquisto</a>
 		<a href="#" id="id_gotoVendita">Vendita</a>
 	</div>
 	<div id="id_alert" class="alertmessage"></div>
@@ -33,7 +32,7 @@
 
 					<p>
 						<input type="hidden" name="astaid"> <input type="button"
-							name="submit" value="submit">
+							name="submit" value="Crea asta">
 					</p>
 				</fieldset>
 			</form>
@@ -41,28 +40,50 @@
 
 		<p>Le tue aste:</p>
 
-		<table class="tableList" id="id_openlistcontainer">
-			<caption>Le tue aste aperte:</caption>
+		<table>
+			<tr>
+				<td>
+					<table class="tableList" id="id_openlistcontainer">
+						<caption>Le tue aste aperte:</caption>
 
-			<thead>
-				<tr>
-					<th>Id</th>
-					<th>Scadenza</th>
-					<th>Tempo rimanente</th>
-					<th>Prezzo iniziale</th>
-					<th>Rialzo minimo</th>
-					<th>Offerta massima</th>
-					<th>Link</th>
-					<th>Codici articoli</th>
-					<th>Nome articoli</th>
-				</tr>
-			</thead>
-			<tbody id="id_openlistcontainerbody">
-			</tbody>
+						<thead>
+							<tr>
+								<th>Id</th>
+								<th>Scadenza</th>
+								<th>Tempo rimanente</th>
+								<th>Prezzo iniziale</th>
+								<th>Rialzo minimo</th>
+								<th>Offerta massima</th>
+								<th>Link</th>
+								<th>Codici articoli</th>
+								<th>Nome articoli</th>
+							</tr>
+						</thead>
+						<tbody id="id_openlistcontainerbody">
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table class="tableList" id="id_detailcontainer" hidden="hidden">
+						<thead>
+							<tr>
+								<th>Offerente</th>
+								<th>Offerta</th>
+								<th>Data e ora</th>
+							</tr>
+						</thead>
+						<tbody id="id_detailcontainerbody">
+
+						</tbody>
+					</table>
+				</td>
+			</tr>
 		</table>
 
 		<br>
-		
+
 		<table class="tableList" id="id_closedlistcontainer">
 			<caption>Le tue aste chiuse:</caption>
 
