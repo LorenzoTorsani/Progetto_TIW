@@ -186,21 +186,139 @@
 		</form>
 		<br>
 
-
+		<table class="tableList id="asteRicercateMacrotable">
+			<tr>
+				<td>
+					<table class="tableList" id="id_listcontainerAsteRicercate">
+						<thead>
+							<tr>
+								<td>
+								<th>Id</th>
+								<th>Scadenza</th>
+								<th>Tempo rimanente</th>
+								<th>Prezzo iniziale</th>
+								<th>Rialzo minimo</th>
+								<th>Offerta massima</th>
+								<th>Fai offerta</th>
+								</td>
+							</tr>
+						</thead>
+						<tbody id="id_listcontainerbodyAsteRicercate">
+						</tbody>
+					</table>
+				</td>
+				<td>
+					<table class="tableList" id="makeOfferTable">
+						<tr>
+							<td>
+								<table class="tableList" id="articoliAstaOfferta">
+									<caption>Articoli nell'asta</caption>
+									<thead>
+										<tr>
+											<th>Codice</th>
+											<th>Nome</th>
+											<th>Descrizione</th>
+											<th>Prezzo</th>
+											<th>Immagine</th>
+										</tr>
+									</thead>
+									<tbody id="articoliAstaOffertaBody"></tbody>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<table class="tableList" id="offerteAstaOfferta">
+									<caption>Offerte ricevute</caption>
+									<thead>
+										<tr>
+											<th>Offerente</th>
+											<th>Quantita' offerta</th>
+											<th>Data e ora</th>
+										</tr>
+									</thead>
+									<tbody id="offerteAstaOffertaBody"></tbody>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<form id="makeOfferta" action="#">
+									<fieldset>
+										<input type="number" step="0.01" name="offerta" /> <input
+											type="button" name="Crea offerta" value="offerta">
+									</fieldset>
+								</form>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<!--  
 		<table class="tableList" id="id_listcontainerAsteRicercate">
 			<thead>
 				<tr>
+					<td>
 					<th>Id</th>
 					<th>Scadenza</th>
 					<th>Tempo rimanente</th>
 					<th>Prezzo iniziale</th>
 					<th>Rialzo minimo</th>
 					<th>Offerta massima</th>
+					</td>
+					<td>
+						<table class="tableList" id="makeOfferTable">
+							<tr>
+								<td>
+									<table class="tableList" id="articoliAstaOfferta">
+										<caption>Articoli nell'asta</caption>
+										<thead>
+											<tr>
+												<th>Codice</th>
+												<th>Nome</th>
+												<th>Descrizione</th>
+												<th>Prezzo</th>
+												<th>Immagine</th>
+											</tr>
+										</thead>
+										<tbody id="articoliAstaOffertaBody"></tbody>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<table class="tableList" id="offerteAstaOfferta">
+										<caption>Offerte ricevute</caption>
+										<thead>
+											<tr>
+												<th>Offerente</th>
+												<th>Quantita' offerta</th>
+												<th>Data e ora</th>
+											</tr>
+										</thead>
+										<tbody id="offerteAstaOffertaBody"></tbody>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<form id="makeOfferta" action="#">
+										<fieldset>
+											<input type="number" step="0.01" name="offerta" /> <input
+												type="button" name="Crea offerta" value="offerta">
+										</fieldset>
+									</form>
+								</td>
+							</tr>
+						</table>
+					</td>
 				</tr>
 			</thead>
 			<tbody id="id_listcontainerbodyAsteRicercate">
 			</tbody>
 		</table>
+		-->
 		<hr>
 		<br>
 		<table class="tableList" id="id_asteaggiudicatecontainer">
