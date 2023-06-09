@@ -429,7 +429,10 @@
 									}
 								}
 							});
-
+						if(cookieExistence(sessionStorage.getItem("username"))){
+							/*var oldCookie = getCookieValue(sessionStorage.getItem("username"));
+							updateOldCookie(sessionStorage.getItem("username"), )*/
+						}
 					}
 				}
 
@@ -513,8 +516,6 @@
 
 		}
 	}
-	
-	// function ListaArticoliAstaRicercata(_alert, )
 
 	// form per creare un nuovo articolo
 	function ArticoliWizard(wizardId, alert) {
@@ -620,10 +621,16 @@
 	}
 
 	// mostra lista di aste aperte che contengono la keyword
-	function ListAsteByKeyword(_listaAsteKeyword, _alert, _listKeywordContainerBody) {
+	function ListAsteByKeyword(_listaAsteKeyword, _alert, _listKeywordContainerBody, _makeOfferTable, _articoliAstaOfferta, _articoliAstaOffertaBody, _offerteAstaOfferta, _offerteAstaOffertaBody, _makeOfferta) {
 		this.alert = _alert;
 		this.listaAsteKeyword = _listaAsteKeyword;
 		this.listKeywordContainerBody = _listKeywordContainerBody;
+		this.makeOfferTable = _makeOfferTable;
+		this.articoliAstaOfferta = _articoliAstaOfferta;
+		this.articoliAstaOffertaBody = _articoliAstaOffertaBody;
+		this.offerteAstaOfferta = _offerteAstaOfferta;
+		this.offerteAstaOffertaBody = _offerteAstaOffertaBody;
+		this.makeOfferta = _makeOfferta;
 
 		this.reset = function() {
 			this.listaAsteKeyword.style.visibility = "hidden";
@@ -635,11 +642,11 @@
 			var self = this;
 			arrayAsteKeyword.forEach(function(asta) {
 				row = document.createElement("tr");
-				
+
 				destcell = document.createElement("td");
 				destcell.textContent = "";
 				row.appendChild(destcell);
-				
+
 				destcell = document.createElement("td");
 				destcell.textContent = asta.idAsta;
 				row.appendChild(destcell);
@@ -667,21 +674,161 @@
 					destcell.textContent = asta.offertaMax;
 				}
 				row.appendChild(destcell);
-				
+
 				linkcell = document.createElement("td");
 				anchor = document.createElement("a");
 				linkcell.appendChild(anchor);
 				linkText = document.createTextNode("Fai offerta");
 				anchor.appendChild(linkText);
 				anchor.setAttribute('idasta', asta.idAsta);
-				anchor.addEventListener("click", (e) => {
-					//TODO finire
-				})
-
+				anchor.addEventListener("click", () => {
+					self.showOffertaForm(asta.idAsta);
+				}, false);
+				anchor.href = "#";
+				row.appendChild(linkcell);
 				self.listKeywordContainerBody.appendChild(row);
 			});
 			this.listaAsteKeyword.style.visibility = "visible";
 		}
+
+		this.showOffertaForm = function(_idAsta, next) {
+			var self = this;
+			this.idAsta = _idAsta;
+			makeCall("GET", "GoToOfferta?idasta=" + this.idAsta, null,
+				function(req) {
+					if (req.readyState == 4) {
+						var message = req.responseText;
+						if (req.status == 200) {
+							var rispostaJson = JSON.parse(req.responseText);
+							if (rispostaJson.length == 0) {
+								self.alert.textContent = "Offerte non disponibili";
+								return;
+							}
+							self.updateOffertaForm(rispostaJson);
+							if (next) next();
+						} else if (req.status == 403) {
+							window.location.href = req.getResponseHeader("Location");
+							window.sessionStorage.removeItem('username');
+						} else {
+							self.alert.textContent = message;
+						}
+					}
+				}
+			)
+		}
+
+		this.updateOffertaForm = function(rispostaJson) {
+			var row, destcell;
+			var self = this;
+			this.articoliAstaOffertaBody.innerHTML = "";
+			this.offerteAstaOffertaBody.innerHTML = "";
+
+			if (this.makeOfferTable.style.display == "block") {
+				this.makeOfferTable.style.display = "none";
+				return;
+			}
+			rispostaJson.articoli.forEach(function(articolo) {
+				row = document.createElement("tr");
+				destcell = document.createElement("td");
+				destcell.textContent = articolo.code;
+				row.appendChild(destcell);
+
+				destcell = document.createElement("td");
+				destcell.textContent = articolo.name;
+				row.appendChild(destcell);
+
+				destcell = document.createElement("td");
+				destcell.textContent = articolo.description;
+				row.appendChild(destcell);
+
+				destcell = document.createElement("td");
+				destcell.textContent = articolo.price;
+				row.appendChild(destcell);
+
+				destcell = document.createElement("td");
+				if (articolo.sold) {
+					destcell.textContent = "venduto";
+				} else {
+					destcell.textContent = "non venduto";
+
+				}
+				row.appendChild(destcell);
+
+				// Crea una cella con l'immagine
+				linkcell = document.createElement("td");
+				const img = document.createElement("img");
+				img.src = "/Proj_tiw_RIA/resources/static/images/" + articolo.image;
+				linkcell.appendChild(img);
+				linkcell.classList.add("immagine"); // Aggiungi la classe "immagine" al <td>
+				row.appendChild(linkcell);
+
+
+				self.articoliAstaOffertaBody.appendChild(row);
+			});
+			rispostaJson.offerte.forEach(function(offerta) {
+				row = document.createElement("tr");
+				destcell = document.createElement("td");
+				destcell.textContent = offerta.offerente;
+				row.appendChild(destcell);
+				destcell = document.createElement("td");
+				destcell.textContent = offerta.offerta;
+				row.appendChild(destcell);
+				destcell = document.createElement("td");
+				destcell.textContent = offerta.data;
+				row.appendChild(destcell);
+
+				self.offerteAstaOffertaBody.appendChild(row);
+			});
+			
+			document.getElementById("astaidforofferta").setAttribute("value", rispostaJson.asta.idAsta);
+			
+			this.makeOfferTable.style.display = "block";
+		}
+
+		this.registerEvent = function(orchestrator) {
+			this.makeOfferta.addEventListener("click", (e) => {
+				if (e.target && e.target.matches("input[type='button']")) {
+					var eventfieldset = e.target.closest("fieldset"),
+						valid = true;
+					for (i = 0; i < eventfieldset.elements.length; i++) {
+						if (!eventfieldset.elements[i].checkValidity()) {
+							eventfieldset.elements[i].reportValidity();
+							valid = false;
+							break;
+						}
+					}
+					if (valid) {
+						var self = this;
+						console.log(e.target.closest("form"));
+						var formData = new FormData(e.target.closest("form"));
+						for (var pair of formData.entries()) {
+							console.log(pair[0] + ', ' + pair[1]);
+						}
+						makeCall("POST", "CreateOfferta", e.target.closest("form"),
+							function(req) {
+								if (req.readyState == XMLHttpRequest.DONE) {
+									var message = req.responseText;
+									if (req.status == 200) {
+										orchestrator.refresh(message);
+									}
+									if (req.status == 403) {
+										window.location.href = req.getResponseHeader("Location");
+										window.sessionStorage.removeItem('username');
+									}
+									else if (req.status != 200) {
+										self.alert.textContent = message;
+										self.reset();
+									}
+								}
+							});
+							this.makeOfferTable.style.display = "none";
+							this.update("");
+					}
+				}
+			});
+
+		}
+
 	}
 
 	function ManagerVendo(_alert, _divcontainer) {
@@ -735,13 +882,18 @@
 				document.getElementById("id_asteaggiudicatecontainer"),
 				document.getElementById("id_asteaggiudicatecontainerbody")
 			);
-
 			listaByKeyword = new ListAsteByKeyword(
 				document.getElementById("id_listcontainerAsteRicercate"),
 				this.alertContainer,
-				document.getElementById("id_listcontainerbodyAsteRicercate")
+				document.getElementById("id_listcontainerbodyAsteRicercate"),
+				document.getElementById("makeOfferTable"),
+				document.getElementById("articoliAstaOfferta"),
+				document.getElementById("articoliAstaOffertaBody"),
+				document.getElementById("offerteAstaOfferta"),
+				document.getElementById("offerteAstaOffertaBody"),
+				document.getElementById("makeOfferta")
 			)
-
+			listaByKeyword.registerEvent(this);
 			astaKeywordForm = new AstaByKeywordForm(document.getElementById("id_cercaform"), this.alertContainer);
 			astaKeywordForm.registerEvent(this);
 		}
