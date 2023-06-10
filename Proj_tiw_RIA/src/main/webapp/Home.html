@@ -7,6 +7,7 @@
 	href="css/mystyle.css" />
 <script src="utils.js" charset="utf-8" defer></script>
 <script src="aste.js" charset="utf-8" defer></script>
+<script src="cookie.js" charset="utf-8" defer></script>
 </head>
 <body>
 	<div align="right">
@@ -246,6 +247,76 @@
 								<form id="makeOfferta" action="#">
 									<fieldset>
 									<input type="hidden" name="idAsta" id="astaidforofferta">
+										<input type="number" step="0.01" name="Offerta" /> <input
+											type="button" name="Crea offerta" value="Offerta">
+									</fieldset>
+								</form>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<table class="tableList" id="asteRicercateMacrotablecookies">
+			<tr>
+				<td>
+					<table class="tableList" id="id_listcontainerAsteRicercatecookies">
+						<thead>
+							<tr>
+								<td>
+								<th>Id</th>
+								<th>Scadenza</th>
+								<th>Tempo rimanente</th>
+								<th>Prezzo iniziale</th>
+								<th>Rialzo minimo</th>
+								<th>Offerta massima</th>
+								<th>Fai offerta</th>
+								</td>
+							</tr>
+						</thead>
+						<tbody id="id_listcontainerbodyAsteRicercatecookies">
+						</tbody>
+					</table>
+				</td>
+				<td>
+					<table class="tableList" id="makeOfferTablecookies">
+						<tr>
+							<td>
+								<table class="tableList" id="articoliAstaOffertacookies">
+									<caption>Articoli nell'asta</caption>
+									<thead>
+										<tr>
+											<th>Codice</th>
+											<th>Nome</th>
+											<th>Descrizione</th>
+											<th>Prezzo</th>
+											<th>Immagine</th>
+										</tr>
+									</thead>
+									<tbody id="articoliAstaOffertaBodycookies"></tbody>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<table class="tableList" id="offerteAstaOffertacookies">
+									<caption>Offerte ricevute</caption>
+									<thead>
+										<tr>
+											<th>Offerente</th>
+											<th>Quantita' offerta</th>
+											<th>Data e ora</th>
+										</tr>
+									</thead>
+									<tbody id="offerteAstaOffertaBodycookies"></tbody>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<form id="makeOffertacookies" action="#">
+									<fieldset>
+									<input type="hidden" name="idAsta" id="astaidforoffertacookies">
 										<input type="number" step="0.01" name="Offerta" /> <input
 											type="button" name="Crea offerta" value="Offerta">
 									</fieldset>

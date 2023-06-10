@@ -3,7 +3,9 @@
  */
 function createNewCookie(username, asta_id) {
 	//onde evitare problemi di formattazione
-
+	const d = new Date();
+	d.setTime(d.getTime() + (30 * 24 * 60 * 60 * 1000));
+	let expires = "expires=" + d.toUTCString();
 
 	document.cookie = username.replace(/(\r\n|\n|\r)/gm, "") + "=" + asta_id + ";" + expires + ";" + "path=/ ; Secure";
 }
@@ -69,7 +71,7 @@ function returnLastValueCookie(username) {
 
 	//getta l'ultimo elemento
 
-	var lastNotEmptyValue = arrayCookie.length - 2;
+	var lastNotEmptyValue = arrayCookie[arrayCookie.length - 2];
 
 	return lastNotEmptyValue;
 }/**
