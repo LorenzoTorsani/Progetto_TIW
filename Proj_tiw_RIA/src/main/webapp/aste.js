@@ -273,7 +273,7 @@
 								self.alert.textContent = "Offerte non disponibili";
 								return;
 							}
-							self.updateDettagliAsta(dettagli); // self visible by closure
+							self.updateDettagliAsta(dettagli, _idAsta); // self visible by closure
 							if (next) next(); // show the default element of the list if present
 
 						} else if (req.status == 403) {
@@ -289,7 +289,7 @@
 
 		}
 
-		this.updateDettagliAsta = function(offerte) {
+		this.updateDettagliAsta = function(offerte, idasta) {
 			var row, destcell;
 			var self = this;
 			this.articolicontainerbody.innerHTML = "";
@@ -298,7 +298,7 @@
 				this.detailcontainer.style.display = "none";
 				return;
 			}
-
+			var i = true;
 			offerte.forEach(function(offerta) {
 				// Verifica se la riga esiste già
 				var existingRow = Array.from(self.detailcontainerbody.children).find(function(row) {
@@ -323,7 +323,25 @@
 					destcell = document.createElement("td");
 					destcell.textContent = offerta.data;
 					row.appendChild(destcell);
-
+					if (i) {
+						i = false;
+						destcell = document.createElement("td");
+						var form = document.createElement("form");
+						var fieldset = document.createElement("fieldset");
+						var button = document.createElement("input");
+						button.setAttribute("type", "button");
+						button.setAttribute("value", "chiudi");
+						var hidden = document.createElement("input");
+						hidden.setAttribute("type", "hidden");
+						hidden.setAttribute("name", "idAsta");
+						hidden.setAttribute("value", idasta);
+						button.setAttribute("id", "chiudiastabutton");
+						destcell.appendChild(form);
+						form.appendChild(fieldset);
+						fieldset.appendChild(button);
+						fieldset.appendChild(hidden);
+						row.appendChild(destcell);
+					}
 					self.detailcontainerbody.appendChild(row);
 				}
 			});
@@ -393,6 +411,46 @@
 			this.astewizard.appendChild(fieldset);
 
 			this.astewizard.style.visibility = "visible";
+		}
+
+		this.registerEvent2 = function(orchestrator) {
+			this.detailcontainerbody.addEventListener("click", (e) => {
+				if (e.target && e.target.matches("input[type='button']")) {
+					var eventfieldset = e.target.closest("fieldset"),
+						valid = true;
+					for (i = 0; i < eventfieldset.elements.length; i++) {
+						if (!eventfieldset.elements[i].checkValidity()) {
+							eventfieldset.elements[i].reportValidity();
+							valid = false;
+							break;
+						}
+					}
+					if (valid) {
+						var self = this;
+						console.log(e.target.closest("form"));
+						var formData = new FormData(e.target.closest("form"));
+						for (var pair of formData.entries()) {
+							console.log(pair[0] + ', ' + pair[1]);
+						}
+						makeCall("POST", 'chiudiAsta', e.target.closest("form"),
+							function(req) {
+								if (req.readyState == XMLHttpRequest.DONE) {
+									var message = req.responseText; // error message or mission id
+									if (req.status == 200) {
+										orchestrator.refresh(message);
+									}
+									if (req.status == 403) {
+										window.location.href = req.getResponseHeader("Location");
+										window.sessionStorage.removeItem('username');
+									}
+									else if (req.status != 200) {
+										self.alert.textContent = message;
+									}
+								}
+							});
+					}
+				}
+			});
 		}
 
 		this.registerEvent1 = function(orchestrator) {
@@ -587,6 +645,7 @@
 				for (var pair of formData.entries()) {
 					console.log(pair[0] + ', ' + pair[1]);
 				}
+				document.getElementById("asteRicercateMacrotable").style.display = "block";
 				makeCall("POST", 'cercaAstaPerParola', e.target.closest("form"),
 					function(req) {
 						if (req.readyState == XMLHttpRequest.DONE) {
@@ -1099,7 +1158,7 @@
 				document.getElementById("id_detailcontainerbody")
 			);
 			goToVendo.registerEvent1(this);
-
+			goToVendo.registerEvent2(this);
 			// creazione form per creare articoli
 			articoliWizard = new ArticoliWizard(document.getElementById("id_articoloform"), this.alertContainer);
 			articoliWizard.registerEvents(this);
@@ -1227,6 +1286,7 @@
 			else {
 				this.showAcquisto();
 				document.getElementById("asteRicercateMacrotablecookies").style.display = "block";
+				document.getElementById("asteRicercateMacrotable").style.display = "none";
 			}
 			//this.showVendo();
 			goToVendo.show();

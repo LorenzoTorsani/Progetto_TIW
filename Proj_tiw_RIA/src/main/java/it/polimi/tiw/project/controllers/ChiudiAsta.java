@@ -118,7 +118,7 @@ public class ChiudiAsta extends HttpServlet {
 		String path = ctxpath + "/Vendo";
 		response.sendRedirect(path);
 	}
-
+	
 	public void destroy() {
 		try {
 			ConnectionHandler.closeConnection(connection);
