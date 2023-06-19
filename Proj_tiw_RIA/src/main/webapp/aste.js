@@ -17,7 +17,7 @@
 
 	// carica la pagina vendo
 	function GoToVendo(_alert, _openlistcontainer, _openlistcontainerbody, _closedlistcontainer, _closedlistcontainerbody,
-		_articolicontainer, _articolicontainerbody, _astewizard, _detailcontainer, _detailcontainerbody) {
+		_articolicontainer, _articolicontainerbody, _astewizard, _detailcontainer, _detailcontainerbody, _emptyopenlistcontainer, _emptyclosedlistcontainer, _emptyarticolicontainer) {
 		this.alert = _alert;
 		this.openlistcontainer = _openlistcontainer;
 		this.openlistcontainerbody = _openlistcontainerbody;
@@ -25,9 +25,12 @@
 		this.closedlistcontainerbody = _closedlistcontainerbody;
 		this.articolicontainer = _articolicontainer;
 		this.articolicontainerbody = _articolicontainerbody;
-		this.astewizard = _astewizard,
-			this.detailcontainer = _detailcontainer,
-			this.detailcontainerbody = _detailcontainerbody;
+		this.astewizard = _astewizard;
+		this.detailcontainer = _detailcontainer;
+		this.detailcontainerbody = _detailcontainerbody;
+		this.emptyopenlistcontainer = _emptyopenlistcontainer;
+		this.emptyclosedlistcontainer = _emptyclosedlistcontainer;
+		this.emptyarticolicontainer = _emptyarticolicontainer;
 
 		var now = new Date(),
 			formattedDate = now.toISOString().substring(0, 10);
@@ -49,13 +52,24 @@
 							var asteToShow = JSON.parse(req.responseText);
 							if (asteToShow.asteAperte.length == 0) {
 								self.alert.textContent = "Nessuna asta aperta";
-								return;
+								self.noAsteAperte(true);
 								// TODO togliere il return o gestirlo in un altro modo
+							} else {
+								self.noAsteAperte(false);
 							}
 							if (asteToShow.asteChiuse.length == 0) {
 								self.alert.textContent = "Nessuna asta chiusa";
-								return;
+								self.noAstechiuse(true);
+							} else {
+								self.noAstechiuse(false);
 							}
+							if (asteToShow.articoli.lenght == 0) {
+								self.alert.textContent = "Nessun articolo";
+								self.noArticoli(true);
+							} else {
+								self.noArticoli(true);
+							}
+
 							console.log(window.location.pathname + window.location.search);
 							self.updateAsteAperte(asteToShow.asteAperte, asteToShow.articoli);
 							self.updateAsteChiuse(asteToShow.asteChiuse);
@@ -73,6 +87,36 @@
 				}
 			);
 		};
+
+		this.noAsteAperte = function(blocca) {
+			if (blocca) {
+				this.openlistcontainer.style.display = "none"
+				this.emptyopenlistcontainer.style.display = "block";
+			} else {
+				this.emptyopenlistcontainer.style.display = "none";
+				this.openlistcontainer.style.display = "block"
+			}
+		}
+
+		this.noAstechiuse = function(blocca) {
+			if (blocca) {
+				this.closedlistcontainer.style.display = "none"
+				this.emptyclosedlistcontainer.style.display = "block";
+			} else {
+				this.emptyclosedlistcontainer.style.display = "none";
+				this.closedlistcontainer.style.display = "block"
+			}
+		}
+
+		this.noArticoli = function(blocca) {
+			if (blocca) {
+				this.articolicontainer.style.display = "none"
+				this.emptyarticolicontainer.style.display = "block";
+			} else {
+				this.articolicontainer.style.display = "none";
+				this.closedlistcontainer.style.display = "block"
+			}
+		}
 
 		// mostra lista aste aperte di un utente
 		this.updateAsteAperte = function(arrayAste, arrayArticoli) {
@@ -134,10 +178,6 @@
 				// make list item clickable
 				anchor.setAttribute('asta_id', asta.idAsta);
 				anchor.addEventListener("click", () => {
-					// quando clicco chiudo e aggiorno
-					//	listaAsteChiuse.reset();
-					//	listaAsteAperte.reset();
-					//	listaAsteAperte.close(e.target.getAttribute("asta_id"));
 					self.showDettagliAsta(asta.idAsta);
 				}, false);
 				anchor.href = "#";
@@ -270,8 +310,7 @@
 						if (req.status == 200) {
 							var dettagli = JSON.parse(req.responseText);
 							if (dettagli.length == 0) {
-								self.alert.textContent = "Offerte non disponibili";
-								return;
+
 							}
 							self.updateDettagliAsta(dettagli, _idAsta); // self visible by closure
 							if (next) next(); // show the default element of the list if present
@@ -292,7 +331,7 @@
 		this.updateDettagliAsta = function(offerte, idasta) {
 			var row, destcell;
 			var self = this;
-			this.articolicontainerbody.innerHTML = "";
+			this.detailcontainerbody.innerHTML = "";
 
 			if (this.detailcontainer.style.display == "block") {
 				this.detailcontainer.style.display = "none";
@@ -413,7 +452,7 @@
 			this.astewizard.style.visibility = "visible";
 		}
 
-		this.registerEvent2 = function(orchestrator) {
+		this.registerEvent2 = function(orchestrator, goToVendo) {
 			this.detailcontainerbody.addEventListener("click", (e) => {
 				if (e.target && e.target.matches("input[type='button']")) {
 					var eventfieldset = e.target.closest("fieldset"),
@@ -432,12 +471,14 @@
 						for (var pair of formData.entries()) {
 							console.log(pair[0] + ', ' + pair[1]);
 						}
+						this.detailcontainer.style.display = "none";
 						makeCall("POST", 'chiudiAsta', e.target.closest("form"),
 							function(req) {
 								if (req.readyState == XMLHttpRequest.DONE) {
 									var message = req.responseText; // error message or mission id
 									if (req.status == 200) {
 										orchestrator.refresh(message);
+										goToVendo.show();
 									}
 									if (req.status == 403) {
 										window.location.href = req.getResponseHeader("Location");
@@ -686,7 +727,7 @@
 	}
 
 	// mostra lista di aste aperte che contengono la keyword
-	function ListAsteByKeyword(_listaAsteKeyword, _alert, _listKeywordContainerBody, _makeOfferTable, _articoliAstaOfferta, _articoliAstaOffertaBody, _offerteAstaOfferta, _offerteAstaOffertaBody, _makeOfferta) {
+	function ListAsteByKeyword(_listaAsteKeyword, _alert, _listKeywordContainerBody, _makeOfferTable, _articoliAstaOfferta, _articoliAstaOffertaBody, _offerteAstaOfferta, _offerteAstaOffertaBody, _makeOfferta, _asteAggiudicate) {
 		this.alert = _alert;
 		this.listaAsteKeyword = _listaAsteKeyword;
 		this.listKeywordContainerBody = _listKeywordContainerBody;
@@ -696,6 +737,7 @@
 		this.offerteAstaOfferta = _offerteAstaOfferta;
 		this.offerteAstaOffertaBody = _offerteAstaOffertaBody;
 		this.makeOfferta = _makeOfferta;
+		this.asteAggiudicate = _asteAggiudicate;
 
 		this.reset = function() {
 			this.listaAsteKeyword.style.visibility = "hidden";
@@ -762,6 +804,7 @@
 				self.listKeywordContainerBody.appendChild(row);
 			});
 			this.listaAsteKeyword.style.visibility = "visible";
+			this.asteAggiudicate.style.visibility = "visible";
 		}
 
 		this.showOffertaForm = function(_idAsta, next) {
@@ -889,8 +932,8 @@
 										window.sessionStorage.removeItem('username');
 									}
 									else if (req.status != 200) {
-										self.alert.textContent = message;
-										self.reset();
+										// self.alert.textContent = message;
+										alert("Errore creazione offerta");
 									}
 								}
 							});
@@ -1155,10 +1198,13 @@
 				document.getElementById("id_articolicontainerbody"),
 				document.getElementById("id_astaform"),
 				document.getElementById("id_detailcontainer"),
-				document.getElementById("id_detailcontainerbody")
+				document.getElementById("id_detailcontainerbody"),
+				document.getElementById("id_emptyopenlistcontainer"),
+				document.getElementById("id_emptyclosedlistcontainer"),
+				document.getElementById("id_emptyarticolicontainer")
 			);
 			goToVendo.registerEvent1(this);
-			goToVendo.registerEvent2(this);
+			goToVendo.registerEvent2(this, goToVendo);
 			// creazione form per creare articoli
 			articoliWizard = new ArticoliWizard(document.getElementById("id_articoloform"), this.alertContainer);
 			articoliWizard.registerEvents(this);
@@ -1199,7 +1245,8 @@
 				document.getElementById("articoliAstaOffertaBody"),
 				document.getElementById("offerteAstaOfferta"),
 				document.getElementById("offerteAstaOffertaBody"),
-				document.getElementById("makeOfferta")
+				document.getElementById("makeOfferta"),
+				document.getElementById("id_asteaggiudicatecontainer")
 			)
 			listAsteCookies = new ListAsteCookies(
 				document.getElementById("id_listcontainerAsteRicercatecookies"),
@@ -1215,7 +1262,6 @@
 			listAsteCookies.registerEvent(this);
 			listAsteCookies.show();
 			listaByKeyword.registerEvent(this);
-			document.getElementById("asteRicercateMacrotablecookies").style.display = "none";
 			astaKeywordForm = new AstaByKeywordForm(document.getElementById("id_cercaform"), this.alertContainer);
 			astaKeywordForm.registerEvent(this);
 		}
@@ -1279,7 +1325,6 @@
 			alertContainer.textContent = "";
 			goToVendo.reset();
 			goToAcquisto.reset();
-			// all'inizio viene visualizzata la pagina vendo
 			if (returnLastValueCookie(sessionStorage.getItem("username")) === "vendo") {
 				this.showVendo();
 			}
@@ -1287,8 +1332,8 @@
 				this.showAcquisto();
 				document.getElementById("asteRicercateMacrotablecookies").style.display = "block";
 				document.getElementById("asteRicercateMacrotable").style.display = "none";
+				document.getElementById("makeOfferTablecookies").style.display = "none";
 			}
-			//this.showVendo();
 			goToVendo.show();
 			goToAcquisto.show();
 

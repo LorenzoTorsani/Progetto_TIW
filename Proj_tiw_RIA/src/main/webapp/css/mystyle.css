@@ -1,90 +1,13 @@
-/* Reset default margin and padding */
-body, h1, h2, h3, h4, h5, h6, p, table, td, th, input, select, textarea {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f2f2f2;
-  padding: 20px;
-}
-
-a {
-  text-decoration: none;
-  color: #000;
-}
-
-.container {
-  max-width: 960px;
-  margin: 0 auto;
-}
-
-/* Page header */
-h1 {
-  font-size: 28px;
-  margin-bottom: 20px;
-}
-
-/* Navigation bar */
-.navbar {
-  text-align: right;
-  margin-bottom: 20px;
-}
-
-.navbar a {
-  margin-left: 10px;
-}
-
-/* Form styles */
-form {
-  margin-bottom: 20px;
-}
-
-fieldset {
-  margin-bottom: 10px;
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-
-input[type="text"],
-input[type="number"],
-input[type="file"] {
-  width: 100%;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-input[type="submit"],
-input[type="button"] {
-  padding: 8px 16px;
-  background-color: #4caf50;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-input[type="submit"]:hover,
-input[type="button"]:hover {
-  background-color: #45a049;
-}
-
 /* Table styles */
 .tableList {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate; /* Aggiunto per separare le celle della tabella */
+  border-spacing: 0; /* Aggiunto per rimuovere lo spazio tra le celle */
 }
 
-.tableList th,
-.tableList td {
+.tableList th, .tableList td {
   padding: 8px;
+  border: 1px solid #ccc; /* Aggiunto bordo a tutte le celle della tabella */
 }
 
 .tableList th {
@@ -101,28 +24,20 @@ input[type="button"]:hover {
   margin-bottom: 10px;
 }
 
-.alertmessage {
-  padding: 10px;
-  background-color: #f44336;
-  color: #fff;
-  margin-bottom: 20px;
-}
-
-/* Image styles */
-.img-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.img-container img {
-  max-width: 100px;
-  max-height: 100px;
-  width: auto;
-  height: auto;
-}
-
-/* Other styles */
-#vendo {
-  margin-bottom: 30px;
+/* Remove border from other elements */
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+table,
+td,
+th,
+select,
+textarea,
+a {
+  border: none; /* Rimuove il contorno da tutti gli elementi */
 }
