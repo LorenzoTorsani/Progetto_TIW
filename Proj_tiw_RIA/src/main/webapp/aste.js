@@ -17,7 +17,8 @@
 
 	// carica la pagina vendo
 	function GoToVendo(_alert, _openlistcontainer, _openlistcontainerbody, _closedlistcontainer, _closedlistcontainerbody,
-		_articolicontainer, _articolicontainerbody, _astewizard, _detailcontainer, _detailcontainerbody, _emptyopenlistcontainer, _emptyclosedlistcontainer, _emptyarticolicontainer, _emptydetailcontainer) {
+		_articolicontainer, _articolicontainerbody, _astewizard, _detailcontainer, _detailcontainerbody, _emptyopenlistcontainer, 
+		_emptyclosedlistcontainer, _emptyarticolicontainer, _emptydetailcontainer, _emptydetailtable, _emptydetailcontainerbody) {
 		this.alert = _alert;
 		this.openlistcontainer = _openlistcontainer;
 		this.openlistcontainerbody = _openlistcontainerbody;
@@ -32,6 +33,8 @@
 		this.emptyclosedlistcontainer = _emptyclosedlistcontainer;
 		this.emptyarticolicontainer = _emptyarticolicontainer;
 		this.emptydetailcontainer = _emptydetailcontainer;
+		this.emptydetailtable = _emptydetailtable;
+		this.emptydetailcontainerbody = _emptydetailcontainerbody;
 
 		var now = new Date(),
 			formattedDate = now.toISOString().substring(0, 10);
@@ -51,19 +54,17 @@
 						var message = req.responseText;
 						if (req.status == 200) {
 							var asteToShow = JSON.parse(req.responseText);
-							if (asteToShow.asteAperte.length == 0) {
+							if (!asteToShow.asteAperte || asteToShow.asteAperte.length == 0) {
 								self.noAsteAperte(true);
 							} else {
 								self.noAsteAperte(false);
 							}
-							console.log(asteToShow.asteChiuse.lenght);
 
-							if (asteToShow.asteChiuse.length == 0) {
+							if (!asteToShow.asteChiuse || asteToShow.asteChiuse.length == 0) {
 								self.noAstechiuse(true);
 							} else {
 								self.noAstechiuse(false);
 							}
-							console.log(asteToShow.articoli);
 							if (!asteToShow.articoli || asteToShow.articoli.length === 0) {
 								self.noArticoli(true);
 							} else {
@@ -332,16 +333,44 @@
 		this.updateDettagliAsta = function(offerte, idasta) {
 			var row, destcell;
 			var self = this;
+			this.offerte = offerte;
 			this.detailcontainerbody.innerHTML = "";
+			//this.emptydetailcontainerbody.innerHTML = "";
 
 			if (this.detailcontainer.style.display == "block") {
 				this.detailcontainer.style.display = "none";
 				return;
 			}
 
-			if (offerte.lenght == 0) {
-				this.emptydetailcontainer.style.display = "block";
-				this.detailcontainer.style.display = "none";
+			if (!this.offerte || this.offerte.length === 0) {
+				if (this.emptydetailcontainer.style.display == "block") {
+					console.log("if");
+					this.emptydetailcontainer.style.display = "none";
+				} else {
+					console.log("dentro else")
+					this.emptydetailcontainer.style.display = "block";
+					// Aggiungi il bottone al div emptydetailcontainer
+				/*	row = document.createElement("tr");
+					destcell = document.createElement("td");
+					var form = document.createElement("form");
+					var fieldset = document.createElement("fieldset");
+					var button = document.createElement("input");
+					button.setAttribute("type", "button");
+					button.setAttribute("value", "chiudi");
+					var hidden = document.createElement("input");
+					hidden.setAttribute("type", "hidden");
+					hidden.setAttribute("name", "idAsta");
+					hidden.setAttribute("value", idasta);
+					button.setAttribute("id", "chiudiastabutton");
+					destcell.appendChild(form);
+					form.appendChild(fieldset);
+					fieldset.appendChild(button);
+					fieldset.appendChild(hidden);
+					row.appendChild(destcell);
+					self.detailcontainerbody.appendChild(row);
+				}
+				this.emptydetailtable.style.visibility = "visible"; */
+				}
 				return;
 			}
 
@@ -1211,7 +1240,9 @@
 				document.getElementById("id_emptyopenlistcontainer"),
 				document.getElementById("id_emptyclosedlistcontainer"),
 				document.getElementById("id_emptyarticolicontainer"),
-				document.getElementById("id_emptydetailcontainer")
+				document.getElementById("id_emptydetailcontainer"),
+				document.getElementById("id_emptydetailcontainertable"),
+				document.getElementById("id_emptydetailcontainerbody")
 			);
 			goToVendo.registerEvent1(this, goToVendo);
 			goToVendo.registerEvent2(this, goToVendo);
