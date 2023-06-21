@@ -17,7 +17,7 @@
 
 	// carica la pagina vendo
 	function GoToVendo(_alert, _openlistcontainer, _openlistcontainerbody, _closedlistcontainer, _closedlistcontainerbody,
-		_articolicontainer, _articolicontainerbody, _astewizard, _detailcontainer, _detailcontainerbody, _emptyopenlistcontainer, _emptyclosedlistcontainer, _emptyarticolicontainer) {
+		_articolicontainer, _articolicontainerbody, _astewizard, _detailcontainer, _detailcontainerbody, _emptyopenlistcontainer, _emptyclosedlistcontainer, _emptyarticolicontainer, _emptydetailcontainer) {
 		this.alert = _alert;
 		this.openlistcontainer = _openlistcontainer;
 		this.openlistcontainerbody = _openlistcontainerbody;
@@ -31,6 +31,7 @@
 		this.emptyopenlistcontainer = _emptyopenlistcontainer;
 		this.emptyclosedlistcontainer = _emptyclosedlistcontainer;
 		this.emptyarticolicontainer = _emptyarticolicontainer;
+		this.emptydetailcontainer = _emptydetailcontainer;
 
 		var now = new Date(),
 			formattedDate = now.toISOString().substring(0, 10);
@@ -51,24 +52,24 @@
 						if (req.status == 200) {
 							var asteToShow = JSON.parse(req.responseText);
 							if (asteToShow.asteAperte.length == 0) {
-								self.alert.textContent = "Nessuna asta aperta";
 								self.noAsteAperte(true);
-								// TODO togliere il return o gestirlo in un altro modo
 							} else {
 								self.noAsteAperte(false);
 							}
+							console.log(asteToShow.asteChiuse.lenght);
+
 							if (asteToShow.asteChiuse.length == 0) {
-								self.alert.textContent = "Nessuna asta chiusa";
 								self.noAstechiuse(true);
 							} else {
 								self.noAstechiuse(false);
 							}
-							if (asteToShow.articoli.lenght == 0) {
-								self.alert.textContent = "Nessun articolo";
+							console.log(asteToShow.articoli);
+							if (!asteToShow.articoli || asteToShow.articoli.length === 0) {
 								self.noArticoli(true);
 							} else {
-								self.noArticoli(true);
+								self.noArticoli(false);
 							}
+
 
 							console.log(window.location.pathname + window.location.search);
 							self.updateAsteAperte(asteToShow.asteAperte, asteToShow.articoli);
@@ -113,8 +114,8 @@
 				this.articolicontainer.style.display = "none"
 				this.emptyarticolicontainer.style.display = "block";
 			} else {
-				this.articolicontainer.style.display = "none";
-				this.closedlistcontainer.style.display = "block"
+				this.articolicontainer.style.display = "block";
+				this.emptyarticolicontainer.style.display = "none"
 			}
 		}
 
@@ -337,6 +338,13 @@
 				this.detailcontainer.style.display = "none";
 				return;
 			}
+
+			if (offerte.lenght == 0) {
+				this.emptydetailcontainer.style.display = "block";
+				this.detailcontainer.style.display = "none";
+				return;
+			}
+
 			var i = true;
 			offerte.forEach(function(offerta) {
 				// Verifica se la riga esiste già
@@ -494,7 +502,7 @@
 			});
 		}
 
-		this.registerEvent1 = function(orchestrator) {
+		this.registerEvent1 = function(orchestrator, goToVendo) {
 			this.astewizard.addEventListener('click', (e) => {
 				if (e.target && e.target.matches("input[type='button']")) {
 					var eventfieldset = e.target.closest("fieldset"),
@@ -519,6 +527,7 @@
 									var message = req.responseText; // error message or mission id
 									if (req.status == 200) {
 										orchestrator.refresh(message);
+										goToVendo.show();
 									}
 									if (req.status == 403) {
 										window.location.href = req.getResponseHeader("Location");
@@ -1201,9 +1210,10 @@
 				document.getElementById("id_detailcontainerbody"),
 				document.getElementById("id_emptyopenlistcontainer"),
 				document.getElementById("id_emptyclosedlistcontainer"),
-				document.getElementById("id_emptyarticolicontainer")
+				document.getElementById("id_emptyarticolicontainer"),
+				document.getElementById("id_emptydetailcontainer")
 			);
-			goToVendo.registerEvent1(this);
+			goToVendo.registerEvent1(this, goToVendo);
 			goToVendo.registerEvent2(this, goToVendo);
 			// creazione form per creare articoli
 			articoliWizard = new ArticoliWizard(document.getElementById("id_articoloform"), this.alertContainer);
