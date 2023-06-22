@@ -350,6 +350,8 @@
 					console.log("dentro else")
 					this.emptydetailcontainer.style.display = "block";
 					// Aggiungi il bottone al div emptydetailcontainer
+					hidden = document.getElementById("closeastahidden");
+					hidden.setAttribute("value", idasta);
 				/*	row = document.createElement("tr");
 					destcell = document.createElement("td");
 					var form = document.createElement("form");
@@ -488,6 +490,49 @@
 
 			this.astewizard.style.visibility = "visible";
 		}
+		
+		this.registerEvent3 = function(orchestrator, goToVendo) {
+			this.emptydetailcontainer.addEventListener("click", (e) => {
+				if (e.target && e.target.matches("input[type='button']")) {
+					var eventfieldset = e.target.closest("fieldset"),
+						valid = true;
+					for (i = 0; i < eventfieldset.elements.length; i++) {
+						if (!eventfieldset.elements[i].checkValidity()) {
+							eventfieldset.elements[i].reportValidity();
+							valid = false;
+							break;
+						}
+					}
+					if (valid) {
+						var self = this;
+						console.log(e.target.closest("form"));
+						var formData = new FormData(e.target.closest("form"));
+						for (var pair of formData.entries()) {
+							console.log(pair[0] + ', ' + pair[1]);
+						}
+						this.detailcontainer.style.display = "none";
+						makeCall("POST", 'chiudiAsta', e.target.closest("form"),
+							function(req) {
+								if (req.readyState == XMLHttpRequest.DONE) {
+									var message = req.responseText; // error message or mission id
+									if (req.status == 200) {
+										orchestrator.refresh(message);
+										goToVendo.show();
+									}
+									if (req.status == 403) {
+										window.location.href = req.getResponseHeader("Location");
+										window.sessionStorage.removeItem('username');
+									}
+									else if (req.status != 200) {
+										//self.alert.textContent = message;
+										alert("asta non ancora scaduta");
+									}
+								}
+							});
+					}
+				}
+			});
+		}
 
 		this.registerEvent2 = function(orchestrator, goToVendo) {
 			this.detailcontainerbody.addEventListener("click", (e) => {
@@ -522,7 +567,8 @@
 										window.sessionStorage.removeItem('username');
 									}
 									else if (req.status != 200) {
-										self.alert.textContent = message;
+										//self.alert.textContent = message;
+										alert("asta non ancora scaduta");
 									}
 								}
 							});
@@ -563,8 +609,9 @@
 										window.sessionStorage.removeItem('username');
 									}
 									else if (req.status != 200) {
-										self.alert.textContent = message;
-										self.reset();
+										//self.alert.textContent = message;
+										//self.reset();
+										alert("valori parametri incorretti o mancanti");
 									}
 								}
 							});
@@ -690,8 +737,9 @@
 								window.sessionStorage.removeItem('username');
 							}
 							else if (req.status != 200) {
-								self.alert.textContent = message;
-								self.reset();
+								//self.alert.textContent = message;
+								//self.reset();
+								alert("valori parametri incorretti");
 							}
 						}
 					);
@@ -971,7 +1019,7 @@
 									}
 									else if (req.status != 200) {
 										// self.alert.textContent = message;
-										alert("Errore creazione offerta");
+										alert("Offerta non sufficiente");
 									}
 								}
 							});
@@ -1205,8 +1253,9 @@
 										window.sessionStorage.removeItem('username');
 									}
 									else if (req.status != 200) {
-										self.alert.textContent = message;
-										self.reset();
+										//self.alert.textContent = message;
+										//self.reset();
+										alert("Offerta non sufficiente");
 									}
 								}
 							});
@@ -1246,6 +1295,7 @@
 			);
 			goToVendo.registerEvent1(this, goToVendo);
 			goToVendo.registerEvent2(this, goToVendo);
+			goToVendo.registerEvent3(this, goToVendo);
 			// creazione form per creare articoli
 			articoliWizard = new ArticoliWizard(document.getElementById("id_articoloform"), this.alertContainer);
 			articoliWizard.registerEvents(this);

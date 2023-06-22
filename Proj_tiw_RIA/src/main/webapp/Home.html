@@ -81,8 +81,16 @@
 
 						</tbody>
 					</table>
-					<div id="id_emptydetailcontainer" hidden="hidden">Non ci sono offerte.
-					<!-- 	<table class="tableList" id="id_emptydetailcontainertable">
+					<div id="id_emptydetailcontainer" hidden="hidden">
+						Non ci sono offerte.
+						<form action="#">
+							<fieldset>
+								<input id="closeastabutton" type="button" value="chiudi asta">
+								<p id="errormessage"></p>
+								<input type="hidden" name="idAsta" id="closeastahidden">
+							</fieldset>
+						</form>
+						<!-- 	<table class="tableList" id="id_emptydetailcontainertable">
 							<thead>
 							</thead>
 							<tbody id="id_emptydetailcontainerbody">
