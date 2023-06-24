@@ -14,6 +14,8 @@
 		<a href="Logout">Logout</a> <a href="#" id="id_gotoAcquisto">Acquisto</a>
 		<a href="#" id="id_gotoVendita">Vendita</a>
 	</div>
+	<h1>Gestore di aste</h1>
+	<h3 text="" id="welcometext"></h3>
 	<div id="id_alert" class="alertmessage"></div>
 
 	<div id="vendo">
@@ -131,15 +133,15 @@
 				<!--enctype="multipart/form-data"  -->
 				<fieldset>
 					<p>
-						Nome: <input type="text" name="name" required />
+						Nome: <input type="text" name="name"/>
 					</p>
 					<p>
-						Descrizione: <input type="text" name="description" required />
+						Descrizione: <input type="text" name="description"/>
 					</p>
 					<p>
-						Prezzo: <input type="text" name="price" min=0.1 step=0.01 required />
+						Prezzo: <input type="text" name="price" min=0.1 step=0.01/>
 					</p>
-					<input type="file" name="file" required /> <br /> <input
+					<input type="file" name="file"/> <br /> <input
 						type="submit" name="Crea Articolo" />
 				</fieldset>
 			</form>

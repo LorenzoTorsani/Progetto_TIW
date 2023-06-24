@@ -22,3 +22,24 @@ function makeCall(method, url, formElement, cback, reset = true) {
 
   // formElement è il <form> html 
   // FormData è la codifica del form da usare nelle form
+  
+  	function makeCall2(method, url, formElement, cback, reset = true) {
+	    var req = new XMLHttpRequest(); // visible by closure
+	    req.onreadystatechange = function() {
+	      cback(req)
+	    }; // closure
+	    req.open(method, url);
+	    if (formElement == null) {
+	      req.send();
+	    } else {
+			console.log(formElement);
+			var formData = new FormData(formElement);
+						for (var pair of formData.entries()) {
+							console.log(pair[0] + ', ' + pair[1]);
+						}
+	      req.send(new FormData(formElement));
+	    }
+	    if (formElement !== null && reset === true) {
+	      formElement.reset();
+	    }
+	  }

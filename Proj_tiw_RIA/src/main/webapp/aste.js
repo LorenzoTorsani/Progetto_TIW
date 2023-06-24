@@ -676,6 +676,7 @@
 			this.aggiudicatelistcontainerbody.innerHTML = "";
 
 			var self = this;
+			
 			arrayAste.forEach(function(asta) {
 				// console.log(asta);
 				row = document.createElement("tr");
@@ -725,7 +726,7 @@
 				}
 				if (valid) {
 					var self = this;
-					makeCall("POST", 'CreateArticolo', e.target.closest("form"),
+					makeCall2("POST", 'CreateArticolo', e.target.closest("form"),
 						function(req) {
 							if (req.readyState == XMLHttpRequest.DONE) { }
 							var message = req.responseText;
