@@ -81,7 +81,7 @@ public class CreateArticolo extends HttpServlet{
 				return;
 			}
 			fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-			String outputPath = "C:\\Users\\lorif\\git\\Progetto_TIW_RIA\\Proj_tiw_RIA\\src\\main\\resources\\static\\images\\" + fileName;
+			String outputPath = "/Users/simonezacchetti/eclipse-workspace/tiw_ria_nogit/src/main/webapp/resources/static/images/" + fileName;
 			File file = new File(outputPath);
 			try (InputStream fileContent = filePart.getInputStream()) {
 				Files.copy(fileContent, file.toPath());

@@ -702,7 +702,7 @@
 	}
 
 	// form per creare un nuovo articolo
-	function ArticoliWizard(wizardId, alert, articolicontainerbody, astewizard) {
+	function ArticoliWizard(wizardId, alert, articolicontainerbody, astewizard, goToVendo) {
 		this.wizard = wizardId;
 		this.alert = alert;
 
@@ -725,7 +725,7 @@
 							var message = req.responseText;
 							if (req.status == 200) {
 								//orchestrator.refresh(message);
-								//goToVendo.show();
+								this.goToVendo.show();
 								/*makeCall("GET", "Vendo", null,
 									function(req) {
 										if (req.readyState == 4) {
@@ -746,7 +746,7 @@
 									}
 								);*/
 								//orchestrator.refresh();
-								GoToVendo.show();
+								//GoToVendo.show();
 
 							}
 							if (req.status == 403) {
@@ -1430,7 +1430,7 @@
 			goToVendo.registerEvent2(this, goToVendo);
 			goToVendo.registerEvent3(this, goToVendo);
 			// creazione form per creare articoli
-			articoliWizard = new ArticoliWizard(document.getElementById("id_articoloform"), this.alertContainer, document.getElementById("id_articolicontainerbody"), document.getElementById("id_astaform"));
+			articoliWizard = new ArticoliWizard(document.getElementById("id_articoloform"), this.alertContainer, document.getElementById("id_articolicontainerbody"), document.getElementById("id_astaform"), goToVendo);
 			articoliWizard.registerEvents(this);
 		}
 
