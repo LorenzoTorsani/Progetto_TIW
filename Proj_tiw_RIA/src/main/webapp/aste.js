@@ -724,7 +724,7 @@
 							if (req.readyState == XMLHttpRequest.DONE) { }
 							var message = req.responseText;
 							if (req.status == 200) {
-								orchestrator.refresh(message);
+								//orchestrator.refresh(message);
 								//goToVendo.show();
 							}
 							if (req.status == 403) {
@@ -738,13 +738,13 @@
 							}
 						}
 					);
-				}
-				makeCall("GET", "Vendo", null,
+					makeCall("GET", "Vendo", null,
 					function(req) {
 						if (req.readyState == 4) {
 							var message = req.responseText;
 							if (req.status == 200) {
 								var asteToShow = JSON.parse(req.responseText);
+								console.log("nella get post creazione");
 								this.updateArticoli(asteToShow.articoli);
 								this.updateAsteWizard(asteToShow.articoli);
 								if (next) next();
@@ -758,6 +758,8 @@
 						}
 					}
 				);
+				}
+			
 			});
 			this.reset = function() {
 				var fieldsets = document.querySelectorAll("#" + this.wizard.id + " fieldset");
@@ -770,6 +772,7 @@
 			var row, destcell, linkcell;
 			var self = this;
 			this.articolicontainerbody.innerHTML = "";
+			console.log("updating articoli");
 
 			arrayArticoli.forEach(function(articolo) {
 				row = document.createElement("tr");
@@ -815,6 +818,7 @@
 		}
 		
 		this.updateAsteWizard = function(arrayArticoli) {
+			console.log("updating aste wizard");
 			var self = this;
 			this.astewizard.innerHTML = "";
 			var fieldset = document.createElement("fieldset");
