@@ -17,7 +17,7 @@
 
 	// carica la pagina vendo
 	function GoToVendo(_alert, _openlistcontainer, _openlistcontainerbody, _closedlistcontainer, _closedlistcontainerbody,
-		_articolicontainer, _articolicontainerbody, _astewizard, _detailcontainer, _detailcontainerbody, _emptyopenlistcontainer, 
+		_articolicontainer, _articolicontainerbody, _astewizard, _detailcontainer, _detailcontainerbody, _emptyopenlistcontainer,
 		_emptyclosedlistcontainer, _emptyarticolicontainer, _emptydetailcontainer, _emptydetailtable, _emptydetailcontainerbody) {
 		this.alert = _alert;
 		this.openlistcontainer = _openlistcontainer;
@@ -471,7 +471,7 @@
 
 			this.astewizard.style.visibility = "visible";
 		}
-		
+
 		this.registerEvent3 = function(orchestrator, goToVendo) {
 			this.emptydetailcontainer.addEventListener("click", (e) => {
 				if (e.target && e.target.matches("input[type='button']")) {
@@ -618,7 +618,7 @@
 		this.aggiudicatelistcontainer = _aggiudicatelistcontainer;
 		this.aggiudicatelistcontainerbody = _aggiudicatelistcontainerbody;
 		this.emptyasteaggiudicate = _emptyasteaggiudicate;
-		
+
 		this.reset = function() {
 			this.aggiudicatelistcontainer.style.visibility = "hidden";
 
@@ -652,7 +652,7 @@
 				}
 			);
 		};
-		
+
 		this.noAggiudicate = function(blocca) {
 			if (blocca) {
 				this.aggiudicatelistcontainer.style.display = "none"
@@ -669,7 +669,7 @@
 			this.aggiudicatelistcontainerbody.innerHTML = "";
 
 			var self = this;
-			
+
 			arrayAste.forEach(function(asta) {
 				// console.log(asta);
 				row = document.createElement("tr");
@@ -702,7 +702,7 @@
 	}
 
 	// form per creare un nuovo articolo
-	function ArticoliWizard(wizardId, alert) {
+	function ArticoliWizard(wizardId, alert, articolicontainerbody, astewizard) {
 		this.wizard = wizardId;
 		this.alert = alert;
 
@@ -725,6 +725,7 @@
 							var message = req.responseText;
 							if (req.status == 200) {
 								orchestrator.refresh(message);
+								//goToVendo.show();
 							}
 							if (req.status == 403) {
 								window.location.href = req.getResponseHeader("Location");
@@ -738,6 +739,25 @@
 						}
 					);
 				}
+				makeCall("GET", "Vendo", null,
+					function(req) {
+						if (req.readyState == 4) {
+							var message = req.responseText;
+							if (req.status == 200) {
+								var asteToShow = JSON.parse(req.responseText);
+								this.updateArticoli(asteToShow.articoli);
+								this.updateAsteWizard(asteToShow.articoli);
+								if (next) next();
+
+							} else if (req.status == 403) {
+								window.location.href = req.getResponseHeader("Location");
+								window.sessionStorage.removeItem('username');
+							} else {
+								self.alert.textContent = message;
+							}
+						}
+					}
+				);
 			});
 			this.reset = function() {
 				var fieldsets = document.querySelectorAll("#" + this.wizard.id + " fieldset");
@@ -746,6 +766,116 @@
 				//fieldsets[2].hidden = true;
 			}
 		}
+		this.updateArticoli = function(arrayArticoli) {
+			var row, destcell, linkcell;
+			var self = this;
+			this.articolicontainerbody.innerHTML = "";
+
+			arrayArticoli.forEach(function(articolo) {
+				row = document.createElement("tr");
+				destcell = document.createElement("td");
+				destcell.textContent = articolo.code;
+				row.appendChild(destcell);
+
+				destcell = document.createElement("td");
+				destcell.textContent = articolo.name;
+				row.appendChild(destcell);
+
+				destcell = document.createElement("td");
+				destcell.textContent = articolo.description;
+				row.appendChild(destcell);
+
+				destcell = document.createElement("td");
+				destcell.textContent = articolo.price;
+				row.appendChild(destcell);
+
+				destcell = document.createElement("td");
+				if (articolo.sold) {
+					destcell.textContent = "venduto";
+				} else {
+					destcell.textContent = "non venduto";
+
+				}
+				row.appendChild(destcell);
+
+				console.log(articolo.image);
+				// Crea una cella con l'immagine
+				linkcell = document.createElement("td");
+				const img = document.createElement("img");
+				img.src = "/Proj_tiw_RIA/resources/static/images/" + articolo.image;
+				linkcell.appendChild(img);
+				linkcell.classList.add("immagine"); // Aggiungi la classe "immagine" al <td>
+				row.appendChild(linkcell);
+
+
+				self.articolicontainerbody.appendChild(row);
+			});
+
+			this.articolicontainer.style.visibility = "visible";
+		}
+		
+		this.updateAsteWizard = function(arrayArticoli) {
+			var self = this;
+			this.astewizard.innerHTML = "";
+			var fieldset = document.createElement("fieldset");
+			var scadenzaInput = document.createElement("input");
+			scadenzaInput.setAttribute("type", "text");
+			scadenzaInput.setAttribute("name", "scadenza");
+			scadenzaInput.setAttribute("required", "required");
+			var label1 = document.createElement("label");
+			label1.textContent = "Scadenza: ";
+			fieldset.appendChild(label1);
+			fieldset.appendChild(scadenzaInput);
+			fieldset.appendChild(document.createElement("br"));
+
+			var rialzoMinimoInput = document.createElement("input");
+			rialzoMinimoInput.setAttribute("type", "number");
+			rialzoMinimoInput.setAttribute("name", "rialzoMinimo");
+			rialzoMinimoInput.setAttribute("step", "1");
+			rialzoMinimoInput.setAttribute("min", "1");
+			rialzoMinimoInput.setAttribute("required", "required");
+			var label2 = document.createElement("label");
+			label2.textContent = "Rialzo minimo: ";
+			fieldset.appendChild(label2);
+			fieldset.appendChild(rialzoMinimoInput);
+			fieldset.appendChild(document.createElement("br"));
+
+			arrayArticoli.forEach(function(articolo) {
+				if (!articolo.sold) {
+					var checkbox = document.createElement("input");
+					checkbox.setAttribute("type", "checkbox");
+					checkbox.setAttribute("name", "articoli");
+					checkbox.setAttribute("id", articolo.code);
+					checkbox.setAttribute("value", articolo.code);
+
+					if (articolo.idasta != null) {
+						checkbox.setAttribute("disabled", "disabled");
+					}
+
+					var label = document.createElement("label");
+					label.textContent = articolo.name;
+
+					fieldset.appendChild(checkbox);
+					fieldset.appendChild(label);
+					fieldset.appendChild(document.createElement("br"));
+				}
+			});
+
+
+
+			var submitButton = document.createElement("input");
+			submitButton.setAttribute("type", "button");
+			submitButton.setAttribute("name", "submit");
+			submitButton.setAttribute("value", "submit");
+
+			fieldset.appendChild(submitButton);
+			fieldset.appendChild(document.createElement("br"));
+
+			this.astewizard.appendChild(fieldset);
+
+			this.astewizard.style.visibility = "visible";
+		}
+
 	}
 
 	// form per cercare un'asta tramita una parola chiave
@@ -1291,7 +1421,7 @@
 			goToVendo.registerEvent2(this, goToVendo);
 			goToVendo.registerEvent3(this, goToVendo);
 			// creazione form per creare articoli
-			articoliWizard = new ArticoliWizard(document.getElementById("id_articoloform"), this.alertContainer);
+			articoliWizard = new ArticoliWizard(document.getElementById("id_articoloform"), this.alertContainer, document.getElementById("id_articolicontainerbody"), document.getElementById("id_astaform"));
 			articoliWizard.registerEvents(this);
 		}
 
