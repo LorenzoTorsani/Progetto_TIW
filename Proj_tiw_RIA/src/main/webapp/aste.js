@@ -726,6 +726,28 @@
 							if (req.status == 200) {
 								//orchestrator.refresh(message);
 								//goToVendo.show();
+								/*makeCall("GET", "Vendo", null,
+									function(req) {
+										if (req.readyState == 4) {
+											var message = req.responseText;
+											if (req.status == 200) {
+												var asteToShow = JSON.parse(req.responseText);
+												self.updateArticoli(asteToShow.articoli);
+												self.updateAsteWizard(asteToShow.articoli);
+												if (next) next();
+
+											} else if (req.status == 403) {
+												window.location.href = req.getResponseHeader("Location");
+												window.sessionStorage.removeItem('username');
+											} else {
+												self.alert.textContent = message;
+											}
+										}
+									}
+								);*/
+								//orchestrator.refresh();
+								GoToVendo.show();
+
 							}
 							if (req.status == 403) {
 								window.location.href = req.getResponseHeader("Location");
@@ -738,28 +760,9 @@
 							}
 						}
 					);
-					makeCall("GET", "Vendo", null,
-					function(req) {
-						if (req.readyState == 4) {
-							var message = req.responseText;
-							if (req.status == 200) {
-								var asteToShow = JSON.parse(req.responseText);
-								console.log("nella get post creazione");
-								this.updateArticoli(asteToShow.articoli);
-								this.updateAsteWizard(asteToShow.articoli);
-								if (next) next();
 
-							} else if (req.status == 403) {
-								window.location.href = req.getResponseHeader("Location");
-								window.sessionStorage.removeItem('username');
-							} else {
-								self.alert.textContent = message;
-							}
-						}
-					}
-				);
 				}
-			
+
 			});
 			this.reset = function() {
 				var fieldsets = document.querySelectorAll("#" + this.wizard.id + " fieldset");
@@ -768,6 +771,8 @@
 				//fieldsets[2].hidden = true;
 			}
 		}
+
+
 		this.updateArticoli = function(arrayArticoli) {
 			var row, destcell, linkcell;
 			var self = this;
@@ -816,7 +821,7 @@
 
 			this.articolicontainer.style.visibility = "visible";
 		}
-		
+
 		this.updateAsteWizard = function(arrayArticoli) {
 			console.log("updating aste wizard");
 			var self = this;
@@ -1489,6 +1494,7 @@
 		this.refresh = function() {
 			this.alertContainer.textContent = "";
 			goToAcquisto.reset();
+			goToAcquisto.show();
 		}
 
 		this.hide = function() {
