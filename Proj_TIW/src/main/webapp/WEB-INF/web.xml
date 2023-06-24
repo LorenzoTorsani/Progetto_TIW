@@ -10,7 +10,7 @@ version="4.0">
 </context-param>
 <context-param>
     <param-name>outputpath</param-name>
-    <param-value>/Users/simonezacchetti/Desktop/immagini/</param-value>
+    <param-value>/Users/simonezacchetti/git/Progetto_TIW/Proj_tiw_RIA/src/main/webapp/resources/static/images/</param-value>
  </context-param>
   <context-param>
     <param-name>dbUser</param-name>
