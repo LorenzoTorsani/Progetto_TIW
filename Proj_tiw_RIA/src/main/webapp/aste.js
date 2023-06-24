@@ -287,6 +287,7 @@
 				}
 				row.appendChild(destcell);
 
+				console.log(articolo.image);
 				// Crea una cella con l'immagine
 				linkcell = document.createElement("td");
 				const img = document.createElement("img");
@@ -352,26 +353,6 @@
 					// Aggiungi il bottone al div emptydetailcontainer
 					hidden = document.getElementById("closeastahidden");
 					hidden.setAttribute("value", idasta);
-				/*	row = document.createElement("tr");
-					destcell = document.createElement("td");
-					var form = document.createElement("form");
-					var fieldset = document.createElement("fieldset");
-					var button = document.createElement("input");
-					button.setAttribute("type", "button");
-					button.setAttribute("value", "chiudi");
-					var hidden = document.createElement("input");
-					hidden.setAttribute("type", "hidden");
-					hidden.setAttribute("name", "idAsta");
-					hidden.setAttribute("value", idasta);
-					button.setAttribute("id", "chiudiastabutton");
-					destcell.appendChild(form);
-					form.appendChild(fieldset);
-					fieldset.appendChild(button);
-					fieldset.appendChild(hidden);
-					row.appendChild(destcell);
-					self.detailcontainerbody.appendChild(row);
-				}
-				this.emptydetailtable.style.visibility = "visible"; */
 				}
 				return;
 			}
@@ -514,7 +495,7 @@
 						makeCall("POST", 'chiudiAsta', e.target.closest("form"),
 							function(req) {
 								if (req.readyState == XMLHttpRequest.DONE) {
-									var message = req.responseText; // error message or mission id
+									var message = req.responseText; // error message
 									if (req.status == 200) {
 										orchestrator.refresh(message);
 										goToVendo.show();
@@ -557,7 +538,7 @@
 						makeCall("POST", 'chiudiAsta', e.target.closest("form"),
 							function(req) {
 								if (req.readyState == XMLHttpRequest.DONE) {
-									var message = req.responseText; // error message or mission id
+									var message = req.responseText; // error message
 									if (req.status == 200) {
 										orchestrator.refresh(message);
 										goToVendo.show();
@@ -599,7 +580,7 @@
 						makeCall("POST", 'CreateAsta', e.target.closest("form"),
 							function(req) {
 								if (req.readyState == XMLHttpRequest.DONE) {
-									var message = req.responseText; // error message or mission id
+									var message = req.responseText; // error message
 									if (req.status == 200) {
 										orchestrator.refresh(message);
 										goToVendo.show();
@@ -615,11 +596,11 @@
 									}
 								}
 							});
+						// se l'ultima azione fatta è creare un'asta, al login lo riporto su pagina vendo
 						if (cookieExistence(sessionStorage.getItem("username"))) {
 							var oldCookie = getCookieValue(sessionStorage.getItem("username"));
 							updateOldCookie(sessionStorage.getItem("username"), oldCookie + "vendo" + ",");
-						}
-						else {
+						} else {
 							createNewCookie(sessionStorage.getItem("username"), "vendo" + ",");
 						}
 						console.log(getCookieValue(sessionStorage.getItem("username")));
@@ -632,11 +613,12 @@
 	}
 
 	// carica la pagina acquisto
-	function GoToAcquisto(_alertContainer, _aggiudicatelistcontainer, _aggiudicatelistcontainerbody) {
+	function GoToAcquisto(_alertContainer, _aggiudicatelistcontainer, _aggiudicatelistcontainerbody, _emptyasteaggiudicate) {
 		this.alert = _alertContainer;
 		this.aggiudicatelistcontainer = _aggiudicatelistcontainer;
 		this.aggiudicatelistcontainerbody = _aggiudicatelistcontainerbody;
-
+		this.emptyasteaggiudicate = _emptyasteaggiudicate;
+		
 		this.reset = function() {
 			this.aggiudicatelistcontainer.style.visibility = "hidden";
 
@@ -650,9 +632,10 @@
 						var message = req.responseText;
 						if (req.status == 200) {
 							var asteToShow = JSON.parse(req.responseText);
-							if (asteToShow.length == 0) {
-								self.alert.textContent = "Nessuna asta aggiudicata!";
-								return;
+							if (!asteToShow || asteToShow.length == 0) {
+								self.noAggiudicate(true);
+							} else {
+								self.noAggiudicate(false);
 							}
 							// console.log(asteToShow);
 							self.update(asteToShow); // self visible by closure
@@ -669,6 +652,16 @@
 				}
 			);
 		};
+		
+		this.noAggiudicate = function(blocca) {
+			if (blocca) {
+				this.aggiudicatelistcontainer.style.display = "none"
+				this.emptyasteaggiudicate.style.display = "block";
+			} else {
+				this.aggiudicatelistcontainer.style.display = "block";
+				this.emptyasteaggiudicate.style.display = "none"
+			}
+		}
 
 		// creo lista aste aggiudicate
 		this.update = function(arrayAste) {
@@ -777,7 +770,7 @@
 				makeCall("POST", 'cercaAstaPerParola', e.target.closest("form"),
 					function(req) {
 						if (req.readyState == XMLHttpRequest.DONE) {
-							var message = req.responseText; // error message or mission id
+							var message = req.responseText; // error message
 							if (req.status == 200) {
 								//salvo la keyword
 								//this.keyword = document.getElementById("keyword").value;
@@ -1326,7 +1319,8 @@
 			goToAcquisto = new GoToAcquisto(
 				this.alertContainer,
 				document.getElementById("id_asteaggiudicatecontainer"),
-				document.getElementById("id_asteaggiudicatecontainerbody")
+				document.getElementById("id_asteaggiudicatecontainerbody"),
+				document.getElementById("id_emptyasteaggiudicatecontainer")
 			);
 			listaByKeyword = new ListAsteByKeyword(
 				document.getElementById("id_listcontainerAsteRicercate"),
