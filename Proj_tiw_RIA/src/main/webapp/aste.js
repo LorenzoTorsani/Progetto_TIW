@@ -632,11 +632,12 @@
 	}
 
 	// carica la pagina acquisto
-	function GoToAcquisto(_alertContainer, _aggiudicatelistcontainer, _aggiudicatelistcontainerbody) {
+	function GoToAcquisto(_alertContainer, _aggiudicatelistcontainer, _aggiudicatelistcontainerbody, _emptyasteaggiudicate) {
 		this.alert = _alertContainer;
 		this.aggiudicatelistcontainer = _aggiudicatelistcontainer;
 		this.aggiudicatelistcontainerbody = _aggiudicatelistcontainerbody;
-
+		this.emptyasteaggiudicate = _emptyasteaggiudicate;
+		
 		this.reset = function() {
 			this.aggiudicatelistcontainer.style.visibility = "hidden";
 
@@ -650,9 +651,10 @@
 						var message = req.responseText;
 						if (req.status == 200) {
 							var asteToShow = JSON.parse(req.responseText);
-							if (asteToShow.length == 0) {
-								self.alert.textContent = "Nessuna asta aggiudicata!";
-								return;
+							if (!asteToShow || asteToShow.length == 0) {
+								self.noAggiudicate(true);
+							} else {
+								self.noAggiudicate(false);
 							}
 							// console.log(asteToShow);
 							self.update(asteToShow); // self visible by closure
@@ -669,6 +671,16 @@
 				}
 			);
 		};
+		
+		this.noAggiudicate = function(blocca) {
+			if (blocca) {
+				this.aggiudicatelistcontainer.style.display = "none"
+				this.emptyasteaggiudicate.style.display = "block";
+			} else {
+				this.aggiudicatelistcontainer.style.display = "block";
+				this.emptyasteaggiudicate.style.display = "none"
+			}
+		}
 
 		// creo lista aste aggiudicate
 		this.update = function(arrayAste) {
@@ -1325,7 +1337,8 @@
 			goToAcquisto = new GoToAcquisto(
 				this.alertContainer,
 				document.getElementById("id_asteaggiudicatecontainer"),
-				document.getElementById("id_asteaggiudicatecontainerbody")
+				document.getElementById("id_asteaggiudicatecontainerbody"),
+				document.getElementById("id_emptyasteaggiudicatecontainer")
 			);
 			listaByKeyword = new ListAsteByKeyword(
 				document.getElementById("id_listcontainerAsteRicercate"),
